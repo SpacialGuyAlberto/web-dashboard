@@ -1,0 +1,139 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 transition-colors duration-200">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Billing Reports</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">Generate invoice basis reports for subcontractors</p>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="error"
+            class="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <p class="text-red-800 dark:text-red-400">{{ error }}</p>
+        </div>
+
+        <!-- Filters -->
+        <div
+            class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Generate Report</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subcontractor</label>
+                    <select [(ngModel)]="selectedSubcontractorId"
+                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option [ngValue]="null">Select Subcontractor</option>
+                        <option *ngFor="let sub of subcontractors" [ngValue]="sub.id">{{ sub.name }}</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
+                    <input [(ngModel)]="startDate" type="date"
+                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date</label>
+                    <input [(ngModel)]="endDate" type="date"
+                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex items-end">
+                    <button (click)="generateReport()"
+                        class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        Generate Report
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+
+        <!-- Report Results -->
+        <div *ngIf="report && !loading" class="space-y-6">
+            <!-- Summary Card -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ report.subcontractorName }}</h2>
+                    <button (click)="exportCSV()"
+                        class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                        Export CSV
+                    </button>
+                </div>
+
+                <!-- Work Summary -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div
+                        class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
+                        <p class="text-sm text-gray-600 dark:text-blue-200 mb-1">Total Meters</p>
+                        <p class="text-2xl font-bold text-blue-600 dark:text-blue-300">{{ report.totalMeters |
+                            number:'1.2-2' }}m</p>
+                    </div>
+                    <div
+                        class="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-100 dark:border-green-800">
+                        <p class="text-sm text-gray-600 dark:text-green-200 mb-1">Total Hours</p>
+                        <p class="text-2xl font-bold text-green-600 dark:text-green-300">{{ report.totalHours |
+                            number:'1.2-2' }}h</p>
+                    </div>
+                    <div
+                        class="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg border border-purple-100 dark:border-purple-800">
+                        <p class="text-sm text-gray-600 dark:text-purple-200 mb-1">Crossings</p>
+                        <p class="text-2xl font-bold text-purple-600 dark:text-purple-300">{{ report.totalCrossings }}
+                        </p>
+                    </div>
+                    <div
+                        class="bg-orange-50 dark:bg-orange-900/30 p-4 rounded-lg border border-orange-100 dark:border-orange-800">
+                        <p class="text-sm text-gray-600 dark:text-orange-200 mb-1">Rework</p>
+                        <p class="text-2xl font-bold text-orange-600 dark:text-orange-300">{{ report.totalReworkMeters |
+                            number:'1.2-2' }}m</p>
+                    </div>
+                </div>
+
+                <!-- Pricing Breakdown -->
+                <div class="border-t dark:border-gray-700 pt-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Cost Breakdown</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700 dark:text-gray-300">Meters ({{ report.totalMeters |
+                                number:'1.2-2' }}m × €{{ report.pricePerMeter | number:'1.2-2' }})</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">€{{ report.meterCost |
+                                number:'1.2-2' }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700 dark:text-gray-300">Labor ({{ report.totalHours | number:'1.2-2'
+                                }}h × €{{ report.pricePerManHour | number:'1.2-2' }})</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">€{{ report.hourCost |
+                                number:'1.2-2' }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700 dark:text-gray-300">Crossings ({{ report.totalCrossings }} × €{{
+                                report.pricePerCrossing | number:'1.2-2' }})</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">€{{ report.crossingCost |
+                                number:'1.2-2' }}</span>
+                        </div>
+                        <div class="border-t dark:border-gray-700 pt-3 flex justify-between items-center">
+                            <span class="text-lg font-bold text-gray-900 dark:text-white">Total Amount</span>
+                            <span class="text-2xl font-bold text-blue-600 dark:text-blue-400">€{{ report.totalAmount |
+                                number:'1.2-2' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!report && !loading"
+            class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-12 text-center border border-gray-200 dark:border-gray-700">
+            <div class="text-gray-400 dark:text-gray-500 mb-4">
+                <svg class="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Report Generated</h3>
+            <p class="text-gray-500 dark:text-gray-400">Select a subcontractor and date range above to generate a
+                report.</p>
+        </div>
+    </div>
+</div>

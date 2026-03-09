@@ -1,0 +1,204 @@
+<div class="container mx-auto px-4 py-6">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Predicción de Riesgos y Retrasos</h1>
+
+        <div class="flex gap-4">
+            <select [(ngModel)]="selectedProjectId" (change)="onProjectChange()"
+                class="bg-white border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option [ngValue]="null" disabled>Seleccionar Proyecto</option>
+                <option *ngFor="let project of projects" [value]="project.id">
+                    {{ project.name }}
+                </option>
+            </select>
+
+            <button (click)="recalculate()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors">
+                <i class="fas fa-sync-alt"></i> Recalcular Modelos
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="loading" class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+
+    <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6">
+        <span class="block sm:inline">{{ error }}</span>
+    </div>
+
+    <div *ngIf="projectRisk && !loading" class="space-y-6">
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
+                <div class="text-sm text-gray-500 uppercase font-semibold">Tramos Riesgo Alto</div>
+                <div class="mt-2 flex items-baseline">
+                    <span class="text-3xl font-bold text-gray-900">{{ projectRisk.segmentSummary.highRisk }}</span>
+                    <span class="ml-2 text-sm text-gray-600">({{ getRiskPercentage(projectRisk.segmentSummary.highRisk)
+                        }}%)</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
+                <div class="text-sm text-gray-500 uppercase font-semibold">Tramos Riesgo Medio</div>
+                <div class="mt-2 flex items-baseline">
+                    <span class="text-3xl font-bold text-gray-900">{{ projectRisk.segmentSummary.mediumRisk }}</span>
+                    <span class="ml-2 text-sm text-gray-600">({{
+                        getRiskPercentage(projectRisk.segmentSummary.mediumRisk) }}%)</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+                <div class="text-sm text-gray-500 uppercase font-semibold">Tramos Riesgo Bajo</div>
+                <div class="mt-2 flex items-baseline">
+                    <span class="text-3xl font-bold text-gray-900">{{ projectRisk.segmentSummary.lowRisk }}</span>
+                    <span class="ml-2 text-sm text-gray-600">({{ getRiskPercentage(projectRisk.segmentSummary.lowRisk)
+                        }}%)</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+                <div class="text-sm text-gray-500 uppercase font-semibold">Retraso Previsto</div>
+                <div class="mt-2 flex items-baseline">
+                    <span class="text-3xl font-bold text-gray-900">{{ projectRisk.predictedDelayDays }}</span>
+                    <span class="ml-2 text-sm text-gray-600">días</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Risk List -->
+        <div class="space-y-4">
+            <h3 class="text-lg font-semibold text-gray-800">Análisis y Recomendaciones</h3>
+
+            <div *ngFor="let item of riskDetails" class="bg-white rounded-lg shadow p-4 border-l-4" [ngClass]="{
+                    'border-red-500': item.riskLevel === 'HIGH',
+                    'border-yellow-500': item.riskLevel === 'MEDIUM',
+                    'border-green-500': item.riskLevel === 'LOW'
+                }">
+
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-lg">Tramo #{{ item.segmentId }}</h3>
+                            <span class="px-2 py-1 rounded text-xs font-bold"
+                                [ngClass]="getRiskLevelColor(item.riskLevel)">
+                                <!-- Simple translation embedded or could be a pipe -->
+                                <ng-container [ngSwitch]="item.riskLevel">
+                                    <span *ngSwitchCase="'HIGH'">ALTO</span>
+                                    <span *ngSwitchCase="'MEDIUM'">MEDIO</span>
+                                    <span *ngSwitchCase="'LOW'">BAJO</span>
+                                    <span *ngSwitchDefault>{{ item.riskLevel }}</span>
+                                </ng-container>
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-500">Retraso Probable: {{ item.delayProbability | number:'1.0-0' }}
+                            días</p>
+                    </div>
+                    <button (click)="assignCrew(item.segmentId)"
+                        class="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded hover:bg-blue-100">
+                        Ver Tramo
+                    </button>
+                </div>
+
+                <!-- Risk Profile (Dimensions) -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span>Cronograma</span>
+                            <span class="font-bold">{{ (item.scheduleRisk * 100) | number:'1.0-0' }}%</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-blue-500" [style.width.%]="item.scheduleRisk * 100"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span>Permisos</span>
+                            <span class="font-bold">{{ (item.permitRisk * 100) | number:'1.0-0' }}%</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-purple-500" [style.width.%]="item.permitRisk * 100"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span>Rendimiento</span>
+                            <span class="font-bold">{{ (item.performanceRisk * 100) | number:'1.0-0' }}%</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-orange-500" [style.width.%]="item.performanceRisk * 100"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span>Seguridad</span>
+                            <span class="font-bold">{{ (item.safetyRisk * 100) | number:'1.0-0' }}%</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-red-500" [style.width.%]="item.safetyRisk * 100"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span>Calidad</span>
+                            <span class="font-bold">{{ (item.qualityRisk * 100) | number:'1.0-0' }}%</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-indigo-500" [style.width.%]="item.qualityRisk * 100"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span>M. Ambiente</span>
+                            <span class="font-bold">{{ (item.environmentRisk * 100) | number:'1.0-0' }}%</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-green-500" [style.width.%]="item.environmentRisk * 100"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Top Causes -->
+                    <div class="bg-gray-50 p-3 rounded">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase mb-2">Causas Principales</h4>
+                        <ul class="list-disc list-inside text-sm space-y-1">
+                            <li *ngFor="let cause of item.topCauses" class="text-gray-700">
+                                {{ cause }}
+                            </li>
+                            <li *ngIf="!item.topCauses.length" class="text-gray-400 italic">No se identificaron causas
+                                específicas</li>
+                        </ul>
+                    </div>
+
+                    <!-- Recommended Actions -->
+                    <div class="bg-blue-50 p-3 rounded">
+                        <h4 class="text-xs font-bold text-blue-500 uppercase mb-2">Acciones Recomendadas</h4>
+                        <div class="space-y-2">
+                            <div *ngFor="let actionJson of item.recommendedActions" class="flex items-start gap-2">
+                                <div class="mt-1 text-blue-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="font-medium text-gray-800">{{ parseAction(actionJson).label }}</span>
+                                    <span class="text-xs text-gray-500 block">Impacto: {{ parseAction(actionJson).impact
+                                        }}</span>
+                                </div>
+                            </div>
+                            <div *ngIf="!item.recommendedActions.length" class="text-gray-400 italic text-sm">Sin
+                                acciones recomendadas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="riskDetails.length === 0" class="text-center text-gray-500 py-8 bg-white rounded-lg shadow">
+                No hay detalles de riesgo disponibles para este proyecto.
+            </div>
+        </div>
+    </div>
+</div>

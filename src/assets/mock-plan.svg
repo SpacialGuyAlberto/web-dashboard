@@ -1,0 +1,12 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>Layer 1</title>
+  <rect id="svg_1" height="600" width="800" y="0" x="0" fill="#ffffff" opacity="0.8"/>
+  <path stroke="red" id="svg_2" d="m100,300 l600,0" stroke-width="15" fill="none" stroke-dasharray="20,10"/>
+  <text x="350" y="280" font-family="Arial" font-size="24" fill="red" font-weight="bold">GASNETZ LEITUNG DN200</text>
+  <path stroke="blue" id="svg_3" d="m400,100 l0,400" stroke-width="15" fill="none"/>
+  <text x="420" y="200" font-family="Arial" font-size="24" fill="blue" font-weight="bold">WASSER HAUPT DN500</text>
+  <rect x="50" y="50" width="700" height="500" stroke="black" fill="none" stroke-width="5"/>
+  <text x="60" y="90" font-family="Arial" font-size="18">OFFICIAL PLAN: BERLIN MITTE</text>
+ </g>
+</svg>

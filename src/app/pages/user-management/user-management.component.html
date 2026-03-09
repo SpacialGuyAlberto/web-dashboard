@@ -1,0 +1,161 @@
+<div class="space-y-6 animate-fade-in-up">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">User Management</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">Manage platform access and roles.</p>
+        </div>
+        <!-- <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition-colors flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            New User
+        </button> -->
+    </div>
+
+    <!-- Filters & Toolbar -->
+    <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 flex flex-col sm:flex-row gap-4 border border-gray-100 dark:border-gray-700">
+        <div class="relative flex-grow">
+            <input type="text" placeholder="Search users..."
+                class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+        </div>
+
+        <div class="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
+            <button (click)="filterRole = 'ALL'" [class.bg-blue-100]="filterRole === 'ALL'"
+                [class.text-blue-700]="filterRole === 'ALL'"
+                class="px-3 py-1.5 rounded-full text-sm font-medium border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap">
+                All
+            </button>
+            <button (click)="filterRole = 'FIELD_WORKER'" [class.bg-emerald-100]="filterRole === 'FIELD_WORKER'"
+                [class.text-emerald-700]="filterRole === 'FIELD_WORKER'"
+                class="px-3 py-1.5 rounded-full text-sm font-medium border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap flex items-center">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>Workers
+            </button>
+            <button (click)="filterRole = 'PROJECT_MANAGER'" [class.bg-purple-100]="filterRole === 'PROJECT_MANAGER'"
+                [class.text-purple-700]="filterRole === 'PROJECT_MANAGER'"
+                class="px-3 py-1.5 rounded-full text-sm font-medium border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap flex items-center">
+                <span class="w-2 h-2 rounded-full bg-purple-500 mr-2"></span>Managers
+            </button>
+            <button (click)="filterRole = 'ADMIN'" [class.bg-gray-100]="filterRole === 'ADMIN'"
+                [class.text-gray-700]="filterRole === 'ADMIN'"
+                class="px-3 py-1.5 rounded-full text-sm font-medium border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap flex items-center">
+                <span class="w-2 h-2 rounded-full bg-gray-600 mr-2"></span>Admins
+            </button>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+                        <th
+                            class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            User</th>
+                        <th
+                            class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Role & Info</th>
+                        <th
+                            class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Status</th>
+                        <th
+                            class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                    <tr *ngFor="let user of getFilteredUsers()"
+                        class="group hover:bg-blue-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <div
+                                    class="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                    {{ getInitials(user) }}
+                                </div>
+                                <div class="ml-4">
+                                    <a [routerLink]="['/users', user.id]"
+                                        class="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer block">
+                                        {{ user.firstName }} {{ user.lastName }}
+                                    </a>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</div>
+                                    <div *ngIf="user.isSubcontractor" class="mt-1">
+                                        <span
+                                            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">
+                                            Subcontractor
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="space-y-2">
+                                <span [ngClass]="getRoleBadgeClass(user.role)"
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border shadow-sm">
+                                    {{ getRoleLabel(user.role) }}
+                                </span>
+
+                                <div *ngIf="user.crewName"
+                                    class="flex items-center text-xs text-gray-600 dark:text-gray-400">
+                                    <span class="mr-1">👷</span> {{ user.crewName }}
+                                </div>
+                                <div *ngIf="user.location"
+                                    class="flex items-center text-xs text-blue-600 dark:text-blue-400">
+                                    <span class="mr-1">📍</span> {{ user.location }}
+                                </div>
+                                <div *ngIf="user.lastActivity"
+                                    class="flex items-center text-xs text-gray-500 dark:text-gray-500 italic">
+                                    <span class="mr-1">🕒</span> {{ user.lastActivity }}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
+                                Active
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div
+                                class="flex justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button class="p-1 text-gray-400 hover:text-blue-500 transition-colors" title="Edit">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <button class="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                    title="Deactivate">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Empty State -->
+                    <tr *ngIf="getFilteredUsers().length === 0">
+                        <td colspan="4" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                            <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <p class="mt-2 text-sm font-medium">No users found with this filter.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

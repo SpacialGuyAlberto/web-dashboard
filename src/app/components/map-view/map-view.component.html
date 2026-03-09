@@ -1,0 +1,36 @@
+<div
+    class="relative w-full h-full min-h-[500px] bg-[#1a1c1e] rounded-xl overflow-hidden shadow-2xl border border-gray-800">
+    <google-map height="600px" width="100%" [center]="center" [zoom]="zoom" [options]="mapOptions"
+        class="block w-full h-full grayscale-[0.3]">
+
+        <!-- Segment Polylines -->
+        <map-polyline *ngFor="let line of polylines" [path]="line.path" [options]="line.options"
+            [title]="line.title"></map-polyline>
+
+        <!-- Segment Markers (Center of project) -->
+        <map-marker *ngFor="let marker of markers" [position]="marker.position" [title]="marker.title"
+            [label]="marker.label"></map-marker>
+
+    </google-map>
+
+    <!-- Map Info Overlay -->
+    <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end pointer-events-none">
+        <div class="bg-gray-900/80 backdrop-blur-md p-3 rounded-lg border border-gray-700 pointer-events-auto">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Network Status</h3>
+            <div class="flex gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#00ff88] shadow-[0_0_8px_#00ff88]"></span>
+                    <span class="text-xs text-white">Low Risk</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#ffcc00] shadow-[0_0_8px_#ffcc00]"></span>
+                    <span class="text-xs text-white">Medium Risk</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#ff0040] shadow-[0_0_8px_#ff0040]"></span>
+                    <span class="text-xs text-white">High Risk</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,194 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Field Crews</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">Manage field deployment teams</p>
+        </div>
+
+        <!-- Crews Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div *ngFor="let crew of crews"
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200 dark:border-gray-700">
+                <!-- Crew Header -->
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ crew.name }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Led by {{ crew.leader }}</p>
+                    </div>
+                    <span [class]="getStatusColor(crew.status)" class="px-3 py-1 rounded-full text-xs font-medium">
+                        {{ getStatusText(crew.status) }}
+                    </span>
+                </div>
+
+                <!-- Crew Details -->
+                <div class="space-y-3 mb-4">
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">👥 Members:</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ crew.members }}</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">📍 Location:</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ crew.location }}</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">🔨 Project:</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ crew.currentProject }}</span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="mt-6 flex gap-2">
+                    <button (click)="openDetailsModal(crew)"
+                        class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                        View Details
+                    </button>
+                    <button (click)="openEditModal(crew)"
+                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Crew Button -->
+        <div class="mt-8">
+            <button (click)="openCreateModal()"
+                class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md">
+                + New Field Crew
+            </button>
+        </div>
+    </div>
+
+    <!-- Create/Edit Crew Modal -->
+    <div *ngIf="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full shadow-xl">
+            <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{{ isEditing ? 'Edit Crew' : 'New Field
+                Crew' }}</h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Crew Name</label>
+                    <input [(ngModel)]="newCrew.name" type="text"
+                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., Alpha Team">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Team Leader</label>
+                    <input [(ngModel)]="newCrew.leader" type="text"
+                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., John Doe">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Number of
+                        Members</label>
+                    <input [(ngModel)]="newCrew.members" type="number" min="1"
+                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., 5">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current
+                        Project</label>
+                    <input [(ngModel)]="newCrew.currentProject" type="text"
+                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., Berlin Fiber Deployment">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
+                    <input [(ngModel)]="newCrew.location" type="text"
+                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., Berlin District 2">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                    <select [(ngModel)]="newCrew.status"
+                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="active">Active</option>
+                        <option value="idle">Idle</option>
+                        <option value="off-duty">Off Duty</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end gap-3">
+                <button (click)="closeCreateModal()"
+                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium">
+                    Cancel
+                </button>
+                <button (click)="saveCrew()"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+                    [disabled]="!newCrew.name">
+                    {{ isEditing ? 'Save Changes' : 'Create Crew' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div *ngIf="showDetailsModal && selectedCrew"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-2xl w-full shadow-xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Crew Details</h2>
+                <button (click)="closeDetailsModal()"
+                    class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
+                    <span class="text-2xl">&times;</span>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Basic Info -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Crew Name</p>
+                        <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ selectedCrew.name }}</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Team Leader</p>
+                        <p class="text-lg font-medium text-gray-900 dark:text-white">{{ selectedCrew.leader }}</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Members</p>
+                        <p class="text-lg font-medium text-gray-900 dark:text-white">{{ selectedCrew.members }} people
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Status</p>
+                        <span [class]="getStatusColor(selectedCrew.status)"
+                            class="px-3 py-1 rounded-full text-sm font-medium inline-block mt-1">
+                            {{ getStatusText(selectedCrew.status) }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Assignment -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Current Assignment</h3>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Project</p>
+                            <p class="text-lg font-medium text-gray-900 dark:text-white">{{ selectedCrew.currentProject
+                                }}</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Location</p>
+                            <p class="text-lg font-medium text-gray-900 dark:text-white">{{ selectedCrew.location }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end">
+                <button (click)="closeDetailsModal()"
+                    class="px-6 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-900 dark:hover:bg-gray-600 font-medium transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

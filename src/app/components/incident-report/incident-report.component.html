@@ -1,0 +1,100 @@
+<div class="bg-white rounded-lg shadow p-6 mt-6">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-gray-900">Incident Management</h3>
+        <button (click)="openModal()"
+            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm font-medium">
+            Report Incident
+        </button>
+    </div>
+
+    <div class="space-y-4">
+        <div *ngFor="let incident of incidents" class="border rounded-lg p-4"
+            [class.border-red-200]="incident.severity === 'CRITICAL'"
+            [class.bg-red-50]="incident.severity === 'CRITICAL'">
+            <div class="flex justify-between items-start">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-gray-900">{{ incident.type }}</span>
+                        <span [class.bg-red-100]="incident.severity === 'CRITICAL' || incident.severity === 'HIGH'"
+                            [class.text-red-800]="incident.severity === 'CRITICAL' || incident.severity === 'HIGH'"
+                            [class.bg-yellow-100]="incident.severity === 'MEDIUM'"
+                            [class.text-yellow-800]="incident.severity === 'MEDIUM'"
+                            [class.bg-blue-100]="incident.severity === 'LOW'"
+                            [class.text-blue-800]="incident.severity === 'LOW'"
+                            class="px-2 py-0.5 rounded text-xs font-medium uppercase">
+                            {{ incident.severity }}
+                        </span>
+                        <span class="text-xs text-gray-500">{{ incident.reportedAt | date:'medium' }}</span>
+                    </div>
+                    <p class="mt-1 text-gray-700">{{ incident.description }}</p>
+                    <div class="mt-2 text-sm text-gray-500">Reported by: {{ incident.reportedBy }}</div>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                    <span [class.bg-green-100]="incident.status === 'RESOLVED'"
+                        [class.text-green-800]="incident.status === 'RESOLVED'"
+                        [class.bg-gray-100]="incident.status === 'OPEN'"
+                        [class.text-gray-800]="incident.status === 'OPEN'" class="px-2 py-1 rounded text-xs font-bold">
+                        {{ incident.status }}
+                    </span>
+                    <button *ngIf="incident.status !== 'RESOLVED'" (click)="resolveIncident(incident)"
+                        class="text-sm text-blue-600 hover:underline">
+                        Mark Resolved
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="incidents.length === 0" class="text-center py-8 text-gray-500">
+            No incidents reported for this segment.
+        </div>
+    </div>
+</div>
+
+<!-- Report Modal -->
+<div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+        <h3 class="text-xl font-bold mb-4 text-gray-900">Report New Incident</h3>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                <select [(ngModel)]="newIncident.type" class="w-full border rounded px-3 py-2">
+                    <option value="BLOCKED">Blocked Access</option>
+                    <option value="WEATHER">Weather Issue</option>
+                    <option value="COMPLAINT">Citizen Complaint</option>
+                    <option value="SAFETY">Safety Violation</option>
+                    <option value="ACCIDENT">Accident</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Severity</label>
+                <select [(ngModel)]="newIncident.severity" class="w-full border rounded px-3 py-2">
+                    <option value="LOW">Low (Info)</option>
+                    <option value="MEDIUM">Medium (Action Required)</option>
+                    <option value="HIGH">High (Urgent)</option>
+                    <option value="CRITICAL">Critical (Stop Work)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea [(ngModel)]="newIncident.description" rows="4" class="w-full border rounded px-3 py-2"
+                    placeholder="Describe what happened..."></textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Reported By</label>
+                <input [(ngModel)]="newIncident.reportedBy" class="w-full border rounded px-3 py-2">
+            </div>
+        </div>
+
+        <div class="mt-6 flex justify-end gap-3">
+            <button (click)="showModal = false" class="px-4 py-2 border rounded hover:bg-gray-50">Cancel</button>
+            <button (click)="submitIncident()"
+                class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium">
+                Submit Report
+            </button>
+        </div>
+    </div>
+</div>

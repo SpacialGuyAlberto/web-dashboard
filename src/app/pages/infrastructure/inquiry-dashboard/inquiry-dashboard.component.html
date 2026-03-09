@@ -1,0 +1,130 @@
+<div class="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Inquiry Management (Leitungsauskunft)
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Coordinate permits with utility providers</p>
+        </div>
+
+        <div class="flex gap-4">
+            <select [(ngModel)]="selectedProjectId" (change)="onProjectChange()"
+                class="bg-white border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option [ngValue]="null" disabled>Select Project</option>
+                <option *ngFor="let project of projects" [ngValue]="project.id">
+                    {{ project.name }}
+                </option>
+            </select>
+
+            <button (click)="generateInquiries()" [disabled]="!selectedProjectId || loading"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                <span *ngIf="loading"
+                    class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                📡 Auto-Detect
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading && inquiries.length === 0" class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+
+    <div *ngIf="!loading || inquiries.length > 0">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <!-- Status Cards -->
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border-l-4 border-yellow-500">
+                <h3 class="text-sm text-gray-500">Pending</h3>
+                <p class="text-2xl font-bold">{{ (inquiries | json).split('PENDING').length - 1 }}</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border-l-4 border-blue-500">
+                <h3 class="text-sm text-gray-500">Sent</h3>
+                <p class="text-2xl font-bold">{{ (inquiries | json).split('SENT').length - 1 }}</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border-l-4 border-green-500">
+                <h3 class="text-sm text-gray-500">Completed</h3>
+                <p class="text-2xl font-bold">{{ (inquiries | json).split('RECEIVED').length - 1 }}</p>
+            </div>
+        </div>
+
+        <!-- Inquiry List -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <tr>
+                        <th class="p-4">Provider</th>
+                        <th class="p-4">Type</th>
+                        <th class="p-4">Status</th>
+                        <th class="p-4">Request Date</th>
+                        <th class="p-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <ng-container *ngFor="let item of inquiries">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                            <td class="p-4 font-medium">{{ item.utilityProvider.name }}</td>
+                            <td class="p-4">
+                                <span
+                                    [ngClass]="{'bg-red-100 text-red-800': item.utilityProvider.type === 'GAS', 'bg-blue-100 text-blue-800': item.utilityProvider.type === 'WATER'}"
+                                    class="px-2 py-1 rounded text-xs font-bold">
+                                    {{ item.utilityProvider.type }}
+                                </span>
+                            </td>
+                            <td class="p-4">
+                                <span [ngClass]="{
+                                'bg-yellow-100 text-yellow-800': item.status === 'PENDING',
+                                'bg-blue-100 text-blue-800': item.status === 'SENT',
+                                'bg-green-100 text-green-800': item.status === 'RECEIVED_CLEAR',
+                                'bg-orange-100 text-orange-800': item.status === 'RECEIVED_CONFLICT'
+                            }" class="px-2 py-1 rounded text-xs uppercase">
+                                    {{ item.status }}
+                                </span>
+                            </td>
+                            <td class="p-4 text-sm text-gray-500">{{ item.requestDate || '-' }}</td>
+                            <td class="p-4 flex gap-2 flex-wrap items-center">
+                                <button *ngIf="item.status === 'PENDING'" (click)="sendStatus(item)"
+                                    class="text-blue-600 hover:underline text-sm">📧 Send Email</button>
+
+                                <button (click)="markReceived(item, false)"
+                                    class="text-green-600 hover:underline text-sm">✅
+                                    No Conflict</button>
+                                <button (click)="markReceived(item, true)"
+                                    class="text-orange-600 hover:underline text-sm">⚠️
+                                    Conflict Found</button>
+
+                                <!-- AI Analysis -->
+                                <div *ngIf="item.status.startsWith('RECEIVED') && !item.analysisResult"
+                                    class="ml-2 inline-block">
+                                    <button (click)="analyze(item)"
+                                        class="bg-purple-100 text-purple-700 hover:bg-purple-200 px-2 py-1 rounded text-xs flex items-center gap-1">
+                                        ✨ Analyze
+                                    </button>
+                                </div>
+
+                                <a *ngIf="item.status === 'RECEIVED_CONFLICT'" href="#"
+                                    class="text-purple-600 hover:underline text-sm flex items-center gap-1 ml-2">
+                                    📄 View Plan
+                                </a>
+                            </td>
+                        </tr>
+                        <!-- Analysis Result Row -->
+                        <tr *ngIf="item.analysisResult">
+                            <td colspan="5" class="bg-purple-50 p-4 border-l-4 border-purple-500">
+                                <div class="font-bold text-purple-600 text-xs uppercase mb-1 flex items-center gap-2">
+                                    <span>🤖 Docu-Bot Analysis</span>
+                                    <span *ngIf="item.analysisStatus === 'PENDING'"
+                                        class="animate-pulse">Analyzing...</span>
+                                </div>
+                                <div class="whitespace-pre-wrap text-gray-700 text-sm">{{ item.analysisResult }}</div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                    <tr *ngIf="inquiries.length === 0">
+                        <td colspan="5" class="p-8 text-center text-gray-500">
+                            No inquiries found. Click "Auto-Detect" to find providers in the area.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>

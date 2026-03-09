@@ -1,0 +1,580 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8 flex justify-between items-center">
+            <div>
+                <button (click)="goBack()" class="text-blue-600 hover:text-blue-800 mb-2 flex items-center gap-2">
+                    ← Back to Projects
+                </button>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ projectName }}</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Manage fiber optic deployment segments</p>
+            </div>
+            <div class="flex gap-3">
+                <button *ngIf="activeTab === 'segments'" (click)="openCreateModal()"
+                    class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md">
+                    + New Segment
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <button (click)="switchTab('segments')" [class.border-blue-500]="activeTab === 'segments'"
+                    [class.text-blue-600]="activeTab === 'segments'"
+                    [class.border-transparent]="activeTab !== 'segments'"
+                    [class.text-gray-500]="activeTab !== 'segments'"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors hover:text-gray-700 dark:hover:text-gray-300">
+                    Segments
+                </button>
+                <button (click)="switchTab('materials')" [class.border-blue-500]="activeTab === 'materials'"
+                    [class.text-blue-600]="activeTab === 'materials'"
+                    [class.border-transparent]="activeTab !== 'materials'"
+                    [class.text-gray-500]="activeTab !== 'materials'"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors hover:text-gray-700 dark:hover:text-gray-300">
+                    Project Materials
+                </button>
+            </nav>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="error"
+            class="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <p class="text-red-800 dark:text-red-400">{{ error }}</p>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+
+        <!-- Segments Grid -->
+        <div *ngIf="!loading && activeTab === 'segments'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div *ngFor="let segment of segments"
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200 dark:border-gray-700">
+                <!-- Segment Header -->
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ segment.streetName }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ segment.streetType }}</p>
+                    </div>
+                    <div class="flex flex-col items-end gap-1">
+                        <span [class]="getStateColor(segment.currentState)"
+                            class="px-3 py-1 rounded-full text-xs font-medium">
+                            {{ getStateText(segment.currentState) }}
+                        </span>
+                        <span *ngIf="segment.volume"
+                            class="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-md text-[10px] font-bold border border-indigo-200">
+                            BIM CERTIFIED
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Segment Details -->
+                <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="font-medium">Work Type:</span>
+                        <span>{{ segment.workType }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-medium">Length:</span>
+                        <span>{{ segment.length }}m</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-medium">Dates:</span>
+                        <span>{{ segment.plannedStartDate }} - {{ segment.plannedEndDate }}</span>
+                    </div>
+                    <div *ngIf="segment.volume"
+                        class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold">
+                        <span class="font-medium">Volume:</span>
+                        <span>{{ segment.volume }} m³</span>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex flex-col gap-2">
+                    <div class="flex gap-2">
+                        <button (click)="openDetailsModal(segment)"
+                            class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                            View Details
+                        </button>
+                        <button (click)="openEditModal(segment)"
+                            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Edit
+                        </button>
+                    </div>
+                    <button (click)="downloadReport(segment.id!)"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg transition-colors text-xs font-bold border border-gray-200 dark:border-gray-600">
+                        <span>📄</span> DOWNLOAD CERTIFIED REPORT (PDF)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Empty State Segments -->
+            <div *ngIf="segments.length === 0" class="col-span-full text-center py-12">
+                <div class="text-gray-400 dark:text-gray-500 mb-4">
+                    <svg class="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
+                        </path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No segments found</h3>
+                <p class="text-gray-500 dark:text-gray-400">Create your first segment to get started</p>
+            </div>
+        </div>
+
+        <!-- Project Materials View -->
+        <div *ngIf="!loading && activeTab === 'materials'"
+            class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700/50">
+                        <tr>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Material</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Allocated Qty</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Unit</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Status</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Supplier</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <tr *ngFor="let material of projectMaterials">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="ml-0">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ material.name
+                                            }}</div>
+                                        <div class="text-sm text-gray-500">{{ material.sku }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-900 dark:text-white font-semibold">
+                                    <!-- Find allocation for this project -->
+                                    {{ material.projectAllocations && material.projectAllocations[0] ?
+                                    material.projectAllocations[0].quantityAllocated : 0 }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ material.unit }}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Available
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ material.supplier?.name || 'N/A' }}
+                            </td>
+                        </tr>
+
+                        <!-- Empty State Materials -->
+                        <tr *ngIf="projectMaterials.length === 0">
+                            <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                No materials allocated to this project yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Segment Modal -->
+    <div *ngIf="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-7xl max-h-[95vh] flex flex-col">
+            <!-- Header -->
+            <div class="p-6 border-b dark:border-gray-700 flex-shrink-0">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ isEditing ? 'Edit Segment' :
+                    'New Segment' }}</h2>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div class="p-6 overflow-y-auto flex-1">
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Street
+                                Name</label>
+                            <input [(ngModel)]="newSegment.streetName" type="text"
+                                class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="e.g., Hauptstraße">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Street
+                                Type</label>
+                            <select [(ngModel)]="newSegment.streetType"
+                                class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="residential">Residential</option>
+                                <option value="highway">Highway</option>
+                                <option value="commercial">Commercial</option>
+                                <option value="industrial">Industrial</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Work
+                                Type</label>
+                            <select [(ngModel)]="newSegment.workType"
+                                class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="EXCAVATION">Excavation</option>
+                                <option value="DUCT_INSTALLATION">Duct Installation</option>
+                                <option value="BACKFILL">Backfill</option>
+                                <option value="ASPHALT">Asphalt</option>
+                                <option value="DOCUMENTATION">Documentation</option>
+                            </select>
+                        </div>
+
+                        <!-- Workflow Actions or Current State -->
+                        <div *ngIf="isEditing && availableTransitions.length > 0; else staticState">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Available
+                                Actions</label>
+                            <div class="flex flex-wrap gap-2">
+                                <button *ngFor="let transition of availableTransitions"
+                                    (click)="executeTransition(transition)"
+                                    class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors">
+                                    {{ transition.actionName }}
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Current State: {{
+                                getStateText(newSegment.currentState) }}</p>
+                        </div>
+                        <ng-template #staticState>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current
+                                    State</label>
+                                <select [(ngModel)]="newSegment.currentState" [disabled]="isEditing"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50">
+                                    <option value="PLAN">Plan</option>
+                                    <option value="EXCAVATION">Excavation</option>
+                                    <option value="DUCT_INSTALLATION">Duct Installation</option>
+                                    <option value="BACKFILL">Backfill</option>
+                                    <option value="ASPHALT">Asphalt</option>
+                                    <option value="DOCUMENTATION">Documentation</option>
+                                    <option value="QA_APPROVAL">QA Approval</option>
+                                    <option value="COMPLETED">Completed</option>
+                                </select>
+                            </div>
+                        </ng-template>
+                    </div>
+
+                    <!-- Assigned Crew Dropdown -->
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assigned
+                            Crew</label>
+                        <select [(ngModel)]="newSegment.assignedCrewId"
+                            class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option [ngValue]="null">-- No Crew Assigned --</option>
+                            <option *ngFor="let crew of crews" [ngValue]="crew.id">
+                                {{crew.name}} ({{crew.size}} ppl)
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Address Display (Top) -->
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start
+                                Address</label>
+                            <input [ngModel]="startAddress || 'Click on map to get address'" type="text" readonly
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End
+                                Address</label>
+                            <input [ngModel]="endAddress || 'Click on map to get address'" type="text" readonly
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Coordinates Display -->
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Point
+                                (Lat, Lng)</label>
+                            <input [ngModel]="newSegment.startLatitude + ', ' + newSegment.startLongitude" type="text"
+                                readonly
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Point
+                                (Lat, Lng)</label>
+                            <input [ngModel]="newSegment.endLatitude + ', ' + newSegment.endLongitude" type="text"
+                                readonly
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Address Display (Bottom) -->
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Address
+                                Details</label>
+                            <input [ngModel]="startAddress || 'Click on map to get address'" type="text" readonly
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Address
+                                Details</label>
+                            <input [ngModel]="endAddress || 'Click on map to get address'" type="text" readonly
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Custom Fields -->
+                    <div *ngIf="customFieldDefinitions.length > 0" class="mt-6 border-t dark:border-gray-700 pt-4">
+                        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Additional Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div *ngFor="let field of customFieldDefinitions">
+                                <app-dynamic-input [field]="field" [value]="customFieldsData[field.fieldKey]"
+                                    (valueChange)="customFieldsData[field.fieldKey] = $event">
+                                </app-dynamic-input>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Map Selection -->
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Route
+                            Selection</label>
+                        <app-segment-creation-map [startLat]="newSegment.startLatitude || 0"
+                            [startLng]="newSegment.startLongitude || 0" [endLat]="newSegment.endLatitude || 0"
+                            [endLng]="newSegment.endLongitude || 0" [isEditing]="isEditing" [smartPlan]="smartPlan"
+                            (coordinatesChanged)="onCoordinatesChanged($event)">
+                        </app-segment-creation-map>
+                        <p class="text-xs text-gray-500 mt-1">Calculated Length: {{ newSegment.length }}m</p>
+                    </div>
+
+                    <!-- Smart Planning Suggestions -->
+                    <div *ngIf="smartPlan"
+                        class="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-xl">💡</span>
+                            <h4 class="text-sm font-bold text-blue-900 dark:text-blue-300">Smart Planning Suggestion
+                            </h4>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 text-xs">
+                            <div>
+                                <p class="text-gray-500 dark:text-gray-400 mb-1">Recommended Regelplan</p>
+                                <p class="font-bold text-blue-800 dark:text-blue-400">{{ smartPlan.suggestedRegelplan }}
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 dark:text-gray-400 mb-1">Safety Score</p>
+                                <p class="font-bold" [class.text-green-600]="smartPlan.safetyScore > 80"
+                                    [class.text-yellow-600]="smartPlan.safetyScore <= 80">
+                                    {{ smartPlan.safetyScore }}/100
+                                </p>
+                            </div>
+                        </div>
+
+                        <div *ngIf="smartPlan.requiresPermit"
+                            class="mt-3 p-2 bg-red-100 dark:bg-red-900/40 border border-red-300 rounded text-[10px] text-red-700 dark:text-red-300 flex items-center gap-2">
+                            <span>⚠️</span>
+                            <strong>PERMIT REQUIRED:</strong> High traffic density detected. Mandatory LSA (Ampel)
+                            setup.
+                        </div>
+
+                        <div class="mt-4">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Required Safety Materials
+                                (Auto-Calculated):</p>
+                            <ul class="space-y-1">
+                                <li *ngFor="let material of smartPlan.requiredMaterials"
+                                    class="text-xs flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                                    <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                                    {{ material }}
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-blue-100 dark:border-blue-800 flex gap-4 text-[10px]">
+                            <div class="flex items-center gap-1">
+                                <span>🌡️</span>
+                                <span class="text-gray-600 dark:text-gray-400">{{
+                                    smartPlan.environmentalContext.weather.temperature }}°C ({{
+                                    smartPlan.environmentalContext.weather.condition }})</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <span>🚗</span>
+                                <span class="text-gray-600 dark:text-gray-400">Traffic: {{
+                                    smartPlan.environmentalContext.traffic.congestionLevel }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div
+                class="p-6 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex justify-end gap-3 flex-shrink-0 rounded-b-lg">
+                <button (click)="closeCreateModal()"
+                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium">
+                    Cancel
+                </button>
+                <button (click)="saveSegment()"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+                    [disabled]="!newSegment.streetName">
+                    {{ isEditing ? 'Save Changes' : 'Create Segment' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div *ngIf="showDetailsModal && selectedSegment"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <!-- Header -->
+            <div class="p-6 border-b dark:border-gray-700 flex justify-between items-center flex-shrink-0">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Segment Details</h2>
+                <button (click)="closeDetailsModal()"
+                    class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
+                    <span class="text-2xl">&times;</span>
+                </button>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div class="p-6 overflow-y-auto flex-1">
+                <div class="space-y-8">
+                    <!-- Basic Info -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Street Name</p>
+                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ selectedSegment.streetName
+                                }}</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Street Type</p>
+                            <p class="text-lg font-medium text-gray-900 dark:text-white capitalize">{{
+                                selectedSegment.streetType }}</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Work Type</p>
+                            <p class="text-lg font-medium text-gray-900 dark:text-white">{{ selectedSegment.workType }}
+                            </p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Current State</p>
+                            <span [class]="getStateColor(selectedSegment.currentState)"
+                                class="px-3 py-1 rounded-full text-sm font-medium inline-block mt-1">
+                                {{ getStateText(selectedSegment.currentState) }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Technical Details -->
+                    <div>
+                        <h3
+                            class="text-lg font-semibold text-gray-900 dark:text-white mb-3 border-b dark:border-gray-700 pb-2">
+                            Technical Details</h3>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Length</p>
+                                <p class="text-lg font-medium text-gray-900 dark:text-white">{{ selectedSegment.length
+                                    }} meters</p>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Project ID</p>
+                                <p class="text-lg font-medium text-gray-900 dark:text-white">{{
+                                    selectedSegment.projectId }}</p>
+                            </div>
+                            <div
+                                class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg border border-indigo-100 dark:border-indigo-800">
+                                <p
+                                    class="text-xs text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1">
+                                    <span>🏗️</span> BIM Volumetry (Phase 3)
+                                </p>
+                                <div class="flex items-baseline gap-2">
+                                    <p class="text-2xl font-black text-indigo-900 dark:text-indigo-200">{{
+                                        selectedSegment.volume || '0.0' }}</p>
+                                    <p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">m³ calculated
+                                    </p>
+                                </div>
+                                <p class="text-[10px] text-indigo-500 mt-1 italic italic">Precise volume extracted from
+                                    AR Ruler & LiDAR scanning</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coordinates -->
+                    <div>
+                        <h3
+                            class="text-lg font-semibold text-gray-900 dark:text-white mb-3 border-b dark:border-gray-700 pb-2">
+                            Location</h3>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Start Point</p>
+                                <p class="font-mono text-gray-900 dark:text-white">{{ selectedSegment.startLatitude }},
+                                    {{
+                                    selectedSegment.startLongitude }}</p>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">End Point</p>
+                                <p class="font-mono text-gray-900 dark:text-white">{{ selectedSegment.endLatitude }}, {{
+                                    selectedSegment.endLongitude }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Schedule -->
+                    <div>
+                        <h3
+                            class="text-lg font-semibold text-gray-900 dark:text-white mb-3 border-b dark:border-gray-700 pb-2">
+                            Schedule</h3>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Planned Start</p>
+                                <p class="text-lg font-medium text-gray-900 dark:text-white">{{
+                                    selectedSegment.plannedStartDate ||
+                                    'Not set' }}</p>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Planned End</p>
+                                <p class="text-lg font-medium text-gray-900 dark:text-white">{{
+                                    selectedSegment.plannedEndDate ||
+                                    'Not set' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Safety & Traffic -->
+                    <div *ngIf="selectedSegment.id">
+                        <h3
+                            class="text-lg font-semibold text-gray-900 dark:text-white mb-3 border-b dark:border-gray-700 pb-2">
+                            Safety & Traffic</h3>
+                        <app-safety-protocols [segmentId]="selectedSegment.id"></app-safety-protocols>
+                    </div>
+
+                    <!-- Incidents -->
+                    <div *ngIf="selectedSegment.id">
+                        <app-incident-report [segmentId]="selectedSegment.id"></app-incident-report>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div
+                class="p-6 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex justify-end flex-shrink-0 rounded-b-lg">
+                <button (click)="closeDetailsModal()"
+                    class="px-6 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-900 dark:hover:bg-gray-600 font-medium transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

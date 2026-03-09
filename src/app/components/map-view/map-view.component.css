@@ -1,0 +1,86 @@
+/* Container styling */
+.map-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: block;
+    background: #e0e0e0;
+}
+
+.map-frame {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Critical: Ensure map div has explicit dimensions */
+#map {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 400px;
+    position: relative;
+    background: #aad3df;
+    z-index: 1;
+}
+
+/* Leaflet container overrides */
+:host ::ng-deep .leaflet-container {
+    width: 100% !important;
+    height: 100% !important;
+    position: relative;
+    background: #aad3df !important;
+    z-index: 1;
+}
+
+/* Ensure Leaflet panes are visible */
+:host ::ng-deep .leaflet-pane {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: auto;
+}
+
+:host ::ng-deep .leaflet-map-pane {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+:host ::ng-deep .leaflet-tile-pane {
+    z-index: 200;
+}
+
+:host ::ng-deep .leaflet-overlay-pane {
+    z-index: 400;
+}
+
+:host ::ng-deep .leaflet-shadow-pane {
+    z-index: 500;
+}
+
+:host ::ng-deep .leaflet-marker-pane {
+    z-index: 600;
+}
+
+:host ::ng-deep .leaflet-tooltip-pane {
+    z-index: 650;
+}
+
+:host ::ng-deep .leaflet-popup-pane {
+    z-index: 700;
+}
+
+/* Ensure tiles are visible */
+:host ::ng-deep .leaflet-tile {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Leaflet control styling */
+:host ::ng-deep .leaflet-control-zoom {
+    z-index: 1000;
+}
+
+:host ::ng-deep .leaflet-control-attribution {
+    z-index: 1000;
+}
