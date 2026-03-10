@@ -103,15 +103,68 @@
 }
 
 .modal-overlay {
-    @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4;
+    @apply fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4;
 }
 
 .modal-container-large {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-7xl max-h-[95vh] flex flex-col;
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700;
 }
 
+.modal-header {
+    @apply p-6 border-b border-gray-100 dark:border-gray-700 flex-shrink-0 bg-white dark:bg-gray-800;
+}
+
+.modal-header-with-close {
+    @apply p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-white dark:bg-gray-800;
+}
+
+.modal-header h2 {
+    @apply text-2xl font-bold text-gray-900 dark:text-white;
+}
+
+.modal-content-scroll {
+    @apply p-6 overflow-y-auto flex-1 bg-white dark:bg-gray-800;
+}
+
+.modal-footer {
+    @apply p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 flex justify-end gap-3 flex-shrink-0;
+}
+
+.btn-close-modal {
+    @apply text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors;
+}
+
+.form-group-list {
+    @apply space-y-6;
+}
+
+.form-grid-2 {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.form-group {
+    @apply mb-2;
+}
+
+.form-label {
+    @apply block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2;
+}
+
+.form-select,
 .form-input {
-    @apply w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded px-3 py-2;
+    @apply w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 transition-all;
+}
+
+.form-input-readonly {
+    @apply bg-gray-50 dark:bg-gray-800/50 text-gray-500 cursor-not-allowed border-dashed;
+}
+
+.transition-actions {
+    @apply flex flex-wrap gap-2;
+}
+
+.btn-transition {
+    @apply px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 shadow-sm transition-all;
 }
 
 .smart-plan-container {
