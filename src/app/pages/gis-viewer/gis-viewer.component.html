@@ -1,26 +1,29 @@
-<div class="gis-container">
+<div class="h-full flex flex-col bg-gray-900">
     <!-- Header/Toolbar -->
-    <div class="gis-toolbar">
-        <div class="brand-block">
-            <h1 class="brand-title">
-                <span class="brand-icon">🌐</span> Digital Plan Room
+    <div class="p-4 bg-gray-800 border-b border-gray-700 flex justify-between items-center shadow-lg z-10">
+        <div class="flex items-center gap-4">
+            <h1 class="text-xl font-bold text-white flex items-center gap-2">
+                <span class="text-blue-500">🌐</span> Digital Plan Room
             </h1>
-            <select (change)="onProjectSelect($event)" class="project-selector">
+            <select (change)="onProjectSelect($event)"
+                class="bg-gray-700 text-white text-sm rounded-lg p-2 border-none focus:ring-2 focus:ring-blue-500">
                 <option *ngFor="let p of projects" [value]="p.id">{{p.name}}</option>
             </select>
         </div>
-        <div class="toolbar-actions">
-            <button (click)="togglePlanOverlay(!showPlanOverlay)" class="btn-toggle-overlay"
-                [class.btn-overlay-active]="showPlanOverlay" [class.btn-overlay-inactive]="!showPlanOverlay">
+        <div class="flex gap-2">
+            <button (click)="togglePlanOverlay(!showPlanOverlay)" [class.bg-blue-600]="showPlanOverlay"
+                [class.bg-gray-700]="!showPlanOverlay"
+                class="text-white px-4 py-2 rounded-lg text-sm font-medium transition-all hover:scale-105 active:scale-95 shadow-md">
                 {{ showPlanOverlay ? 'Hide Utility Plans' : 'Show Utility Plans' }}
             </button>
         </div>
     </div>
 
     <!-- Map Container -->
-    <div class="map-view-container">
-        <div *ngIf="isLoading" class="map-loading-overlay">
-            <div class="map-spinner"></div>
+    <div class="flex-1 relative">
+        <div *ngIf="isLoading"
+            class="absolute inset-0 z-20 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm transition-opacity duration-500">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
         </div>
 
         <google-map height="100%" width="100%" [center]="center" [zoom]="zoom" [options]="mapOptions"
@@ -31,24 +34,25 @@
         </google-map>
 
         <!-- Legend Overlay -->
-        <div class="gis-legend">
-            <h3 class="legend-title">Utility Legend</h3>
-            <div class="legend-list">
-                <div class="legend-item">
-                    <div class="utility-indicator indicator-gas"></div>
-                    <span class="legend-label">Gas Lines (Vattenfall)</span>
+        <div
+            class="absolute bottom-6 right-6 p-4 bg-gray-800/90 backdrop-blur-md rounded-xl border border-gray-700 shadow-2xl max-w-xs z-10 transition-transform duration-300 hover:scale-105">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Utility Legend</h3>
+            <div class="space-y-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-1 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
+                    <span class="text-xs text-gray-200 font-medium tracking-wide">Gas Lines (Vattenfall)</span>
                 </div>
-                <div class="legend-item">
-                    <div class="utility-indicator indicator-water"></div>
-                    <span class="legend-label">Water Main (Berlin Wasser)</span>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-1 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                    <span class="text-xs text-gray-200 font-medium tracking-wide">Water Main (Berlin Wasser)</span>
                 </div>
-                <div class="legend-item">
-                    <div class="utility-indicator indicator-fiber"></div>
-                    <span class="legend-label">Fiber Optic (Telekom)</span>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-1 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.5)]"></div>
+                    <span class="text-xs text-gray-200 font-medium tracking-wide">Fiber Optic (Telekom)</span>
                 </div>
             </div>
-            <div class="legend-footer">
-                <p class="footer-text">
+            <div class="mt-4 pt-3 border-t border-gray-700">
+                <p class="text-[10px] text-gray-500 italic leading-relaxed">
                     Source: Combined VZ/GisData Infrastructure Feed (Updated 2026)
                 </p>
             </div>
