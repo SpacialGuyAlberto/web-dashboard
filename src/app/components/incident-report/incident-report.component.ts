@@ -71,4 +71,23 @@ export class IncidentReportComponent implements OnInit, OnChanges {
             incident.status = 'RESOLVED';
         });
     }
+
+    getSeverityClass(severity: string): string {
+        switch (severity) {
+            case 'CRITICAL': return 'bg-rose-100 text-rose-700';
+            case 'HIGH': return 'bg-orange-100 text-orange-700';
+            case 'MEDIUM': return 'bg-amber-100 text-amber-700';
+            case 'LOW': return 'bg-blue-100 text-blue-700';
+            default: return 'bg-slate-100 text-slate-700';
+        }
+    }
+
+    getStatusClass(status: string): string {
+        switch (status) {
+            case 'OPEN': return 'text-rose-500 border-rose-500';
+            case 'RESOLVED': return 'text-emerald-500 border-emerald-500';
+            case 'IN_PROGRESS': return 'text-amber-500 border-amber-500';
+            default: return 'text-slate-500 border-slate-500';
+        }
+    }
 }

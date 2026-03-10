@@ -116,57 +116,60 @@
         </div>
 
         <!-- Project Materials View -->
-        <div *ngIf="!loading && activeTab === 'materials'" class="materials-table-container">
-            <div class="data-table-wrapper">
-                <table class="data-table">
-                    <thead class="data-table-thead">
-                        <tr>
-                            <th scope="col" class="data-table-th">Material</th>
-                            <th scope="col" class="data-table-th">Allocated Qty</th>
-                            <th scope="col" class="data-table-th">Unit</th>
-                            <th scope="col" class="data-table-th">Status</th>
-                            <th scope="col" class="data-table-th">Supplier</th>
-                        </tr>
-                    </thead>
-                    <tbody class="data-table-tbody">
-                        <tr *ngFor="let material of projectMaterials">
-                            <td class="data-table-td">
-                                <div class="material-info">
-                                    <div class="ml-0">
-                                        <div class="material-title">{{ material.name }}</div>
-                                        <div class="material-sku">{{ material.sku }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="data-table-td">
-                                <span class="material-qty">
-                                    {{ material.projectAllocations && material.projectAllocations[0] ?
-                                    material.projectAllocations[0].quantityAllocated : 0 }}
-                                </span>
-                            </td>
-                            <td class="data-table-td">
-                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ material.unit }}</span>
-                            </td>
-                            <td class="data-table-td">
-                                <span class="pill-success">
-                                    Available
-                                </span>
-                            </td>
-                            <td class="data-table-td">
-                                <span class="text-sm text-gray-500 dark:text-gray-400">
-                                    {{ material.supplier?.name || 'N/A' }}
-                                </span>
-                            </td>
-                        </tr>
+        <div *ngIf="!loading && activeTab === 'materials'">
+            <div class="materials-grid" *ngIf="projectMaterials.length > 0">
+                <div *ngFor="let material of projectMaterials" class="material-card group">
+                    <div class="card-edge-glow"></div>
 
-                        <!-- Empty State Materials -->
-                        <tr *ngIf="projectMaterials.length === 0">
-                            <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                                No materials allocated to this project yet.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <div class="material-card-header">
+                        <div class="material-icon-box">
+                            <span *ngIf="material.name.toLowerCase().includes('cable')">🔌</span>
+                            <span *ngIf="material.name.toLowerCase().includes('duct')">🕳️</span>
+                            <span *ngIf="material.name.toLowerCase().includes('joint')">🔗</span>
+                            <span
+                                *ngIf="!material.name.toLowerCase().includes('cable') && !material.name.toLowerCase().includes('duct') && !material.name.toLowerCase().includes('joint')">📦</span>
+                        </div>
+                        <span class="material-status-pill status-available">Available</span>
+                    </div>
+
+                    <div class="material-body">
+                        <h3 class="material-name">{{ material.name }}</h3>
+                        <span class="material-sku-tag">SKU: {{ material.sku }}</span>
+                    </div>
+
+                    <div class="material-footer">
+                        <div class="material-stats-row">
+                            <div class="flex flex-col">
+                                <span class="stat-label">Allocated</span>
+                                <div class="flex items-baseline">
+                                    <span class="stat-value">
+                                        {{ material.projectAllocations && material.projectAllocations[0] ?
+                                        material.projectAllocations[0].quantityAllocated : 0 }}
+                                    </span>
+                                    <span class="stat-unit">{{ material.unit }}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end">
+                                <span class="stat-label">Stock Level</span>
+                                <span class="text-xs font-bold text-emerald-500">100%</span>
+                            </div>
+                        </div>
+
+                        <div class="supplier-box">
+                            <div class="supplier-avatar">{{ (material.supplier?.name || 'NA').substring(0, 1) }}</div>
+                            <span class="supplier-name">{{ material.supplier?.name || 'Internal Warehouse' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State Materials -->
+            <div *ngIf="projectMaterials.length === 0"
+                class="flex flex-col items-center justify-center py-24 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[3rem]">
+                <span class="text-6xl mb-6 opacity-20">📦</span>
+                <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">No Materials Allocated</h3>
+                <p class="text-slate-500 dark:text-slate-400 font-medium">This project currently has no materials
+                    assigned.</p>
             </div>
         </div>
     </div>
@@ -368,118 +371,100 @@
         </div>
     </div>
 
-    <!-- Details Modal -->
+    <!-- Segment Details Modal -->
     <div *ngIf="showDetailsModal && selectedSegment" class="modal-overlay">
         <div class="modal-container-medium">
-            <!-- Header -->
             <div class="modal-header-with-close">
-                <h2>Segment Details</h2>
-                <button (click)="closeDetailsModal()" class="btn-close-modal">
-                    <span class="text-2xl">&times;</span>
+                <div>
+                    <span class="text-[10px] font-black uppercase text-accent tracking-[0.2em] mb-1 block">Quick
+                        Look</span>
+                    <h2 class="text-3xl font-black text-slate-900 dark:text-white">{{ selectedSegment.streetName }}</h2>
+                </div>
+                <button (click)="closeDetailsModal()"
+                    class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
                 </button>
             </div>
 
-            <!-- Scrollable Content -->
             <div class="modal-content-scroll">
                 <div class="details-section">
-                    <!-- Basic Info -->
-                    <div class="details-grid">
-                        <div class="details-box">
-                            <p class="details-box-label">Street Name</p>
-                            <p class="details-box-value">{{ selectedSegment.streetName }}</p>
-                        </div>
-                        <div class="details-box">
-                            <p class="details-box-label">Street Type</p>
-                            <p class="details-box-value capitalize">{{ selectedSegment.streetType }}</p>
-                        </div>
-                        <div class="details-box">
-                            <p class="details-box-label">Work Type</p>
-                            <p class="details-box-value">{{ selectedSegment.workType }}</p>
-                        </div>
-                        <div class="details-box">
-                            <p class="details-box-label">Current State</p>
-                            <span [class]="getStateColor(selectedSegment.currentState)"
-                                class="status-badge inline-block mt-1">
-                                {{ getStateText(selectedSegment.currentState) }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Technical Details -->
-                    <div>
-                        <h3 class="section-title">Technical Details</h3>
+                    <!-- Technical Box -->
+                    <div class="section-group">
+                        <h3 class="section-title">Technical Specifications</h3>
                         <div class="details-grid">
                             <div class="details-box">
-                                <p class="details-box-label">Length</p>
-                                <p class="details-box-value">{{ selectedSegment.length }} meters</p>
+                                <span class="details-box-label">Current State</span>
+                                <div class="details-box-value">
+                                    <span [class]="'status-badge ' + selectedSegment.currentState.toLowerCase()">
+                                        {{ getStateText(selectedSegment.currentState) }}
+                                    </span>
+                                </div>
                             </div>
                             <div class="details-box">
-                                <p class="details-box-label">Project ID</p>
-                                <p class="details-box-value">{{ selectedSegment.projectId }}</p>
+                                <span class="details-box-label">Work Type</span>
+                                <div class="details-box-value">{{ selectedSegment.workType }}</div>
                             </div>
-                            <div class="details-box-bim">
-                                <p class="bim-title">
-                                    <span>🏗️</span> BIM Volumetry (Phase 3)
-                                </p>
+                            <div class="details-box">
+                                <span class="details-box-label">Total Length</span>
+                                <div class="details-box-value">{{ selectedSegment.length }}<small
+                                        class="text-slate-400 ml-1">meters</small></div>
+                            </div>
+                            <div class="details-box">
+                                <span class="details-box-label">Project ID</span>
+                                <div class="details-box-value mono-text">#{{ selectedSegment.projectId }}</div>
+                            </div>
+
+                            <!-- BIM Box (Premium highlight) -->
+                            <div *ngIf="selectedSegment.volume" class="details-box-bim">
+                                <div class="card-edge-glow"></div>
+                                <span class="bim-title">
+                                    <span class="text-lg">🏗️</span> BIM Volumetry (Phase 3)
+                                </span>
                                 <div class="bim-value-group">
-                                    <p class="bim-value">{{ selectedSegment.volume || '0.0' }}</p>
-                                    <p class="bim-unit">m³ calculated</p>
+                                    <span class="bim-value">{{ selectedSegment.volume }}</span>
+                                    <span class="bim-unit">m³ calculated</span>
                                 </div>
                                 <p class="bim-footer">Precise volume extracted from AR Ruler & LiDAR scanning</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Location -->
-                    <div>
-                        <h3 class="section-title">Location</h3>
+                    <!-- Timeline & Location -->
+                    <div class="section-group">
+                        <h3 class="section-title">Schedule & Logistics</h3>
                         <div class="details-grid">
                             <div class="details-box">
-                                <p class="details-box-label">Start Point</p>
-                                <p class="mono-text">{{ selectedSegment.startLatitude }}, {{
-                                    selectedSegment.startLongitude }}</p>
+                                <span class="details-box-label">Planned Start</span>
+                                <div class="details-box-value">{{ selectedSegment.plannedStartDate || 'Not set' }}</div>
                             </div>
                             <div class="details-box">
-                                <p class="details-box-label">End Point</p>
-                                <p class="mono-text">{{ selectedSegment.endLatitude }}, {{ selectedSegment.endLongitude
-                                    }}</p>
+                                <span class="details-box-label">Planned End</span>
+                                <div class="details-box-value">{{ selectedSegment.plannedEndDate || 'Not set' }}</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Schedule -->
-                    <div>
-                        <h3 class="section-title">Schedule</h3>
-                        <div class="details-grid">
-                            <div class="details-box">
-                                <p class="details-box-label">Planned Start</p>
-                                <p class="details-box-value">{{ selectedSegment.plannedStartDate || 'Not set' }}</p>
-                            </div>
-                            <div class="details-box">
-                                <p class="details-box-label">Planned End</p>
-                                <p class="details-box-value">{{ selectedSegment.plannedEndDate || 'Not set' }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Safety & Traffic -->
-                    <div *ngIf="selectedSegment.id">
-                        <h3 class="section-title">Safety & Traffic</h3>
-                        <app-safety-protocols [segmentId]="selectedSegment.id"></app-safety-protocols>
+                    <!-- Safety & Traffic (Sub-components) -->
+                    <div class="section-group">
+                        <h3 class="section-title">Safety & Compliance</h3>
+                        <app-safety-protocols [segmentId]="selectedSegment.id!"></app-safety-protocols>
                     </div>
 
                     <!-- Incidents -->
-                    <div *ngIf="selectedSegment.id">
-                        <app-incident-report [segmentId]="selectedSegment.id"></app-incident-report>
+                    <div class="section-group">
+                        <h3 class="section-title">Incident Awareness</h3>
+                        <app-incident-report [segmentId]="selectedSegment.id!"></app-incident-report>
                     </div>
                 </div>
             </div>
 
-            <!-- Footer -->
             <div class="modal-footer">
-                <button (click)="closeDetailsModal()" class="btn-save">
-                    Close
-                </button>
+                <button (click)="closeDetailsModal()" class="btn-action-outline px-8">Close Overview</button>
+                <button (click)="openEditModal(selectedSegment)" class="btn-save shadow-blue-500/20">Edit
+                    Details</button>
             </div>
         </div>
     </div>

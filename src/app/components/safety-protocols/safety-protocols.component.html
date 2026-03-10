@@ -1,56 +1,56 @@
-<div class="bg-white rounded-lg shadow p-6">
-    <div class="flex border-b mb-6">
-        <button (click)="activeTab = 'protocols'" [class]="activeTab === 'protocols' ? 'tab-active' : 'tab-inactive'"
-            class="px-4 py-2 font-medium focus:outline-none">
+<div class="py-6">
+    <div class="tab-nav mb-8">
+        <button (click)="activeTab = 'protocols'" [class.tab-btn-active]="activeTab === 'protocols'" class="tab-btn">
             Safety Protocols (RSA)
         </button>
-        <button (click)="activeTab = 'permits'" [class]="activeTab === 'permits' ? 'tab-active' : 'tab-inactive'"
-            class="px-4 py-2 font-medium focus:outline-none">
+        <button (click)="activeTab = 'permits'" [class.tab-btn-active]="activeTab === 'permits'" class="tab-btn">
             Traffic Permits
         </button>
     </div>
 
     <!-- Protocols Tab -->
     <div *ngIf="activeTab === 'protocols'">
-        <div class="grid grid-cols-2 gap-6">
+        <div class="details-grid">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Regelplan Type</label>
-                <select [(ngModel)]="protocol.regelplanType" class="w-full border rounded px-3 py-2">
-                    <option value="B I/1">B I/1 (Gehweg)</option>
-                    <option value="B I/2 innerorts">B I/2 (Fahrbahnrand innerorts)</option>
-                    <option value="C I/3">C I/3 (Halbseitig)</option>
-                    <option value="D II/1">D II/1 (Vollsperrung)</option>
+                <label class="form-label">Regelplan Type</label>
+                <select [(ngModel)]="protocol.regelplanType" class="form-select">
+                    <option value="B I/1" class="dark:bg-slate-800">B I/1 (Gehweg)</option>
+                    <option value="B I/2 innerorts" class="dark:bg-slate-800">B I/2 (Fahrbahnrand innerorts)</option>
+                    <option value="C I/3" class="dark:bg-slate-800">C I/3 (Halbseitig)</option>
+                    <option value="D II/1" class="dark:bg-slate-800">D II/1 (Vollsperrung)</option>
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Street Category</label>
-                <select [(ngModel)]="protocol.streetCategory" class="w-full border rounded px-3 py-2">
-                    <option value="innerorts">Innerorts (Urban)</option>
-                    <option value="außerorts">Außerorts (Rural)</option>
-                    <option value="autobahn">Autobahn</option>
+                <label class="form-label">Street Category</label>
+                <select [(ngModel)]="protocol.streetCategory" class="form-select">
+                    <option value="innerorts" class="dark:bg-slate-800">Innerorts (Urban)</option>
+                    <option value="außerorts" class="dark:bg-slate-800">Außerorts (Rural)</option>
+                    <option value="autobahn" class="dark:bg-slate-800">Autobahn</option>
                 </select>
             </div>
             <div class="col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Required Signs (JSON)</label>
-                <textarea [(ngModel)]="protocol.requiredSigns" rows="2"
-                    class="w-full border rounded px-3 py-2 font-mono text-sm"></textarea>
+                <label class="form-label">Required Signs (JSON)</label>
+                <textarea [(ngModel)]="protocol.requiredSigns" rows="2" class="form-input font-mono text-sm"></textarea>
             </div>
             <div class="col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Required Barriers (JSON)</label>
+                <label class="form-label">Required Barriers (JSON)</label>
                 <textarea [(ngModel)]="protocol.requiredBarriers" rows="2"
-                    class="w-full border rounded px-3 py-2 font-mono text-sm"></textarea>
+                    class="form-input font-mono text-sm"></textarea>
             </div>
             <div class="col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                <textarea [(ngModel)]="protocol.notes" rows="3" class="w-full border rounded px-3 py-2"></textarea>
+                <label class="form-label">Notes</label>
+                <textarea [(ngModel)]="protocol.notes" rows="3" class="form-input"></textarea>
             </div>
         </div>
-        <div class="mt-6 flex justify-between items-center">
-            <div class="flex items-center">
-                <input type="checkbox" [(ngModel)]="protocol.validated" id="validated" class="mr-2">
-                <label for="validated" class="text-sm font-medium text-gray-900">Safety Compliance Validated</label>
+        <div
+            class="mt-8 flex justify-between items-center bg-slate-50 dark:bg-slate-800/20 p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-3">
+                <input type="checkbox" [(ngModel)]="protocol.validated" id="validated"
+                    class="w-5 h-5 rounded-lg border-slate-300 dark:border-slate-700 text-accent focus:ring-accent bg-white dark:bg-slate-800">
+                <label for="validated" class="text-sm font-bold text-slate-700 dark:text-slate-300">Safety Compliance
+                    Validated</label>
             </div>
-            <button (click)="saveProtocol()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            <button (click)="saveProtocol()" class="btn-save py-3 px-8 text-[10px]">
                 Save Protocol
             </button>
         </div>
@@ -58,86 +58,122 @@
 
     <!-- Permits Tab -->
     <div *ngIf="activeTab === 'permits'">
-        <div class="flex justify-end mb-4">
+        <div class="flex justify-end mb-6">
             <button (click)="openPermitModal()"
-                class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
-                + Add Permit
+                class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2">
+                <span>➕</span> Add Permit
             </button>
         </div>
 
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead>
-                <tr>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Permit #</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Authority</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Valid From</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Valid To</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                <tr *ngFor="let permit of permits">
-                    <td class="px-3 py-2">{{ permit.permitNumber }}</td>
-                    <td class="px-3 py-2">{{ permit.issuingAuthority }}</td>
-                    <td class="px-3 py-2">{{ permit.validFrom }}</td>
-                    <td class="px-3 py-2">{{ permit.validTo }}</td>
-                    <td class="px-3 py-2">
-                        <span [class.bg-yellow-100]="permit.status === 'PENDING'"
-                            [class.text-yellow-800]="permit.status === 'PENDING'"
-                            [class.bg-green-100]="permit.status === 'APPROVED'"
-                            [class.text-green-800]="permit.status === 'APPROVED'"
-                            [class.bg-red-100]="permit.status === 'REJECTED'"
-                            [class.text-red-800]="permit.status === 'REJECTED'"
-                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                            {{ permit.status }}
-                        </span>
-                    </td>
-                    <td class="px-3 py-2 text-sm">
-                        <button *ngIf="permit.status === 'PENDING'" (click)="updatePermitStatus(permit, 'APPROVED')"
-                            class="text-green-600 hover:text-green-900 mr-2">Approve</button>
-                        <button *ngIf="permit.status === 'PENDING'" (click)="updatePermitStatus(permit, 'REJECTED')"
-                            class="text-red-600 hover:text-red-900">Reject</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <div *ngIf="permits.length === 0" class="text-center py-4 text-gray-500 text-sm">
-            No permits found.
+        <div class="overflow-hidden rounded-3xl border border-slate-100 dark:border-slate-800">
+            <table class="min-w-full divide-y divide-slate-100 dark:divide-slate-800">
+                <thead class="bg-slate-50 dark:bg-slate-800/50">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            Permit #</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            Authority</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            Status</th>
+                        <th
+                            class="px-6 py-4 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900/40">
+                    <tr *ngFor="let permit of permits"
+                        class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                        <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300 text-sm italic">#{{
+                            permit.permitNumber }}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-slate-500 dark:text-slate-400">{{
+                            permit.issuingAuthority }}</td>
+                        <td class="px-6 py-4">
+                            <span [class.bg-amber-100]="permit.status === 'PENDING'"
+                                [class.text-amber-700]="permit.status === 'PENDING'"
+                                [class.bg-emerald-100]="permit.status === 'APPROVED'"
+                                [class.text-emerald-700]="permit.status === 'APPROVED'"
+                                [class.bg-rose-100]="permit.status === 'REJECTED'"
+                                [class.text-rose-700]="permit.status === 'REJECTED'"
+                                class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                                {{ permit.status }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right text-sm">
+                            <div class="flex justify-end gap-2">
+                                <button *ngIf="permit.status === 'PENDING'"
+                                    (click)="updatePermitStatus(permit, 'APPROVED')"
+                                    class="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-emerald-600 rounded-lg transition-colors"
+                                    title="Approve">
+                                    ✅
+                                </button>
+                                <button *ngIf="permit.status === 'PENDING'"
+                                    (click)="updatePermitStatus(permit, 'REJECTED')"
+                                    class="p-2 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-rose-600 rounded-lg transition-colors"
+                                    title="Reject">
+                                    ❌
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div *ngIf="permits.length === 0" class="text-center py-12 bg-white dark:bg-slate-900/40">
+                <span class="text-3xl mb-3 block">📄</span>
+                <p class="text-slate-400 font-bold text-sm tracking-tight text-center">No permits found for this
+                    segment.</p>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Permit Modal -->
-<div *ngIf="showPermitModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-6 w-96">
-        <h3 class="text-lg font-bold mb-4">Add Traffic Permit</h3>
-        <div class="space-y-3">
+<div *ngIf="showPermitModal" class="modal-overlay">
+    <div class="modal-container-medium max-w-md">
+        <div class="modal-header-with-close">
             <div>
-                <label class="block text-sm font-medium text-gray-700">Permit Number</label>
-                <input [(ngModel)]="newPermit.permitNumber" class="w-full border rounded px-3 py-2">
+                <span class="text-[10px] font-black uppercase text-emerald-500 tracking-widest mb-1 block">Traffic
+                    Department</span>
+                <h3 class="text-2xl font-black text-slate-900 dark:text-white">Add Permit</h3>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Issuing Authority</label>
-                <input [(ngModel)]="newPermit.issuingAuthority" class="w-full border rounded px-3 py-2">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Valid From</label>
-                <input type="date" [(ngModel)]="newPermit.validFrom" class="w-full border rounded px-3 py-2">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Valid To</label>
-                <input type="date" [(ngModel)]="newPermit.validTo" class="w-full border rounded px-3 py-2">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Conditions</label>
-                <textarea [(ngModel)]="newPermit.conditions" class="w-full border rounded px-3 py-2"></textarea>
+            <button (click)="showPermitModal = false"
+                class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-content-scroll">
+            <div class="space-y-6">
+                <div>
+                    <label class="form-label">Permit Number</label>
+                    <input [(ngModel)]="newPermit.permitNumber" class="form-input" placeholder="e.g., VZ-2024-001">
+                </div>
+                <div>
+                    <label class="form-label">Issuing Authority</label>
+                    <input [(ngModel)]="newPermit.issuingAuthority" class="form-input" placeholder="e.g., Stadt Berlin">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="form-label">Valid From</label>
+                        <input type="date" [(ngModel)]="newPermit.validFrom" class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label">Valid To</label>
+                        <input type="date" [(ngModel)]="newPermit.validTo" class="form-input text-xs">
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Special Conditions</label>
+                    <textarea [(ngModel)]="newPermit.conditions" class="form-input" rows="3"
+                        placeholder="Additional constraints..."></textarea>
+                </div>
             </div>
         </div>
-        <div class="mt-6 flex justify-end gap-3">
-            <button (click)="showPermitModal = false" class="px-4 py-2 border rounded hover:bg-gray-50">Cancel</button>
+        <div class="modal-footer">
+            <button (click)="showPermitModal = false" class="btn-action-outline px-6">Cancel</button>
             <button (click)="savePermit()"
-                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+                class="btn-save px-10 border-none bg-emerald-500 text-white hover:bg-emerald-600">Issue Permit</button>
         </div>
     </div>
 </div>

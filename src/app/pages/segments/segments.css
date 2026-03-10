@@ -178,6 +178,75 @@
     @apply bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800;
 }
 
+.modal-container-medium {
+    @apply bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800;
+}
+
+.details-section {
+    @apply space-y-12;
+}
+
+.section-title {
+    @apply text-xs font-black uppercase tracking-[0.2em] text-blue-500 mb-6 flex items-center gap-3;
+}
+
+.section-title::after {
+    content: "";
+    @apply h-[1px] flex-1 bg-slate-200 dark:bg-slate-800;
+}
+
+.details-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.details-box {
+    @apply bg-slate-50 dark:bg-slate-800/30 p-6 rounded-3xl border border-slate-100 dark:border-slate-800;
+}
+
+.details-box-label {
+    @apply text-[10px] font-black uppercase text-slate-400 mb-2 tracking-wider;
+}
+
+.details-box-value {
+    @apply text-lg font-bold text-slate-800 dark:text-slate-100;
+}
+
+.details-box-bim {
+    @apply col-span-1 md:col-span-2 bg-indigo-50/50 dark:bg-indigo-950/20 p-8 rounded-[2.5rem] border border-indigo-100/50 dark:border-indigo-500/10 relative overflow-hidden;
+}
+
+.bim-title {
+    @apply text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2;
+}
+
+.bim-value-group {
+    @apply flex items-baseline gap-2 mb-2;
+}
+
+.bim-value {
+    @apply text-4xl font-black text-indigo-900 dark:text-indigo-100;
+}
+
+.bim-unit {
+    @apply text-sm font-bold text-indigo-400;
+}
+
+.bim-footer {
+    @apply text-[10px] font-medium text-slate-400 italic;
+}
+
+.mono-text {
+    @apply font-mono text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded;
+}
+
+.modal-header-with-close {
+    @apply p-10 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900;
+}
+
+.btn-save {
+    @apply bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-10 py-4 rounded-2xl font-black text-xs tracking-widest shadow-xl hover:opacity-90 transition-all;
+}
+
 .modal-header {
     @apply p-10 border-b border-slate-100 dark:border-slate-800 flex-shrink-0;
 }
@@ -203,4 +272,81 @@
 .form-select:focus {
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
     outline: none;
+}
+
+/* Project Materials Grid */
+.materials-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+}
+
+.material-card {
+    @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden flex flex-col;
+}
+
+.material-card:hover {
+    @apply border-blue-400/30 -translate-y-1;
+}
+
+.material-card-header {
+    @apply flex justify-between items-start mb-4;
+}
+
+.material-icon-box {
+    @apply w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl group-hover:scale-110 transition-transform;
+}
+
+.material-status-pill {
+    @apply text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border;
+}
+
+.status-available {
+    @apply bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20;
+}
+
+.status-low {
+    @apply bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20;
+}
+
+.material-body {
+    @apply mb-6;
+}
+
+.material-name {
+    @apply text-lg font-black text-slate-900 dark:text-white mb-1 line-clamp-1;
+}
+
+.material-sku-tag {
+    @apply text-[10px] font-mono font-bold text-slate-400 tracking-wider;
+}
+
+.material-footer {
+    @apply mt-auto pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-4;
+}
+
+.material-stats-row {
+    @apply flex justify-between items-center;
+}
+
+.stat-label {
+    @apply text-[10px] font-black uppercase text-slate-400 tracking-widest;
+}
+
+.stat-value {
+    @apply text-base font-black text-slate-800 dark:text-slate-200;
+}
+
+.stat-unit {
+    @apply text-[10px] font-bold text-slate-400 ml-1;
+}
+
+.supplier-box {
+    @apply bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl flex items-center gap-2;
+}
+
+.supplier-avatar {
+    @apply w-6 h-6 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-[10px] flex items-center justify-center font-black text-blue-600 dark:text-blue-400;
+}
+
+.supplier-name {
+    @apply text-xs font-bold text-slate-600 dark:text-slate-400 truncate;
 }
