@@ -2,40 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-export interface SafetyProtocol {
-    id?: number;
-    segmentId: number;
-    regelplanType: string;
-    streetCategory: string;
-    workType: string;
-    requiredSigns: string; // JSON string
-    requiredBarriers: string; // JSON string
-    notes?: string;
-    validated: boolean;
-}
-
-export interface TrafficPermit {
-    id?: number;
-    segmentId: number;
-    permitNumber: string;
-    issuingAuthority?: string;
-    validFrom?: string;
-    validTo?: string;
-    status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'EXPIRED';
-    conditions?: string;
-}
-
-export interface Incident {
-    id?: number;
-    segmentId: number;
-    type: 'BLOCKED' | 'WEATHER' | 'COMPLAINT' | 'SAFETY' | 'ACCIDENT';
-    severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-    description: string;
-    status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
-    reportedBy?: string;
-    reportedAt?: string;
-    photos?: string[];
-}
+import { SafetyProtocol, TrafficPermit, Incident } from '../models/safety.model';
 
 @Injectable({
     providedIn: 'root'

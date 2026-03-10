@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CustomFieldService, CustomFieldDefinition } from '../../services/custom-field.service';
+import { CustomFieldService } from '../../services/custom-field.service';
+import { CustomFieldDefinition } from '../../models/custom-field.model';
 
 @Component({
     selector: 'app-field-config',

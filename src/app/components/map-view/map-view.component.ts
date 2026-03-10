@@ -4,7 +4,7 @@ import { GoogleMapsModule, GoogleMap, MapPolyline, MapMarker } from '@angular/go
 import { RoutingService } from '../../services/routing.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import {RiskScore} from '../../pages/risk-dashboard/model/RiskScore.interface';
+import { RiskScore } from '../../models/prediction.model';
 
 @Component({
     selector: 'app-map-view',

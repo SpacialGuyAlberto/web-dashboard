@@ -1,7 +1,8 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SafetyService, SafetyProtocol, TrafficPermit } from '../../services/safety.service';
+import { SafetyService } from '../../services/safety.service';
+import { SafetyProtocol, TrafficPermit } from '../../models/safety.model';
 
 @Component({
     selector: 'app-safety-protocols',

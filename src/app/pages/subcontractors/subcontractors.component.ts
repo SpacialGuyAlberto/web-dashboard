@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SubcontractorService, Subcontractor, Crew } from '../../services/subcontractor.service';
+import { SubcontractorService } from '../../services/subcontractor.service';
+import { Subcontractor, Crew } from '../../models/subcontractor.model';
 
 @Component({
     selector: 'app-subcontractors',

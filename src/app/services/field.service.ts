@@ -2,26 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
-export interface Evidence {
-    id?: number;
-    segmentId: number;
-    stepName: string;
-    photoUrl: string;
-    latitude?: number;
-    longitude?: number;
-    createdAt?: string;
-    userId?: string;
-}
-
-export interface FieldCrew {
-    id: number;
-    name: string;
-    leader: string;
-    members: number;
-    currentProject: string;
-    status: string;
-    location: string;
-}
+import { Evidence, FieldCrew } from '../models/field.model';
 
 @Injectable({
     providedIn: 'root'

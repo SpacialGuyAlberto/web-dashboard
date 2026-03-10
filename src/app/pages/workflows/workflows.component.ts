@@ -1,7 +1,8 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { WorkflowService, WorkflowTask } from '../../services/workflow.service';
+import { WorkflowService } from '../../services/workflow.service';
+import { WorkflowTask } from '../../models/workflow.model';
 
 
 

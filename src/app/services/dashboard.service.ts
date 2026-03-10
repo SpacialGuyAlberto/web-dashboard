@@ -2,18 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-export interface DashboardStats {
-    overallProgress: number;
-    highRiskSegments: number;
-    highRiskTrend: number;
-    predictedDelayDays: number;
-    dailyProduction: number;
-    dailyProductionTarget: number;
-    openIncidents: number;
-    criticalIncidents: number;
-    pendingPermits: number;
-    avgPermitWaitDays: number;
-}
+import { DashboardStats } from '../models/dashboard.model';
 
 @Injectable({
     providedIn: 'root'

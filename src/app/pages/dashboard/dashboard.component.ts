@@ -6,9 +6,10 @@ import { MapViewComponent } from '../../components/map-view/map-view.component';
 import { KPICardComponent } from '../../components/kpi-card/kpi-card.component';
 import { ActionCenterComponent, ActionItem } from '../../components/action-center/action-center.component';
 import { PlanningService } from '../../services/planning.service';
-import { DashboardService, DashboardStats } from '../../services/dashboard.service';
-import {RiskScore} from '../risk-dashboard/model/RiskScore.interface';
-import {Project} from '../projects/model/Project.interface';
+import { DashboardService } from '../../services/dashboard.service';
+import { DashboardStats } from '../../models/dashboard.model';
+import { RiskScore } from '../../models/prediction.model';
+import { Project } from '../../models/project.model';
 
 
 @Component({

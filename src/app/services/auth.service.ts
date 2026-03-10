@@ -3,25 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
-export interface User {
-    id: number;
-    email: string;
-    firstName: string;
-    lastName: string;
-    role: 'ADMIN' | 'PROJECT_MANAGER' | 'SITE_MANAGER' | 'FIELD_WORKER' | 'SUBCONTRACTOR';
-    organizationId?: number;
-    // Field Data Extensions
-    crewName?: string;
-    location?: string;
-    lastActivity?: string;
-    isSubcontractor?: boolean;
-}
-
-export interface AuthResponse {
-    accessToken: string;
-    refreshToken: string;
-    user: User;
-}
+import { User, AuthResponse } from '../models/auth.model';
 
 @Injectable({
     providedIn: 'root'

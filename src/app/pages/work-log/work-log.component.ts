@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BillingService, WorkLog, WorkLogDTO } from '../../services/billing.service';
-import { FieldService, FieldCrew } from '../../services/field.service';
-import { SegmentService, Segment } from '../../services/segment.service';
+import { BillingService } from '../../services/billing.service';
+import { WorkLog, WorkLogDTO } from '../../models/billing.model';
+import { FieldService } from '../../services/field.service';
+import { FieldCrew } from '../../models/field.model';
+import { SegmentService } from '../../services/segment.service';
+import { Segment } from '../../models/segment.model';
 
 @Component({
     selector: 'app-work-log',

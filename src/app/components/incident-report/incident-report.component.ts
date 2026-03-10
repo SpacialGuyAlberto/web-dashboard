@@ -1,7 +1,8 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SafetyService, Incident } from '../../services/safety.service';
+import { SafetyService } from '../../services/safety.service';
+import { Incident } from '../../models/safety.model';
 
 @Component({
     selector: 'app-incident-report',

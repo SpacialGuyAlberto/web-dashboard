@@ -2,22 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, map, catchError } from 'rxjs';
 
-export interface RouteCoordinate {
-    lat: number;
-    lng: number;
-}
-
-export interface OSRMResponse {
-    code: string;
-    routes: {
-        geometry: {
-            type: string;
-            coordinates: number[][];
-        };
-        distance: number;
-        duration: number;
-    }[];
-}
+import { RouteCoordinate, OSRMResponse } from '../models/routing.model';
 
 @Injectable({
     providedIn: 'root'

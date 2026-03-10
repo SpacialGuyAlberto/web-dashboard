@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import {Project} from '../pages/projects/model/Project.interface';
-import {RiskScore} from '../pages/risk-dashboard/model/RiskScore.interface';
+import { Project } from '../models/project.model';
+import { RiskScore } from '../models/prediction.model';
 
 
 @Injectable({
@@ -24,6 +24,7 @@ export class PlanningService {
                     id: 1, segmentId: 101, projectId: 1, riskLevel: 'HIGH', confidenceScore: 0.85, riskFactors: 'Weather, Traffic',
                     predictedCompletion: '2025-07-01', bestCaseCompletion: '2025-06-15', worstCaseCompletion: '2025-08-01', delayProbability: 0.75,
                     scheduleRisk: 80, permitRisk: 20, performanceRisk: 50, safetyRisk: 30, qualityRisk: 10, environmentRisk: 60,
+                    score: 80,
                     topCauses: ['Heavy Rain Forecast next week', 'Material Delivery Delayed (Steel)', 'High Traffic Congestion'],
                     recommendedActions: [
                         'Pre-order materials immediately to mitigate delay.',
@@ -35,6 +36,7 @@ export class PlanningService {
                     id: 2, segmentId: 102, projectId: 2, riskLevel: 'LOW', confidenceScore: 0.95, riskFactors: 'None',
                     predictedCompletion: '2025-03-20', bestCaseCompletion: '2025-03-18', worstCaseCompletion: '2025-03-25', delayProbability: 0.10,
                     scheduleRisk: 10, permitRisk: 5, performanceRisk: 10, safetyRisk: 5, qualityRisk: 5, environmentRisk: 5,
+                    score: 10,
                     topCauses: [],
                     recommendedActions: ['Continue monitoring.', 'Maintain current pace.']
                 }

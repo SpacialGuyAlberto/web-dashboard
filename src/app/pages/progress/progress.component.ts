@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProgressService, AdvancedProgressData } from '../../services/progress.service';
+import { ProgressService } from '../../services/progress.service';
+import { AdvancedProgressData } from '../../models/progress.model';
 
 @Component({
     selector: 'app-progress',

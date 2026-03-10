@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { InventoryService, Material, Supplier } from '../../../services/inventory.service';
+import { InventoryService } from '../../../services/inventory.service';
+import { Material, Supplier } from '../../../models/inventory.model';
 import { ToastService } from '../../../services/toast.service';
 
 @Component({

@@ -1,11 +1,14 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ScheduleService, CrewAssignment } from '../../services/schedule.service';
-import { SubcontractorService, Crew } from '../../services/subcontractor.service';
+import { ScheduleService } from '../../services/schedule.service';
+import { CrewAssignment } from '../../models/schedule.model';
+import { SubcontractorService } from '../../services/subcontractor.service';
+import { Crew } from '../../models/subcontractor.model';
 import { PlanningService } from '../../services/planning.service';
-import { SegmentService, Segment } from '../../services/segment.service';
-import {Project} from '../projects/model/Project.interface';
+import { SegmentService } from '../../services/segment.service';
+import { Segment } from '../../models/segment.model';
+import { Project } from '../../models/project.model';
 
 @Component({
     selector: 'app-schedule',

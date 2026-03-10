@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { InventoryService, Supplier } from '../../../services/inventory.service';
+import { InventoryService } from '../../../services/inventory.service';
+import { Supplier } from '../../../models/inventory.model';
 
 @Component({
   selector: 'app-suppliers',

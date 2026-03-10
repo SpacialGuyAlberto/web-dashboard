@@ -2,21 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
-export interface CustomFieldDefinition {
-    id?: number;
-    entityTypes: string[]; // Changed from entityType: string
-    fieldKey: string;
-    label: string;
-    fieldType: 'TEXT' | 'NUMBER' | 'DATE' | 'SELECT' | 'BOOLEAN';
-    options?: string[];
-    isRequired: boolean;
-    defaultValue?: string;
-    uiOrder: number;
-}
+import { CustomFieldDefinition } from '../models/custom-field.model';
 
-@Injectable({
-    providedIn: 'root'
-})
 @Injectable({
     providedIn: 'root'
 })

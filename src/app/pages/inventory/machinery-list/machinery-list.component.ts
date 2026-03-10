@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { InventoryService, Machine } from '../../../services/inventory.service';
+import { InventoryService } from '../../../services/inventory.service';
+import { Machine } from '../../../models/inventory.model';
 
 @Component({
     selector: 'app-machinery-list',

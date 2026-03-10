@@ -1,13 +1,13 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CustomFieldDefinition } from '../../services/custom-field.service';
+import { CustomFieldDefinition } from '../../models/custom-field.model';
 
 @Component({
-    selector: 'app-dynamic-input',
-    standalone: true,
-    imports: [CommonModule, FormsModule],
-    template: `
+  selector: 'app-dynamic-input',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
     <div class="mb-4">
       <label [for]="field.fieldKey" class="block text-sm font-medium text-gray-700 mb-1">
         {{ field.label }}
@@ -67,11 +67,11 @@ import { CustomFieldDefinition } from '../../services/custom-field.service';
   `
 })
 export class DynamicInputComponent {
-    @Input() field!: CustomFieldDefinition;
-    @Input() value: any;
-    @Output() valueChange = new EventEmitter<any>();
+  @Input() field!: CustomFieldDefinition;
+  @Input() value: any;
+  @Output() valueChange = new EventEmitter<any>();
 
-    onValueChange(newValue: any) {
-        this.valueChange.emit(newValue);
-    }
+  onValueChange(newValue: any) {
+    this.valueChange.emit(newValue);
+  }
 }

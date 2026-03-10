@@ -2,14 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
-export interface WorkflowTask {
-    id: number;
-    projectName: string;
-    currentStep: string;
-    assignedTo: string;
-    status: string;
-    dueDate: string;
-}
+import { WorkflowTask } from '../models/workflow.model';
 
 @Injectable({
     providedIn: 'root'

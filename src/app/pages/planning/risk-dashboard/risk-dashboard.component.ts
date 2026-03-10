@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PredictionService, ProjectRisk, RiskScore } from '../../../services/prediction.service';
+import { PredictionService } from '../../../services/prediction.service';
+import { ProjectRisk, RiskScore } from '../../../models/prediction.model';
 
 @Component({
     selector: 'app-risk-dashboard',

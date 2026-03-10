@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
-export interface Toast {
-    message: string;
-    type: 'success' | 'error' | 'info' | 'warning';
-    id?: number;
-}
+import { Toast } from '../models/toast.model';
 
 @Injectable({
     providedIn: 'root'

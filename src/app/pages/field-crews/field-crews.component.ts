@@ -1,7 +1,8 @@
 import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FieldService, FieldCrew } from '../../services/field.service';
+import { FieldService } from '../../services/field.service';
+import { FieldCrew } from '../../models/field.model';
 
 
 

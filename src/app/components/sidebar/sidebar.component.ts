@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
-import { AuthService, User } from '../../services/auth.service';
+import { AuthService } from '../../services/auth.service';
+import { User } from '../../models/auth.model';
 import { filter } from 'rxjs/operators';
 
 interface NavigationItem {
