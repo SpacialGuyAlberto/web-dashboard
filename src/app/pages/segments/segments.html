@@ -43,53 +43,60 @@
         <!-- Segments Grid -->
         <div *ngIf="!loading && activeTab === 'segments'" class="segments-grid">
             <div *ngFor="let segment of segments" class="segment-card">
+                <!-- Card Glow effect (CSS) -->
+                <div class="card-edge-glow"></div>
+
                 <!-- Segment Header -->
                 <div class="segment-card-header">
-                    <div>
-                        <h3>{{ segment.streetName }}</h3>
-                        <p class="segment-subtitle">{{ segment.streetType }}</p>
+                    <div class="header-main">
+                        <div class="title-row">
+                            <span class="location-icon">📍</span>
+                            <h3>{{ segment.streetName }}</h3>
+                        </div>
+                        <span class="street-type-tag">{{ segment.streetType }}</span>
                     </div>
-                    <div class="status-group">
-                        <span [class]="getStateColor(segment.currentState)" class="status-badge">
+                    <div class="status-stack">
+                        <span [class]="'status-badge ' + segment.currentState.toLowerCase()">
                             {{ getStateText(segment.currentState) }}
                         </span>
-                        <span *ngIf="segment.volume" class="bim-certified-badge">
-                            BIM CERTIFIED
+                        <span *ngIf="segment.volume" class="bim-badge">
+                            <i class="icon-bim"></i> BIM READY
                         </span>
                     </div>
                 </div>
 
                 <!-- Segment Details -->
-                <div class="segment-details">
-                    <div class="detail-row">
-                        <span class="detail-label">Work Type:</span>
-                        <span>{{ segment.workType }}</span>
+                <div class="segment-info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Service</span>
+                        <span class="info-value">{{ segment.workType }}</span>
                     </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Length:</span>
-                        <span>{{ segment.length }}m</span>
+                    <div class="info-item">
+                        <span class="info-label">Length</span>
+                        <span class="info-value">{{ segment.length }}<small>m</small></span>
                     </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Dates:</span>
-                        <span>{{ segment.plannedStartDate }} - {{ segment.plannedEndDate }}</span>
-                    </div>
-                    <div *ngIf="segment.volume" class="detail-row detail-value-bim">
-                        <span class="detail-label">Volume:</span>
-                        <span>{{ segment.volume }} m³</span>
+                    <div class="info-item full-width">
+                        <span class="info-label">Timeline</span>
+                        <span class="info-value timeline">
+                            <span class="date">{{ segment.plannedStartDate }}</span>
+                            <span class="arrow">→</span>
+                            <span class="date">{{ segment.plannedEndDate }}</span>
+                        </span>
                     </div>
                 </div>
 
-                <div class="segment-actions-wrapper">
-                    <div class="segment-actions">
-                        <button (click)="openDetailsModal(segment)" class="btn-details">
-                            View Details
+                <div class="card-footer-actions">
+                    <div class="primary-actions">
+                        <button (click)="openDetailsModal(segment)" class="btn-action-glass">
+                            <span>Details</span>
                         </button>
-                        <button (click)="openEditModal(segment)" class="btn-edit-outline">
-                            Edit
+                        <button (click)="openEditModal(segment)" class="btn-action-outline">
+                            <span>Edit</span>
                         </button>
                     </div>
-                    <button (click)="downloadReport(segment.id!)" class="btn-download-report">
-                        <span>📄</span> DOWNLOAD CERTIFIED REPORT (PDF)
+                    <button (click)="downloadReport(segment.id!)" class="btn-report-gradient">
+                        <span class="icon">📊</span>
+                        <span>CERTIFIED PDF REPORT</span>
                     </button>
                 </div>
             </div>

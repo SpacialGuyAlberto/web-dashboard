@@ -1,5 +1,16 @@
+:host {
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --accent-color: #3b82f6;
+}
+
+.dark :host {
+    --glass-bg: rgba(30, 41, 59, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
 .segments-container {
-    @apply min-h-screen bg-gray-50 dark:bg-gray-900 p-6;
+    @apply min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8;
 }
 
 .segments-wrapper {
@@ -7,174 +18,189 @@
 }
 
 .segments-header {
-    @apply mb-8 flex justify-between items-center;
+    @apply mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6;
 }
 
 .btn-back {
-    @apply text-blue-600 hover:text-blue-800 mb-2 flex items-center gap-2;
+    @apply text-slate-500 flex items-center gap-1 text-sm font-semibold transition-all mb-2;
+    color: var(--slate-500);
+}
+
+.btn-back:hover {
+    color: var(--accent-color);
 }
 
 .segments-header h1 {
-    @apply text-3xl font-bold text-gray-900 dark:text-white;
+    @apply text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight;
 }
 
 .segments-header p {
-    @apply text-gray-600 dark:text-gray-400 mt-2;
-}
-
-.header-actions {
-    @apply flex gap-3;
+    @apply text-slate-500 dark:text-slate-400 font-medium;
 }
 
 .btn-new-segment {
-    @apply bg-blue-600 text-white px-2 py-1 rounded bg-blue-700 transition font-medium;
+    @apply text-white px-6 py-3 rounded-xl shadow-lg font-bold transition-all active:scale-95;
+    background-color: var(--accent-color);
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2);
+}
+
+.btn-new-segment:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
 }
 
 .tabs-container {
-    @apply border-b border-gray-200 dark:border-gray-700 mb-6;
+    @apply mb-8;
 }
 
 .tab-nav {
-    @apply flex space-x-8;
+    @apply flex bg-slate-200/50 dark:bg-slate-800/50 p-1 rounded-2xl w-fit backdrop-blur-md;
 }
 
 .tab-btn {
-    @apply py-4 px-1 border-b-2 font-medium text-sm transition text-gray-500;
+    @apply px-6 py-2.5 rounded-xl font-bold text-sm transition-all text-slate-500;
 }
 
 .tab-btn-active {
-    @apply border-blue-500 text-blue-600;
-}
-
-.error-container {
-    @apply bg-red-50 dark:bg-red-900 border border-red-200 rounded p-4 mb-6;
-}
-
-.error-message {
-    @apply text-red-800 dark:text-red-400;
-}
-
-.loading-container {
-    @apply flex justify-center py-12;
-}
-
-.spinner {
-    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600;
+    @apply bg-white dark:bg-slate-700 shadow-sm;
+    color: var(--accent-color);
 }
 
 .segments-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+    @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8;
 }
 
 .segment-card {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow p-6 border dark:border-gray-700;
+    @apply relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-8 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col;
+}
+
+.segment-card:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateY(-4px);
+}
+
+.card-edge-glow {
+    @apply absolute -top-24 -right-24 w-48 h-48 blur-[80px] rounded-full pointer-events-none;
+    background-color: rgba(59, 130, 246, 0.1);
 }
 
 .segment-card-header {
-    @apply flex justify-between items-start mb-4;
+    @apply flex justify-between items-start mb-6;
+}
+
+.title-row {
+    @apply flex items-center gap-3 mb-1;
+}
+
+.title-row h3 {
+    @apply text-xl font-extrabold text-slate-800 dark:text-slate-100;
+}
+
+.location-icon {
+    @apply text-xl opacity-60;
+}
+
+.street-type-tag {
+    @apply text-[10px] uppercase font-black tracking-widest text-slate-400 py-1 px-2 bg-slate-100 dark:bg-slate-800 rounded-md;
 }
 
 .status-badge {
-    @apply px-3 py-1 rounded-full text-xs font-medium;
+    @apply text-[11px] font-black tracking-wider uppercase px-4 py-2 rounded-full shadow-sm;
 }
 
-.segment-details {
-    @apply space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-4;
+.status-badge.plan {
+    @apply bg-slate-100 text-slate-500;
 }
 
-.btn-details {
-    @apply flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-medium;
+.status-badge.excavation {
+    @apply bg-amber-100 text-amber-700;
 }
 
-.btn-download-report {
-    @apply w-full flex items-center justify-center gap-2 px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded transition text-xs font-bold;
+.status-badge.completed {
+    @apply bg-emerald-100 text-emerald-700;
 }
 
-.materials-table-container {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden;
+.segment-info-grid {
+    @apply grid grid-cols-2 gap-6 mb-8;
 }
 
-.data-table-th {
-    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase;
+.info-item {
+    @apply flex flex-col;
 }
 
-.data-table-td {
-    @apply px-6 py-4 whitespace-nowrap text-sm;
+.info-item.full-width {
+    @apply col-span-2;
 }
 
+.info-label {
+    @apply text-[10px] font-black uppercase text-slate-400 mb-1;
+}
+
+.info-value {
+    @apply font-bold text-slate-700 dark:text-slate-300;
+}
+
+.info-value.timeline {
+    @apply flex items-center gap-2 text-xs;
+}
+
+.info-value .arrow {
+    color: var(--accent-color);
+    opacity: 0.5;
+}
+
+.card-footer-actions {
+    @apply mt-auto space-y-4;
+}
+
+.primary-actions {
+    @apply grid grid-cols-2 gap-3;
+}
+
+.btn-action-glass {
+    @apply bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 py-3 rounded-2xl font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-700 transition-all border border-slate-200 dark:border-slate-700;
+}
+
+.btn-action-outline {
+    @apply border-2 border-slate-100 dark:border-slate-800 py-3 rounded-2xl font-bold text-xs hover:border-blue-400/40 transition-all text-slate-500;
+}
+
+.btn-report-gradient {
+    @apply w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-4 rounded-2xl font-black text-[10px] tracking-widest flex items-center justify-center gap-3 shadow-lg hover:opacity-90 transition-all;
+}
+
+/* Modal styles */
 .modal-overlay {
-    @apply fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4;
+    @apply fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-[100] p-4;
 }
 
 .modal-container-large {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700;
+    @apply bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800;
 }
 
 .modal-header {
-    @apply p-6 border-b border-gray-100 dark:border-gray-700 flex-shrink-0 bg-white dark:bg-gray-800;
-}
-
-.modal-header-with-close {
-    @apply p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-white dark:bg-gray-800;
-}
-
-.modal-header h2 {
-    @apply text-2xl font-bold text-gray-900 dark:text-white;
+    @apply p-10 border-b border-slate-100 dark:border-slate-800 flex-shrink-0;
 }
 
 .modal-content-scroll {
-    @apply p-6 overflow-y-auto flex-1 bg-white dark:bg-gray-800;
+    @apply p-10 overflow-y-auto flex-1;
 }
 
 .modal-footer {
-    @apply p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 flex justify-end gap-3 flex-shrink-0;
-}
-
-.btn-close-modal {
-    @apply text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors;
-}
-
-.form-group-list {
-    @apply space-y-6;
-}
-
-.form-grid-2 {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
-}
-
-.form-group {
-    @apply mb-2;
+    @apply p-8 bg-slate-50 dark:bg-slate-900/50 flex justify-end gap-4;
 }
 
 .form-label {
-    @apply block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2;
+    @apply block text-[11px] font-black uppercase text-slate-400 mb-2 tracking-widest;
 }
 
-.form-select,
-.form-input {
-    @apply w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 transition-all;
+.form-input,
+.form-select {
+    @apply w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-2xl px-5 py-4 font-bold text-slate-700 dark:text-slate-200 transition-all;
 }
 
-.form-input-readonly {
-    @apply bg-gray-50 dark:bg-gray-800/50 text-gray-500 cursor-not-allowed border-dashed;
-}
-
-.transition-actions {
-    @apply flex flex-wrap gap-2;
-}
-
-.btn-transition {
-    @apply px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 shadow-sm transition-all;
-}
-
-.smart-plan-container {
-    @apply mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded p-4;
-}
-
-.bim-value {
-    @apply text-2xl font-black text-indigo-900 dark:text-indigo-200;
-}
-
-.section-title {
-    @apply text-lg font-semibold mb-3 border-b pb-2;
+.form-input:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+    outline: none;
 }
