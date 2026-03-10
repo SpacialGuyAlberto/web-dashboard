@@ -6,7 +6,8 @@ import { InventoryService, Machine } from '../../../services/inventory.service';
     selector: 'app-machinery-list',
     standalone: true,
     imports: [CommonModule],
-    templateUrl: './machinery-list.component.html'
+    templateUrl: './machinery-list.component.html',
+    styleUrls: ['./machinery-list.component.css']
 })
 export class MachineryListComponent implements OnInit {
     machines: Machine[] = [];

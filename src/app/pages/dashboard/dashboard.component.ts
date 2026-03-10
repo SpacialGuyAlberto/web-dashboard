@@ -5,8 +5,11 @@ import { Router } from '@angular/router';
 import { MapViewComponent } from '../../components/map-view/map-view.component';
 import { KPICardComponent } from '../../components/kpi-card/kpi-card.component';
 import { ActionCenterComponent, ActionItem } from '../../components/action-center/action-center.component';
-import { PlanningService, Project, Segment, RiskScore } from '../../services/planning.service';
+import { PlanningService } from '../../services/planning.service';
 import { DashboardService, DashboardStats } from '../../services/dashboard.service';
+import {RiskScore} from '../risk-dashboard/model/RiskScore.interface';
+import {Project} from '../projects/model/Project.interface';
+
 
 @Component({
     selector: 'app-dashboard',

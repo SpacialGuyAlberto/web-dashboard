@@ -1,64 +1,59 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Subcontractors & Crews</h1>
-        <button (click)="openAddSubModal()"
-            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+<div class="subcontractors-container">
+    <div class="page-header">
+        <h1>Subcontractors & Crews</h1>
+        <button (click)="openAddSubModal()" class="btn-add-main">
             + Add Subcontractor
         </button>
     </div>
 
-    <div class="grid gap-6">
-        <div *ngFor="let sub of subcontractors"
-            class="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
-            <div class="flex justify-between items-start mb-4">
+    <div class="subcontractors-list">
+        <div *ngFor="let sub of subcontractors" class="subcontractor-card">
+            <div class="card-header">
                 <div>
-                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{sub.name}}</h2>
-                    <p class="text-gray-500 dark:text-gray-400">{{sub.contactPerson}} | {{sub.email}} | {{sub.phone}}
-                    </p>
-                    <div class="mt-2">
-                        <span [class]="'px-2 py-1 rounded-full text-xs font-medium ' + 
-                            (sub.status === 'PREFERRED' ? 'bg-green-100 text-green-800' : 
-                             sub.status === 'BLOCKED' ? 'bg-red-100 text-red-800' : 
-                             'bg-blue-100 text-blue-800')">
+                    <h2 class="sub-title">{{sub.name}}</h2>
+                    <p class="sub-contact-info">{{sub.contactPerson}} | {{sub.email}} | {{sub.phone}}</p>
+                    <div class="status-badge-container">
+                        <span class="status-badge" [ngClass]="{
+                            'badge-preferred': sub.status === 'PREFERRED',
+                            'badge-blocked': sub.status === 'BLOCKED',
+                            'badge-active': sub.status !== 'PREFERRED' && sub.status !== 'BLOCKED'
+                        }">
                             {{sub.status}}
                         </span>
                     </div>
 
                     <!-- KPIs -->
-                    <div class="mt-3 grid grid-cols-3 gap-2 text-sm">
-                        <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded text-center">
-                            <div class="text-xs text-gray-500 dark:text-gray-400">Avg Time/m</div>
-                            <div class="font-medium text-gray-900 dark:text-white">{{sub.averageTimePerMeter || 0}} min
-                            </div>
+                    <div class="kpi-grid">
+                        <div class="kpi-box">
+                            <div class="kpi-label">Avg Time/m</div>
+                            <div class="kpi-value">{{sub.averageTimePerMeter || 0}} min</div>
                         </div>
-                        <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded text-center">
-                            <div class="text-xs text-gray-500 dark:text-gray-400">Defect Rate</div>
-                            <div class="font-medium text-gray-900 dark:text-white">{{sub.defectRate || 0}}%</div>
+                        <div class="kpi-box">
+                            <div class="kpi-label">Defect Rate</div>
+                            <div class="kpi-value">{{sub.defectRate || 0}}%</div>
                         </div>
-                        <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded text-center">
-                            <div class="text-xs text-gray-500 dark:text-gray-400">Rework Freq</div>
-                            <div class="font-medium text-gray-900 dark:text-white">{{sub.reworkFrequency || 0}}%</div>
+                        <div class="kpi-box">
+                            <div class="kpi-label">Rework Freq</div>
+                            <div class="kpi-value">{{sub.reworkFrequency || 0}}%</div>
                         </div>
                     </div>
                 </div>
-                <button (click)="openAddCrewModal(sub.id!)"
-                    class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                <button (click)="openAddCrewModal(sub.id!)" class="btn-add-crew">
                     + Add Crew
                 </button>
             </div>
 
             <!-- Crews List -->
-            <div class="mt-4 border-t dark:border-gray-700 pt-4">
-                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Crews</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div *ngFor="let crew of crews[sub.id!]"
-                        class="bg-gray-50 dark:bg-gray-700 rounded p-3 border border-gray-200 dark:border-gray-600">
-                        <div class="font-medium text-gray-900 dark:text-white">{{crew.name}}</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Foreman: {{crew.foremanName}}</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Size: {{crew.size}} people</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Vehicle: {{crew.vehiclePlate}}</div>
+            <div class="crews-section">
+                <h3>Crews</h3>
+                <div class="crews-grid">
+                    <div *ngFor="let crew of crews[sub.id!]" class="crew-card">
+                        <div class="crew-name">{{crew.name}}</div>
+                        <div class="crew-info">Foreman: {{crew.foremanName}}</div>
+                        <div class="crew-info">Size: {{crew.size}} people</div>
+                        <div class="crew-info">Vehicle: {{crew.vehiclePlate}}</div>
                     </div>
-                    <div *ngIf="!crews[sub.id!]?.length" class="text-sm text-gray-400 dark:text-gray-500 italic">
+                    <div *ngIf="!crews[sub.id!]?.length" class="empty-crews">
                         No crews assigned.
                     </div>
                 </div>
@@ -68,34 +63,29 @@
 </div>
 
 <!-- Add Subcontractor Modal -->
-<div *ngIf="showAddSubModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Add Subcontractor</h2>
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Name</label>
-                <input [(ngModel)]="newSubcontractor.name" type="text"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm border p-2">
+<div *ngIf="showAddSubModal" class="modal-overlay">
+    <div class="modal-container">
+        <h2>Add Subcontractor</h2>
+        <div class="form-group-list">
+            <div class="form-group">
+                <label>Company Name</label>
+                <input [(ngModel)]="newSubcontractor.name" type="text" class="form-input">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contact Person</label>
-                <input [(ngModel)]="newSubcontractor.contactPerson" type="text"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm border p-2">
+            <div class="form-group">
+                <label>Contact Person</label>
+                <input [(ngModel)]="newSubcontractor.contactPerson" type="text" class="form-input">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                <input [(ngModel)]="newSubcontractor.email" type="email"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm border p-2">
+            <div class="form-group">
+                <label>Email</label>
+                <input [(ngModel)]="newSubcontractor.email" type="email" class="form-input">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
-                <input [(ngModel)]="newSubcontractor.phone" type="text"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm border p-2">
+            <div class="form-group">
+                <label>Phone</label>
+                <input [(ngModel)]="newSubcontractor.phone" type="text" class="form-input">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                <select [(ngModel)]="newSubcontractor.status"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm border p-2">
+            <div class="form-group">
+                <label>Status</label>
+                <select [(ngModel)]="newSubcontractor.status" class="form-select">
                     <option value="ACTIVE">Active</option>
                     <option value="PREFERRED">Preferred</option>
                     <option value="BLOCKED">Blocked</option>
@@ -103,69 +93,56 @@
             </div>
 
             <!-- Performance Metrics Inputs -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 font-bold mt-2">Performance
-                    Metrics</label>
-                <div class="grid grid-cols-3 gap-2 mt-1">
+            <div class="form-group">
+                <label class="form-section-title">Performance Metrics</label>
+                <div class="metrics-inline-grid">
                     <div>
-                        <label class="text-xs text-gray-500 dark:text-gray-400">Avg Time/m (min)</label>
-                        <input [(ngModel)]="newSubcontractor.averageTimePerMeter" type="number"
-                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm border p-2">
+                        <label class="metrics-label-sub">Avg Time/m (min)</label>
+                        <input [(ngModel)]="newSubcontractor.averageTimePerMeter" type="number" class="form-input">
                     </div>
                     <div>
-                        <label class="text-xs text-gray-500 dark:text-gray-400">Defect Rate (%)</label>
-                        <input [(ngModel)]="newSubcontractor.defectRate" type="number"
-                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm border p-2">
+                        <label class="metrics-label-sub">Defect Rate (%)</label>
+                        <input [(ngModel)]="newSubcontractor.defectRate" type="number" class="form-input">
                     </div>
                     <div>
-                        <label class="text-xs text-gray-500 dark:text-gray-400">Rework Freq (%)</label>
-                        <input [(ngModel)]="newSubcontractor.reworkFrequency" type="number"
-                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm border p-2">
+                        <label class="metrics-label-sub">Rework Freq (%)</label>
+                        <input [(ngModel)]="newSubcontractor.reworkFrequency" type="number" class="form-input">
                     </div>
                 </div>
             </div>
         </div>
-        <div class="mt-6 flex justify-end gap-3">
-            <button (click)="closeAddSubModal()"
-                class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white">Cancel</button>
-            <button (click)="saveSubcontractor()"
-                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+        <div class="modal-footer">
+            <button (click)="closeAddSubModal()" class="btn-cancel">Cancel</button>
+            <button (click)="saveSubcontractor()" class="btn-save">Save</button>
         </div>
     </div>
 </div>
 
 <!-- Add Crew Modal -->
-<div *ngIf="showAddCrewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Add Crew</h2>
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Crew Name</label>
-                <input [(ngModel)]="newCrew.name" type="text"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm border p-2"
-                    placeholder="e.g. Team Alpha">
+<div *ngIf="showAddCrewModal" class="modal-overlay">
+    <div class="modal-container">
+        <h2>Add Crew</h2>
+        <div class="form-group-list">
+            <div class="form-group">
+                <label>Crew Name</label>
+                <input [(ngModel)]="newCrew.name" type="text" class="form-input" placeholder="e.g. Team Alpha">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Foreman Name</label>
-                <input [(ngModel)]="newCrew.foremanName" type="text"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm border p-2">
+            <div class="form-group">
+                <label>Foreman Name</label>
+                <input [(ngModel)]="newCrew.foremanName" type="text" class="form-input">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Crew Size</label>
-                <input [(ngModel)]="newCrew.size" type="number"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm border p-2">
+            <div class="form-group">
+                <label>Crew Size</label>
+                <input [(ngModel)]="newCrew.size" type="number" class="form-input">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vehicle Plate</label>
-                <input [(ngModel)]="newCrew.vehiclePlate" type="text"
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm border p-2">
+            <div class="form-group">
+                <label>Vehicle Plate</label>
+                <input [(ngModel)]="newCrew.vehiclePlate" type="text" class="form-input">
             </div>
         </div>
-        <div class="mt-6 flex justify-end gap-3">
-            <button (click)="closeAddCrewModal()"
-                class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white">Cancel</button>
-            <button (click)="saveCrew()"
-                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+        <div class="modal-footer">
+            <button (click)="closeAddCrewModal()" class="btn-cancel">Cancel</button>
+            <button (click)="saveCrew()" class="btn-save">Save</button>
         </div>
     </div>
 </div>

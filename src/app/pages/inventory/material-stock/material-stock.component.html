@@ -1,91 +1,80 @@
-<div class="p-6 relative">
-    <div class="flex items-center justify-between mb-6">
+<div class="material-stock-container">
+    <div class="page-header">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Inventario de Materiales</h1>
-            <p class="text-gray-500 text-sm">Control de stock, proveedores y reabastecimiento</p>
+            <h1 class="header-title">Inventario de Materiales</h1>
+            <p class="header-subtitle">Control de stock, proveedores y reabastecimiento</p>
         </div>
-        <button (click)="openNewMaterialModal()"
-            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition-colors flex items-center gap-2">
+        <button (click)="openNewMaterialModal()" class="btn-primary-action">
             <span>+</span> Registrar Material
         </button>
     </div>
 
     <!-- Alert for Low Stock -->
-    <div *ngIf="hasLowStock"
-        class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
-        <span class="text-red-600 dark:text-red-400 text-xl">⚠️</span>
+    <div *ngIf="hasLowStock" class="alert-banner">
+        <span class="alert-icon">⚠️</span>
         <div>
-            <h3 class="font-bold text-red-800 dark:text-red-200 text-sm uppercase">Alerta de Stock Bajo</h3>
-            <p class="text-sm text-red-700 dark:text-red-300 mt-1">Hay materiales por debajo del nivel mínimo requerido.
-            </p>
+            <h3 class="alert-title">Alerta de Stock Bajo</h3>
+            <p class="alert-description">Hay materiales por debajo del nivel mínimo requerido.</p>
         </div>
     </div>
 
     <!-- Materials Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let material of materials"
-            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 flex flex-col relative group hover:shadow-md transition-shadow">
+    <div class="materials-grid">
+        <div *ngFor="let material of materials" class="material-card group">
 
             <!-- Header -->
-            <div class="flex items-start justify-between mb-3">
-                <div class="flex items-center gap-3">
-                    <div
-                        class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xl">
-                        📦
-                    </div>
+            <div class="card-header">
+                <div class="badge-identity">
+                    <div class="icon-box">📦</div>
                     <div>
-                        <h3 class="font-bold text-gray-900 dark:text-white">{{ material.name }}</h3>
-                        <p class="text-xs font-mono text-gray-500">SKU: {{ material.sku }}</p>
-                        <p class="text-xs font-semibold text-gray-700 dark:text-gray-300 mt-1"
-                            *ngIf="material.unitPrice">
+                        <h3 class="item-name">{{ material.name }}</h3>
+                        <p class="item-sku">SKU: {{ material.sku }}</p>
+                        <p class="item-price" *ngIf="material.unitPrice">
                             {{ material.unitPrice | currency:'EUR':'symbol':'1.2-2' }} / {{ material.unit }}
                         </p>
                     </div>
                 </div>
                 <!-- Status Dot -->
-                <span class="w-3 h-3 rounded-full"
-                    [ngClass]="material.quantityOnHand < material.minThreshold ? 'bg-red-500 animate-pulse' : 'bg-green-500'"></span>
+                <span class="status-indicator"
+                    [ngClass]="material.quantityOnHand < material.minThreshold ? 'status-low' : 'status-ok'"></span>
             </div>
 
             <!-- Stock Info -->
-            <div class="flex items-end gap-2 my-2">
-                <span class="text-3xl font-black text-gray-900 dark:text-white">{{ material.quantityOnHand }}</span>
-                <span class="text-sm text-gray-500 mb-1">{{ material.unit }}</span>
+            <div class="stock-main-display">
+                <span class="stock-value">{{ material.quantityOnHand }}</span>
+                <span class="stock-unit">{{ material.unit }}</span>
             </div>
 
             <!-- Progress Bar (Health) -->
-            <div class="w-full h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden mb-4">
-                <div class="h-full rounded-full transition-all duration-500"
+            <div class="progress-container">
+                <div class="progress-filler transition-all duration-500"
                     [style.width.%]="(material.quantityOnHand / (material.minThreshold * 2)) * 100"
-                    [ngClass]="material.quantityOnHand < material.minThreshold ? 'bg-red-500' : 'bg-green-500'">
+                    [ngClass]="material.quantityOnHand < material.minThreshold ? 'filler-critical' : 'filler-safe'">
                 </div>
             </div>
 
             <!-- Supplier & Reorder Section -->
-            <div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
+            <div class="info-footer">
 
                 <!-- Supplier Info (Compact) -->
-                <div *ngIf="material.supplier"
-                    class="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-2 rounded">
+                <div *ngIf="material.supplier" class="supplier-card-compact">
                     <span class="text-lg">🏭</span>
                     <div>
-                        <div class="font-semibold text-xs uppercase text-gray-500">Proveedor Recomendado</div>
-                        <div class="font-medium text-blue-600 dark:text-blue-400">{{ material.supplier.name }}</div>
-                        <div class="text-xs">{{ material.supplier.address }}</div>
+                        <div class="supplier-label">Proveedor Recomendado</div>
+                        <div class="supplier-name">{{ material.supplier.name }}</div>
+                        <div class="supplier-contact-info">{{ material.supplier.address }}</div>
                     </div>
                 </div>
 
                 <!-- Reorder Controls -->
-                <div class="flex items-center justify-between">
-                    <button (click)="toggleReorderMode(material)"
-                        class="text-xs px-2 py-1 rounded border transition-colors"
-                        [ngClass]="material.reorderMode === 'AUTOMATIC' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-100 text-gray-600 border-gray-200'">
+                <div class="reorder-controls">
+                    <button (click)="toggleReorderMode(material)" class="btn-tag"
+                        [ngClass]="material.reorderMode === 'AUTOMATIC' ? 'btn-tag-auto' : 'btn-tag-manual'">
                         {{ material.reorderMode === 'AUTOMATIC' ? '🔄 Auto-Pedido' : '✋ Manual' }}
                     </button>
 
                     <button *ngIf="material.reorderMode === 'MANUAL' && material.quantityOnHand < material.minThreshold"
-                        (click)="openOrderModal(material)"
-                        class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded shadow-sm">
+                        (click)="openOrderModal(material)" class="btn-order-now">
                         Pedir Ahora
                     </button>
                 </div>
@@ -94,28 +83,23 @@
     </div>
 
     <!-- Modal for New Material -->
-    <div *ngIf="showNewMaterialModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md p-6">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Registrar Nuevo Material</h2>
+    <div *ngIf="showNewMaterialModal" class="modal-overlay">
+        <div class="modal-content animate-zoom-in">
+            <h2 class="modal-title">Registrar Nuevo Material</h2>
 
             <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre
-                        Material</label>
-                    <input [(ngModel)]="newMaterial.name" type="text"
-                        class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 text-sm">
+                <div class="form-group">
+                    <label class="form-label">Nombre Material</label>
+                    <input [(ngModel)]="newMaterial.name" type="text" class="form-control">
                 </div>
                 <div class="grid grid-cols-3 gap-4">
                     <div class="col-span-1">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">SKU</label>
-                        <input [(ngModel)]="newMaterial.sku" type="text"
-                            class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 text-sm">
+                        <label class="form-label">SKU</label>
+                        <input [(ngModel)]="newMaterial.sku" type="text" class="form-control">
                     </div>
                     <div class="col-span-1">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Unidad</label>
-                        <select [(ngModel)]="newMaterial.unit"
-                            class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 text-sm">
+                        <label class="form-label">Unidad</label>
+                        <select [(ngModel)]="newMaterial.unit" class="form-select">
                             <option>Metros</option>
                             <option>Unidades</option>
                             <option>Kg</option>
@@ -123,80 +107,66 @@
                         </select>
                     </div>
                     <div class="col-span-1">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Precio</label>
+                        <label class="form-label">Precio</label>
                         <input [(ngModel)]="newMaterial.unitPrice" type="number" placeholder="0.00"
-                            class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 text-sm">
+                            class="form-control">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stock
-                            Inicial</label>
-                        <input [(ngModel)]="newMaterial.quantityOnHand" type="number"
-                            class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 text-sm">
+                        <label class="form-label">Stock Inicial</label>
+                        <input [(ngModel)]="newMaterial.quantityOnHand" type="number" class="form-control">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Umbral
-                            Mínimo</label>
-                        <input [(ngModel)]="newMaterial.minThreshold" type="number"
-                            class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 text-sm">
+                        <label class="form-label">Umbral Mínimo</label>
+                        <input [(ngModel)]="newMaterial.minThreshold" type="number" class="form-control">
                     </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Proveedor
-                        Principal</label>
-                    <select [(ngModel)]="newMaterial.supplier"
-                        class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 text-sm">
+                <div class="form-group">
+                    <label class="form-label">Proveedor Principal</label>
+                    <select [(ngModel)]="newMaterial.supplier" class="form-select">
                         <option [ngValue]="null">Seleccionar Proveedor</option>
                         <option *ngFor="let s of suppliers" [ngValue]="s">{{ s.name }}</option>
                     </select>
                 </div>
             </div>
 
-            <div class="mt-6 flex justify-end gap-3">
-                <button (click)="closeNewMaterialModal()"
-                    class="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-300">Cancelar</button>
-                <button (click)="saveNewMaterial()"
-                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow">Guardar</button>
+            <div class="modal-footer">
+                <button (click)="closeNewMaterialModal()" class="btn-cancel">Cancelar</button>
+                <button (click)="saveNewMaterial()" class="btn-save">Guardar</button>
             </div>
         </div>
     </div>
 
     <!-- Smart Order Modal -->
-    <div *ngIf="showOrderModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
-        <div
-            class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+    <div *ngIf="showOrderModal" class="modal-overlay">
+        <div class="modal-content-wide animate-zoom-in">
             <!-- Header -->
-            <div class="bg-blue-600 p-4 text-white">
+            <div class="smart-order-header">
                 <h2 class="text-xl font-bold flex items-center gap-2">
                     <span>🚀</span> Smart Order: {{ currentMaterialForOrder?.name }}
                 </h2>
-                <p class="text-blue-100 text-sm mt-1">Sugerencia basada en demanda y stock de seguridad</p>
+                <p class="header-accent">Sugerencia basada en demanda y stock de seguridad</p>
             </div>
 
-            <div class="p-6 space-y-6">
+            <div class="smart-order-body">
                 <!-- Usage Stats Section -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div
-                        class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
-                        <div class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase mb-1">Demanda Proyectos
+                <div class="stats-summary-grid">
+                    <div class="summary-box box-demand">
+                        <div class="summary-label label-demand">Demanda Proyectos</div>
+                        <div class="summary-value">{{ orderStats.projectDemand }}
+                            <span class="value-unit">{{ currentMaterialForOrder?.unit }}</span>
                         </div>
-                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ orderStats.projectDemand }}
-                            <span class="text-sm font-normal text-gray-500">{{ currentMaterialForOrder?.unit }}</span>
-                        </div>
-                        <div class="text-xs text-gray-500 mt-2 truncate" *ngIf="orderStats.activeProjects.length">
+                        <div class="summary-footer-text" *ngIf="orderStats.activeProjects.length">
                             {{ orderStats.activeProjects.join(', ') }}
                         </div>
                     </div>
-                    <div
-                        class="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-100 dark:border-amber-800">
-                        <div class="text-xs text-amber-600 dark:text-amber-400 font-bold uppercase mb-1">Rellenar Stock
+                    <div class="summary-box box-safety">
+                        <div class="summary-label label-safety">Rellenar Stock</div>
+                        <div class="summary-value">{{ orderStats.safetyStockNeed }}
+                            <span class="value-unit">{{ currentMaterialForOrder?.unit }}</span>
                         </div>
-                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ orderStats.safetyStockNeed }}
-                            <span class="text-sm font-normal text-gray-500">{{ currentMaterialForOrder?.unit }}</span>
-                        </div>
-                        <div class="text-xs text-gray-500 mt-2">
+                        <div class="summary-footer-text">
                             Base: {{ currentMaterialForOrder?.minThreshold }} (Min)
                         </div>
                     </div>
@@ -204,12 +174,9 @@
 
                 <!-- Input Section -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Cantidad a Pedir
-                    </label>
+                    <label class="form-label">Cantidad a Pedir</label>
                     <div class="flex items-center gap-4">
-                        <input [(ngModel)]="orderQuantity" type="number"
-                            class="flex-1 text-2xl font-bold p-3 rounded-lg border-2 border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 text-center">
+                        <input [(ngModel)]="orderQuantity" type="number" class="input-large-control">
                         <span class="text-gray-500 font-medium">{{ currentMaterialForOrder?.unit }}</span>
                     </div>
                     <p class="text-xs text-gray-500 mt-2">
@@ -217,8 +184,7 @@
                     </p>
 
                     <!-- Cost Estimate -->
-                    <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg flex justify-between items-center"
-                        *ngIf="currentMaterialForOrder?.unitPrice">
+                    <div class="estimate-bar" *ngIf="currentMaterialForOrder?.unitPrice">
                         <span class="text-sm text-gray-600 dark:text-gray-400">Costo Estimado:</span>
                         <span class="font-bold text-lg text-gray-900 dark:text-white">
                             {{ (orderQuantity * (currentMaterialForOrder?.unitPrice || 0)) |
@@ -229,14 +195,11 @@
             </div>
 
             <!-- Footer -->
-            <div
-                class="p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-700">
-                <button (click)="closeOrderModal()"
-                    class="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-300 font-medium">
+            <div class="smart-order-footer">
+                <button (click)="closeOrderModal()" class="btn-cancel font-medium">
                     Cancelar
                 </button>
-                <button (click)="confirmOrder()"
-                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow font-medium flex items-center gap-2">
+                <button (click)="confirmOrder()" class="btn-save font-medium flex items-center gap-2">
                     <span>🛒</span> Confirmar Pedido
                 </button>
             </div>

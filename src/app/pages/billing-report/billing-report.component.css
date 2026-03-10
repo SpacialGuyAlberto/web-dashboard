@@ -1,0 +1,206 @@
+.page-container {
+    @apply min-h-screen bg-gray-50 dark:bg-gray-900 p-6 transition-colors duration-200;
+}
+
+.content-wrapper {
+    @apply max-w-7xl mx-auto;
+}
+
+.page-header {
+    @apply mb-8;
+}
+
+.page-header h1 {
+    @apply text-3xl font-bold text-gray-900 dark:text-white;
+}
+
+.page-header p {
+    @apply text-gray-600 dark:text-gray-400 mt-2;
+}
+
+.error-container {
+    @apply mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4;
+}
+
+.error-message {
+    @apply text-red-800 dark:text-red-400;
+}
+
+/* Filter Section */
+.filter-card {
+    @apply bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6 border border-gray-200 dark:border-gray-700;
+}
+
+.filter-card h3 {
+    @apply text-lg font-semibold text-gray-900 dark:text-white mb-4;
+}
+
+.filter-grid {
+    @apply grid grid-cols-1 md:grid-cols-4 gap-4;
+}
+
+.form-group label {
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+}
+
+.form-input {
+    @apply w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.btn-generate {
+    @apply w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium;
+}
+
+.btn-generate-container {
+    @apply flex items-end;
+}
+
+/* Loading State */
+.loading-container {
+    @apply flex justify-center items-center py-12;
+}
+
+.spinner {
+    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600;
+}
+
+/* Report Results */
+.report-content {
+    @apply space-y-6;
+}
+
+.summary-card {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700;
+}
+
+.summary-header {
+    @apply flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4;
+}
+
+.summary-header h2 {
+    @apply text-2xl font-bold text-gray-900 dark:text-white;
+}
+
+.btn-export {
+    @apply bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium;
+}
+
+/* Metric Pills */
+.metric-grid {
+    @apply grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6;
+}
+
+.metric-pill {
+    @apply p-4 rounded-lg border;
+}
+
+.metric-label {
+    @apply text-sm mb-1;
+}
+
+.metric-value {
+    @apply text-2xl font-bold;
+}
+
+/* Variants */
+.pill-blue {
+    @apply bg-blue-50 dark:bg-blue-900/30 border-blue-100 dark:border-blue-800;
+}
+
+.pill-blue .metric-label {
+    @apply text-gray-600 dark:text-blue-200;
+}
+
+.pill-blue .metric-value {
+    @apply text-blue-600 dark:text-blue-300;
+}
+
+.pill-green {
+    @apply bg-green-50 dark:bg-green-900/30 border-green-100 dark:border-green-800;
+}
+
+.pill-green .metric-label {
+    @apply text-gray-600 dark:text-green-200;
+}
+
+.pill-green .metric-value {
+    @apply text-green-600 dark:text-green-300;
+}
+
+.pill-purple {
+    @apply bg-purple-50 dark:bg-purple-900/30 border-purple-100 dark:border-purple-800;
+}
+
+.pill-purple .metric-label {
+    @apply text-gray-600 dark:text-purple-200;
+}
+
+.pill-purple .metric-value {
+    @apply text-purple-600 dark:text-purple-300;
+}
+
+.pill-orange {
+    @apply bg-orange-50 dark:bg-orange-900/30 border-orange-100 dark:border-orange-800;
+}
+
+.pill-orange .metric-label {
+    @apply text-gray-600 dark:text-orange-200;
+}
+
+.pill-orange .metric-value {
+    @apply text-orange-600 dark:text-orange-300;
+}
+
+/* Cost Breakdown */
+.breakdown-section {
+    @apply border-t dark:border-gray-700 pt-6;
+}
+
+.breakdown-title {
+    @apply text-lg font-semibold text-gray-900 dark:text-white mb-4;
+}
+
+.breakdown-list {
+    @apply space-y-3;
+}
+
+.breakdown-item {
+    @apply flex justify-between items-center;
+}
+
+.item-label {
+    @apply text-gray-700 dark:text-gray-300;
+}
+
+.item-value {
+    @apply font-semibold text-gray-900 dark:text-white;
+}
+
+.total-row {
+    @apply border-t dark:border-gray-700 pt-3 flex justify-between items-center;
+}
+
+.total-label {
+    @apply text-lg font-bold text-gray-900 dark:text-white;
+}
+
+.total-value {
+    @apply text-2xl font-bold text-blue-600 dark:text-blue-400;
+}
+
+/* Empty State */
+.empty-state-card {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md p-12 text-center border border-gray-200 dark:border-gray-700;
+}
+
+.empty-state-icon {
+    @apply text-gray-400 dark:text-gray-500 mb-4;
+}
+
+.empty-state-card h3 {
+    @apply text-lg font-medium text-gray-900 dark:text-white mb-2;
+}
+
+.empty-state-card p {
+    @apply text-gray-500 dark:text-gray-400;
+}

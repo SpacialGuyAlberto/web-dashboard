@@ -1,0 +1,151 @@
+.suppliers-container {
+    @apply p-6 relative;
+}
+
+.page-header {
+    @apply flex items-center justify-between mb-6;
+}
+
+.header-title {
+    @apply text-2xl font-bold text-gray-900 dark:text-white;
+}
+
+.header-subtitle {
+    @apply text-gray-500 text-sm;
+}
+
+.btn-add-supplier {
+    @apply px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition-colors flex items-center gap-2;
+}
+
+/* Suppliers Grid */
+.suppliers-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.supplier-card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md transition-shadow;
+}
+
+.card-header {
+    @apply flex justify-between items-start mb-4;
+}
+
+.supplier-identity {
+    @apply flex items-center gap-3;
+}
+
+.supplier-icon-box {
+    @apply w-10 h-10 rounded-lg flex items-center justify-center text-xl;
+}
+
+.icon-machinery {
+    @apply bg-orange-100 text-orange-600;
+}
+
+.icon-both {
+    @apply bg-purple-100 text-purple-600;
+}
+
+.icon-material {
+    @apply bg-blue-100 text-blue-600;
+}
+
+.supplier-name {
+    @apply font-bold text-gray-900 dark:text-white;
+}
+
+.type-badge {
+    @apply text-xs px-2 py-0.5 rounded-full border;
+}
+
+.badge-machinery {
+    @apply bg-orange-50 text-orange-700 border-orange-200;
+}
+
+.badge-both {
+    @apply bg-purple-50 text-purple-700 border-purple-200;
+}
+
+.badge-material {
+    @apply bg-blue-50 text-blue-700 border-blue-200;
+}
+
+.card-actions {
+    @apply flex gap-2 opacity-0 transition-opacity;
+}
+
+.supplier-card:hover .card-actions {
+    @apply opacity-100;
+}
+
+.btn-card-action {
+    @apply text-gray-400 transition-colors;
+}
+
+.btn-edit:hover {
+    @apply text-blue-500;
+}
+
+.btn-delete:hover {
+    @apply text-red-500;
+}
+
+/* Contact Info List */
+.contact-info-list {
+    @apply space-y-2 text-sm text-gray-600 dark:text-gray-300;
+}
+
+.contact-item {
+    @apply flex items-center gap-2;
+}
+
+.info-icon {
+    @apply text-gray-400;
+}
+
+/* Modal */
+.modal-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm;
+}
+
+.modal-content {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md p-6;
+}
+
+.modal-title {
+    @apply text-xl font-bold text-gray-900 dark:text-white mb-4;
+}
+
+.form-group-stack {
+    @apply space-y-4;
+}
+
+.form-field {
+    @apply block;
+}
+
+.field-label {
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+}
+
+.form-input,
+.form-select {
+    @apply w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 text-sm focus:ring-blue-500 focus:border-blue-500;
+}
+
+.form-grid-2 {
+    @apply grid grid-cols-2 gap-4;
+}
+
+.modal-footer {
+    @apply mt-6 flex justify-end gap-3;
+}
+
+.btn-secondary {
+    @apply px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-300;
+}
+
+.btn-primary {
+    @apply px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow;
+}

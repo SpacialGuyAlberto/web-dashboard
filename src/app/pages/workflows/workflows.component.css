@@ -1,1 +1,132 @@
-/* Workflows Component Styles */
+.workflows-container {
+    @apply min-h-screen bg-gray-50 dark:bg-gray-900 p-6;
+}
+
+.max-container {
+    @apply max-w-7xl mx-auto;
+}
+
+/* Header Section */
+.page-header {
+    @apply mb-8;
+}
+
+.header-title {
+    @apply text-3xl font-bold text-gray-900 dark:text-white;
+}
+
+.header-subtitle {
+    @apply text-gray-600 dark:text-gray-400 mt-2;
+}
+
+/* Table Section */
+.table-wrapper {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700;
+}
+
+.data-table {
+    @apply min-w-full divide-y divide-gray-200 dark:divide-gray-700;
+}
+
+.thead-light {
+    @apply bg-gray-50 dark:bg-gray-700;
+}
+
+.table-th {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider;
+}
+
+.tbody-main {
+    @apply bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700;
+}
+
+.table-row-hover {
+    @apply hover:bg-gray-50 dark:hover:bg-gray-700;
+}
+
+.table-td {
+    @apply px-6 py-4 whitespace-nowrap;
+}
+
+.projectName-cell {
+    @apply text-sm font-medium text-gray-900 dark:text-white;
+}
+
+.currentStep-cell {
+    @apply text-sm text-gray-900 dark:text-white;
+}
+
+.assignedTo-cell {
+    @apply text-sm text-gray-500 dark:text-gray-400;
+}
+
+.status-badge {
+    @apply px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full;
+}
+
+.dueDate-cell {
+    @apply text-sm text-gray-500 dark:text-gray-400;
+}
+
+.actions-cell {
+    @apply text-sm font-medium;
+}
+
+.btn-view {
+    @apply text-blue-600 hover:text-blue-900 mr-4;
+}
+
+.btn-edit-action {
+    @apply text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white;
+}
+
+/* Footer Actions */
+.footer-actions {
+    @apply mt-8;
+}
+
+.btn-primary-lg {
+    @apply bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md;
+}
+
+/* Modal Section */
+.modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+    @apply bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full shadow-xl;
+}
+
+.modal-title {
+    @apply text-2xl font-bold mb-6 text-gray-900 dark:text-white;
+}
+
+.form-stack {
+    @apply space-y-4;
+}
+
+.form-field {
+    @apply block;
+}
+
+.field-label {
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+}
+
+.form-input,
+.form-select {
+    @apply w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.modal-footer {
+    @apply mt-8 flex justify-end gap-3;
+}
+
+.btn-secondary {
+    @apply px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium;
+}
+
+.btn-save {
+    @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50;
+}

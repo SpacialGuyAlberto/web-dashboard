@@ -1,0 +1,154 @@
+.subcontractors-container {
+    @apply min-h-screen bg-gray-50 dark:bg-gray-900 p-6;
+}
+
+.page-header {
+    @apply flex justify-between items-center mb-6;
+}
+
+.page-header h1 {
+    @apply text-2xl font-bold text-gray-900 dark:text-white;
+}
+
+.btn-add-main {
+    @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors;
+}
+
+.subcontractors-list {
+    @apply grid gap-6;
+}
+
+.subcontractor-card {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6;
+}
+
+.card-header {
+    @apply flex justify-between items-start mb-4;
+}
+
+.sub-title {
+    @apply text-xl font-semibold text-gray-900 dark:text-white;
+}
+
+.sub-contact-info {
+    @apply text-gray-500 dark:text-gray-400;
+}
+
+.status-badge-container {
+    @apply mt-2;
+}
+
+.status-badge {
+    @apply px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.badge-preferred {
+    @apply bg-green-100 text-green-800;
+}
+
+.badge-blocked {
+    @apply bg-red-100 text-red-800;
+}
+
+.badge-active {
+    @apply bg-blue-100 text-blue-800;
+}
+
+.kpi-grid {
+    @apply mt-3 grid grid-cols-3 gap-2 text-sm;
+}
+
+.kpi-box {
+    @apply bg-gray-50 dark:bg-gray-700 p-2 rounded text-center;
+}
+
+.kpi-label {
+    @apply text-xs text-gray-500 dark:text-gray-400;
+}
+
+.kpi-value {
+    @apply font-medium text-gray-900 dark:text-white;
+}
+
+.btn-add-crew {
+    @apply text-sm text-blue-600 hover:text-blue-800 font-medium;
+}
+
+/* Crews Section */
+.crews-section {
+    @apply mt-4 border-t dark:border-gray-700 pt-4;
+}
+
+.crews-section h3 {
+    @apply text-sm font-medium text-gray-700 dark:text-gray-300 mb-3;
+}
+
+.crews-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.crew-card {
+    @apply bg-gray-50 dark:bg-gray-700 rounded p-3 border border-gray-200 dark:border-gray-600;
+}
+
+.crew-name {
+    @apply font-medium text-gray-900 dark:text-white;
+}
+
+.crew-info {
+    @apply text-sm text-gray-500 dark:text-gray-400;
+}
+
+.empty-crews {
+    @apply text-sm text-gray-400 dark:text-gray-500 italic;
+}
+
+/* Modals */
+.modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-container {
+    @apply bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md;
+}
+
+.modal-container h2 {
+    @apply text-xl font-bold mb-4 text-gray-900 dark:text-white;
+}
+
+.form-group-list {
+    @apply space-y-4;
+}
+
+.form-group label {
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300;
+}
+
+.form-input,
+.form-select {
+    @apply mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm border p-2;
+}
+
+.form-section-title {
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 font-bold mt-2;
+}
+
+.metrics-inline-grid {
+    @apply grid grid-cols-3 gap-2 mt-1;
+}
+
+.metrics-label-sub {
+    @apply text-xs text-gray-500 dark:text-gray-400;
+}
+
+.modal-footer {
+    @apply mt-6 flex justify-end gap-3;
+}
+
+.btn-cancel {
+    @apply px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white;
+}
+
+.btn-save {
+    @apply px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700;
+}

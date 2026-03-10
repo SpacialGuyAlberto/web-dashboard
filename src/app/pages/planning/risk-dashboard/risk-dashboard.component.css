@@ -1,0 +1,161 @@
+.risk-dashboard-container {
+    @apply p-6 bg-gray-50 dark:bg-gray-900 min-h-screen;
+}
+
+.page-header {
+    @apply mb-6;
+}
+
+.header-title {
+    @apply text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2;
+}
+
+.title-badge {
+    @apply text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full;
+}
+
+.header-subtitle {
+    @apply text-gray-600 dark:text-gray-400;
+}
+
+/* Loading State */
+.loading-container {
+    @apply text-center p-10;
+}
+
+.spinner {
+    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto;
+}
+
+.loading-text {
+    @apply mt-4 text-gray-500;
+}
+
+/* Info Cards Grid */
+.dashboard-grid {
+    @apply grid grid-cols-1 md:grid-cols-4 gap-6 mb-8;
+}
+
+/* Main Score Card */
+.score-card {
+    @apply col-span-1 md:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-t-4;
+}
+
+.card-label {
+    @apply text-gray-500 font-medium uppercase text-xs tracking-wider;
+}
+
+.score-display {
+    @apply flex items-end mt-2;
+}
+
+.score-number {
+    @apply text-5xl font-extrabold;
+}
+
+.score-max {
+    @apply text-gray-400 mb-1 ml-1;
+}
+
+.card-stats-row {
+    @apply mt-4 flex gap-4 text-sm;
+}
+
+.stat-group-label {
+    @apply block text-gray-400 text-xs;
+}
+
+.stat-value-bold {
+    @apply font-bold text-gray-800 dark:text-white;
+}
+
+.critical-value {
+    @apply font-bold text-red-600;
+}
+
+/* AI Insight Card */
+.ai-insight-card {
+    @apply col-span-1 md:col-span-2 bg-gradient-to-br from-purple-600 to-indigo-700 text-white p-6 rounded-xl shadow-lg;
+}
+
+.ai-insight-label {
+    @apply font-medium text-purple-200 uppercase text-xs tracking-wider flex items-center gap-2;
+}
+
+.ai-insight-text {
+    @apply mt-3 text-lg font-light leading-relaxed;
+}
+
+.highlight-bold {
+    @apply font-bold;
+}
+
+/* Details Table */
+.data-card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden;
+}
+
+.card-title {
+    @apply p-4 border-b border-gray-100 dark:border-gray-700 font-semibold text-gray-700 dark:text-gray-200;
+}
+
+.data-table {
+    @apply w-full text-left;
+}
+
+.thead-light {
+    @apply bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-xs uppercase;
+}
+
+.table-th {
+    @apply p-4;
+}
+
+.tbody-main {
+    @apply divide-y divide-gray-100 dark:divide-gray-700;
+}
+
+.table-tr {
+    @apply hover:bg-gray-50 dark:hover:bg-gray-700 transition;
+}
+
+.table-td {
+    @apply p-4;
+}
+
+.td-id {
+    @apply font-bold text-gray-700 dark:text-gray-200;
+}
+
+.risk-badge {
+    @apply px-2 py-1 rounded text-xs font-bold;
+}
+
+/* Progress Bar in Table */
+.progress-track {
+    @apply w-24 bg-gray-200 rounded-full h-2;
+}
+
+.progress-bar {
+    @apply h-2 rounded-full;
+}
+
+.bg-safe {
+    @apply bg-green-500;
+}
+
+.bg-warning {
+    @apply bg-yellow-500;
+}
+
+.bg-critical {
+    @apply bg-red-500;
+}
+
+.recommendation-list {
+    @apply list-disc list-inside;
+}
+
+.recommendation-empty {
+    @apply text-gray-400 italic;
+}

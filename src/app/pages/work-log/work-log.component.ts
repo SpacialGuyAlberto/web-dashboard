@@ -9,7 +9,8 @@ import { SegmentService, Segment } from '../../services/segment.service';
     selector: 'app-work-log',
     standalone: true,
     imports: [CommonModule, FormsModule],
-    templateUrl: './work-log.component.html'
+    templateUrl: './work-log.component.html',
+    styleUrls: ['./work-log.component.css']
 })
 // Work Log Component - Updated
 export class WorkLogComponent implements OnInit {

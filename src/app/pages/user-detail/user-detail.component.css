@@ -1,0 +1,210 @@
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.detail-container {
+    @apply space-y-6;
+}
+
+/* Loading & Error States */
+.loading-container {
+    @apply flex justify-center items-center h-64;
+}
+
+.spinner {
+    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600;
+}
+
+.error-banner {
+    @apply bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded shadow-sm;
+}
+
+.error-icon {
+    @apply h-5 w-5 text-red-400;
+}
+
+.error-text {
+    @apply text-sm text-red-700 dark:text-red-200 ml-3;
+}
+
+.btn-retry {
+    @apply mt-2 text-sm font-medium text-red-700 dark:text-red-300 hover:text-red-600 underline;
+}
+
+/* Header Card */
+.profile-card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative;
+}
+
+.profile-banner {
+    @apply h-32 bg-gradient-to-r from-blue-600 to-cyan-500;
+}
+
+.profile-content {
+    @apply px-6 pb-6;
+}
+
+.profile-header-meta {
+    @apply relative flex justify-between items-end -mt-12 mb-4;
+}
+
+.profile-identity {
+    @apply flex items-end;
+}
+
+.profile-avatar {
+    @apply h-24 w-24 rounded-full border-4 border-white dark:border-gray-800 bg-white dark:bg-gray-700 flex items-center justify-center text-3xl font-bold text-gray-400 shadow-md;
+}
+
+.profile-info {
+    @apply ml-4 mb-1;
+}
+
+.profile-name {
+    @apply text-2xl font-bold text-gray-900 dark:text-white;
+}
+
+.profile-email {
+    @apply text-gray-500 dark:text-gray-400;
+}
+
+.badge-container {
+    @apply flex gap-2 mb-1;
+}
+
+.badge {
+    @apply px-3 py-1 rounded-full text-sm font-medium border;
+}
+
+.subcontractor-badge {
+    @apply bg-amber-100 text-amber-800 border-amber-200;
+}
+
+/* Grid Layout */
+.detail-grid {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-6;
+}
+
+.info-box {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6;
+}
+
+.field-data-box {
+    @apply info-box md:col-span-2;
+}
+
+.box-title {
+    @apply text-lg font-bold text-gray-800 dark:text-white mb-4;
+}
+
+.box-title-flex {
+    @apply box-title flex items-center;
+}
+
+.live-indicator {
+    @apply ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full;
+}
+
+/* Info Items */
+.info-stack {
+    @apply space-y-3 text-sm;
+}
+
+.info-label {
+    @apply block text-xs uppercase text-gray-500 font-semibold mb-1;
+}
+
+.info-value {
+    @apply text-gray-800 dark:text-gray-200;
+}
+
+.info-link {
+    @apply text-blue-600 hover:underline;
+}
+
+.status-active {
+    @apply inline-flex items-center text-green-600 font-medium;
+}
+
+.dot-active {
+    @apply w-2 h-2 rounded-full bg-green-500 mr-2;
+}
+
+/* Section Cards */
+.sub-card-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-6;
+}
+
+.sub-card {
+    @apply bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-100 dark:border-gray-600;
+}
+
+.sub-card-header {
+    @apply text-xs text-gray-500 uppercase font-semibold mb-2;
+}
+
+.sub-card-body {
+    @apply flex items-start gap-3;
+}
+
+.icon-wrapper {
+    @apply p-2 rounded-lg;
+}
+
+.icon-blue {
+    @apply bg-blue-100 text-blue-600;
+}
+
+.icon-purple {
+    @apply bg-purple-100 text-purple-600;
+}
+
+.icon-orange {
+    @apply bg-orange-100 text-orange-600;
+}
+
+.sub-card-title {
+    @apply font-medium text-gray-900 dark:text-white;
+}
+
+.sub-card-subtitle {
+    @apply text-xs text-gray-500 mt-1;
+}
+
+/* Wide Card */
+.wide-card {
+    @apply sm:col-span-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-100 dark:border-gray-600 flex items-center justify-between;
+}
+
+.wide-card-body {
+    @apply flex items-center gap-3;
+}
+
+.wide-card-title {
+    @apply text-xs text-gray-500 uppercase font-semibold;
+}
+
+.wide-card-value {
+    @apply font-medium text-gray-900 dark:text-white text-lg;
+}
+
+.btn-link {
+    @apply text-sm text-blue-600 hover:text-blue-700 font-medium;
+}
+
+/* Empty State */
+.empty-state {
+    @apply text-center py-8 text-gray-500 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-dashed border-gray-300 dark:border-gray-600;
+}

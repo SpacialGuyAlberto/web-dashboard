@@ -1,1 +1,148 @@
-/* Projects Component Styles */
+.projects-container {
+    @apply min-h-screen bg-gray-50 dark:bg-gray-900 p-6;
+}
+
+.projects-wrapper {
+    @apply max-w-7xl mx-auto;
+}
+
+.projects-header {
+    @apply mb-8;
+}
+
+.projects-header h1 {
+    @apply text-3xl font-bold text-gray-900 dark:text-white;
+}
+
+.projects-header p {
+    @apply text-gray-600 dark:text-gray-400 mt-2;
+}
+
+.error-container {
+    @apply mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4;
+}
+
+.error-message {
+    @apply text-red-800 dark:text-red-400;
+}
+
+.loading-spinner-container {
+    @apply flex justify-center items-center py-12;
+}
+
+.spinner {
+    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600;
+}
+
+.projects-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.project-card {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200 dark:border-gray-700;
+}
+
+.project-card-header {
+    @apply flex justify-between items-start mb-4;
+}
+
+.project-card-header h3 {
+    @apply text-xl font-semibold text-gray-900 dark:text-white;
+}
+
+.status-badge {
+    @apply px-3 py-1 rounded-full text-xs font-medium;
+}
+
+.project-description {
+    @apply text-gray-600 dark:text-gray-400 mb-4 line-clamp-2;
+}
+
+.project-dates {
+    @apply space-y-2 text-sm text-gray-500 dark:text-gray-400;
+}
+
+.date-row {
+    @apply flex items-center gap-2;
+}
+
+.date-label {
+    @apply font-medium;
+}
+
+.project-actions {
+    @apply mt-6 flex gap-2;
+}
+
+.btn-view {
+    @apply flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium;
+}
+
+.btn-edit {
+    @apply px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300;
+}
+
+.empty-state-container {
+    @apply col-span-full text-center py-12;
+}
+
+.empty-state-icon {
+    @apply text-gray-400 dark:text-gray-500 mb-4;
+}
+
+.empty-state-container h3 {
+    @apply text-lg font-medium text-gray-900 dark:text-white mb-2;
+}
+
+.empty-state-container p {
+    @apply text-gray-500 dark:text-gray-400;
+}
+
+.btn-new-project-wrapper {
+    @apply mt-8;
+}
+
+.btn-new-project {
+    @apply bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md;
+}
+
+/* Modal */
+.modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-container {
+    @apply bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full shadow-xl;
+}
+
+.modal-container h2 {
+    @apply text-2xl font-bold mb-6 text-gray-900 dark:text-white;
+}
+
+.form-group-list {
+    @apply space-y-4;
+}
+
+.form-group label {
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+}
+
+.form-control {
+    @apply w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.date-grid {
+    @apply grid grid-cols-2 gap-4;
+}
+
+.modal-footer {
+    @apply mt-8 flex justify-end gap-3;
+}
+
+.btn-cancel {
+    @apply px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium;
+}
+
+.btn-save {
+    @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50;
+}

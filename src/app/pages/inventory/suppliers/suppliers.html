@@ -1,56 +1,54 @@
-<div class="p-6 relative">
-    <div class="flex items-center justify-between mb-6">
+<div class="suppliers-container">
+    <div class="page-header">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Proveedores</h1>
-            <p class="text-gray-500 text-sm">Administra proveedores de materiales y maquinaria</p>
+            <h1 class="header-title">Gestión de Proveedores</h1>
+            <p class="header-subtitle">Administra proveedores de materiales y maquinaria</p>
         </div>
-        <button (click)="openModal()"
-            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition-colors flex items-center gap-2">
+        <button (click)="openModal()" class="btn-add-supplier">
             <span>+</span> Nuevo Proveedor
         </button>
     </div>
 
     <!-- Suppliers Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let supplier of suppliers"
-            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 group hover:shadow-md transition-shadow">
+    <div class="suppliers-grid">
+        <div *ngFor="let supplier of suppliers" class="supplier-card group">
 
-            <div class="flex justify-between items-start mb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
-                        [ngClass]="supplier.type === 'MACHINERY' ? 'bg-orange-100 text-orange-600' : (supplier.type === 'BOTH' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600')">
+            <div class="card-header">
+                <div class="supplier-identity">
+                    <div class="supplier-icon-box"
+                        [ngClass]="supplier.type === 'MACHINERY' ? 'icon-machinery' : (supplier.type === 'BOTH' ? 'icon-both' : 'icon-material')">
                         {{ supplier.type === 'MACHINERY' ? '🚜' : (supplier.type === 'BOTH' ? '🏭' : '📦') }}
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-900 dark:text-white">{{ supplier.name }}</h3>
-                        <span class="text-xs px-2 py-0.5 rounded-full border"
-                            [ngClass]="supplier.type === 'MACHINERY' ? 'bg-orange-50 text-orange-700 border-orange-200' : (supplier.type === 'BOTH' ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-blue-50 text-blue-700 border-blue-200')">
+                        <h3 class="supplier-name">{{ supplier.name }}</h3>
+                        <span class="type-badge"
+                            [ngClass]="supplier.type === 'MACHINERY' ? 'badge-machinery' : (supplier.type === 'BOTH' ? 'badge-both' : 'badge-material')">
                             {{ supplier.type === 'BOTH' ? 'Materiales y Maquinaria' : (supplier.type === 'MACHINERY' ?
                             'Solo Maquinaria' : 'Solo Materiales') }}
                         </span>
                     </div>
                 </div>
-                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button (click)="openModal(supplier)" class="text-gray-400 hover:text-blue-500">
+                <div class="card-actions">
+                    <button (click)="openModal(supplier)" class="btn-card-action btn-edit">
                         ✏️
                     </button>
-                    <button (click)="deleteSupplier(supplier.id!)" class="text-gray-400 hover:text-red-500">
+                    <button (click)="deleteSupplier(supplier.id!)" class="btn-card-action btn-delete">
                         🗑️
                     </button>
                 </div>
             </div>
 
-            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                <div class="flex items-center gap-2">
-                    <span class="text-gray-400">👤</span>
+            <div class="contact-info-list">
+                <div class="contact-item">
+                    <span class="info-icon">👤</span>
                     <span>{{ supplier.contactName || 'Sin contacto' }}</span>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-gray-400">📞</span>
+                <div class="contact-item">
+                    <span class="info-icon">📞</span>
                     <span>{{ supplier.phone || 'Sin teléfono' }}</span>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-gray-400">📍</span>
+                <div class="contact-item">
+                    <span class="info-icon">📍</span>
                     <span class="truncate">{{ supplier.address || 'Sin dirección' }}</span>
                 </div>
             </div>
@@ -59,25 +57,22 @@
     </div>
 
     <!-- Modal -->
-    <div *ngIf="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md p-6">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
+    <div *ngIf="showModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">
                 {{ isEditing ? 'Editar Proveedor' : 'Nuevo Proveedor' }}
             </h2>
 
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre
-                        Empresa</label>
-                    <input [(ngModel)]="currentSupplier.name" type="text"
-                        class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 text-sm">
+            <div class="form-group-stack">
+                <div class="form-field">
+                    <label class="field-label">Nombre Empresa</label>
+                    <input [(ngModel)]="currentSupplier.name" type="text" class="form-input">
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo</label>
-                        <select [(ngModel)]="currentSupplier.type"
-                            class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 text-sm">
+                <div class="form-grid-2">
+                    <div class="form-field">
+                        <label class="field-label">Tipo</label>
+                        <select [(ngModel)]="currentSupplier.type" class="form-select">
                             <option value="MATERIAL">Solo Materiales</option>
                             <option value="MACHINERY">Solo Maquinaria</option>
                             <option value="BOTH">Ambos</option>
@@ -85,31 +80,26 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contacto</label>
-                        <input [(ngModel)]="currentSupplier.contactName" type="text"
-                            class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 text-sm">
+                <div class="form-grid-2">
+                    <div class="form-field">
+                        <label class="field-label">Contacto</label>
+                        <input [(ngModel)]="currentSupplier.contactName" type="text" class="form-input">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Teléfono</label>
-                        <input [(ngModel)]="currentSupplier.phone" type="text"
-                            class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 text-sm">
+                    <div class="form-field">
+                        <label class="field-label">Teléfono</label>
+                        <input [(ngModel)]="currentSupplier.phone" type="text" class="form-input">
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Dirección</label>
-                    <input [(ngModel)]="currentSupplier.address" type="text"
-                        class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 text-sm">
+                <div class="form-field">
+                    <label class="field-label">Dirección</label>
+                    <input [(ngModel)]="currentSupplier.address" type="text" class="form-input">
                 </div>
             </div>
 
-            <div class="mt-6 flex justify-end gap-3">
-                <button (click)="closeModal()"
-                    class="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-300">Cancelar</button>
-                <button (click)="saveSupplier()"
-                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow">Guardar</button>
+            <div class="modal-footer">
+                <button (click)="closeModal()" class="btn-secondary">Cancelar</button>
+                <button (click)="saveSupplier()" class="btn-primary">Guardar</button>
             </div>
         </div>
     </div>

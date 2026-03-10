@@ -8,16 +8,7 @@ import { ProgressService, AdvancedProgressData } from '../../services/progress.s
     standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './progress.component.html',
-    styles: [`
-        :host {
-            display: block;
-        }
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
-    `]
+    styleUrls: ['./progress.component.css']
 })
 export class ProgressComponent implements OnInit {
     advancedData: AdvancedProgressData | null = null;

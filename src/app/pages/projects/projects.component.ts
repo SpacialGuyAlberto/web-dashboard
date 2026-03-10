@@ -2,7 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { PlanningService, Project } from '../../services/planning.service';
+import { PlanningService } from '../../services/planning.service';
+import {Project} from './model/Project.interface';
 
 @Component({
   selector: 'app-projects',

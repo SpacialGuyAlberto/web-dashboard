@@ -1,43 +1,37 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-    <div class="max-w-7xl mx-auto">
+<div class="work-log-container">
+    <div class="max-container">
         <!-- Header -->
-        <div class="mb-8 flex justify-between items-center">
+        <div class="page-header">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Work Logs</h1>
-                <p class="text-gray-600 dark:text-gray-400 mt-2">Track daily work completed by crews</p>
+                <h1 class="header-title">Work Logs</h1>
+                <p class="header-subtitle">Track daily work completed by crews</p>
             </div>
-            <button (click)="openCreateModal()"
-                class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md">
+            <button (click)="openCreateModal()" class="btn-primary-lg">
                 + Log Work
             </button>
         </div>
 
         <!-- Error Message -->
-        <div *ngIf="error"
-            class="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <p class="text-red-800 dark:text-red-400">{{ error }}</p>
+        <div *ngIf="error" class="error-box">
+            <p class="error-text">{{ error }}</p>
         </div>
 
         <!-- Filters -->
-        <div
-            class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 mb-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filters</h3>
-            <div class="grid grid-cols-3 gap-4">
+        <div class="filter-card">
+            <h3 class="filter-title">Filters</h3>
+            <div class="filter-grid">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Crew</label>
-                    <select [(ngModel)]="filterCrewId"
-                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="filter-label">Crew</label>
+                    <select [(ngModel)]="filterCrewId" class="filter-select">
                         <option [ngValue]="null">All Crews</option>
                         <option *ngFor="let crew of crews" [ngValue]="crew.id">{{ crew.name }}</option>
                     </select>
                 </div>
-                <div class="flex items-end gap-2">
-                    <button (click)="applyFilters()"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                <div class="filter-actions">
+                    <button (click)="applyFilters()" class="btn-filter-apply">
                         Apply
                     </button>
-                    <button (click)="clearFilters()"
-                        class="border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
+                    <button (click)="clearFilters()" class="btn-filter-clear">
                         Clear
                     </button>
                 </div>
@@ -45,187 +39,146 @@
         </div>
 
         <!-- Loading State -->
-        <div *ngIf="loading" class="flex justify-center items-center py-12">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div *ngIf="loading" class="loading-box">
+            <div class="spinner"></div>
         </div>
 
         <!-- Work Logs Table -->
         <!-- Desktop Table (Hidden on Mobile) -->
-        <div *ngIf="!loading"
-            class="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <!-- ... existing header ... -->
-                <thead class="bg-gray-50 dark:bg-gray-700">
+        <div *ngIf="!loading" class="table-wrapper">
+            <table class="data-table">
+                <thead class="thead-light">
                     <tr>
-                        <th
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Date</th>
-                        <th
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Segment</th>
-                        <th
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Crew</th>
-                        <th
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Meters</th>
-                        <th
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Hours</th>
-                        <th
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Actions</th>
+                        <th class="table-th">Date</th>
+                        <th class="table-th">Segment</th>
+                        <th class="table-th">Crew</th>
+                        <th class="table-th">Meters</th>
+                        <th class="table-th">Hours</th>
+                        <th class="table-th">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    <tr *ngFor="let log of workLogs" class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ log.date }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ log.segmentName
-                            }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ log.crewName }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{
-                            log.metersCompleted }}m</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ log.hoursWorked
-                            }}h</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 cursor-pointer">View</td>
+                <tbody class="tbody-main">
+                    <tr *ngFor="let log of workLogs" class="table-row-hover">
+                        <td class="table-td">{{ log.date }}</td>
+                        <td class="table-td">{{ log.segmentName }}</td>
+                        <td class="table-td">{{ log.crewName }}</td>
+                        <td class="table-td">{{ log.metersCompleted }}m</td>
+                        <td class="table-td">{{ log.hoursWorked }}h</td>
+                        <td class="table-td link-action">View</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <!-- Mobile Cards (Shown on Mobile) -->
-        <div *ngIf="!loading" class="md:hidden space-y-4">
-            <div *ngFor="let log of workLogs"
-                class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow border border-gray-100 dark:border-gray-700">
-                <div class="flex justify-between items-start mb-2">
+        <div *ngIf="!loading" class="mobile-cards-stack">
+            <div *ngFor="let log of workLogs" class="mobile-log-card">
+                <div class="card-header-flex">
                     <div>
-                        <span class="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">{{ log.date
-                            }}</span>
-                        <h3 class="font-bold text-gray-800 dark:text-gray-200 mt-1">{{ log.segmentName }}</h3>
+                        <span class="date-badge">{{ log.date }}</span>
+                        <h3 class="card-segment-name">{{ log.segmentName }}</h3>
                     </div>
-                    <span class="text-sm text-gray-500">{{ log.crewName }}</span>
+                    <span class="card-crew-label">{{ log.crewName }}</span>
                 </div>
-                <div class="grid grid-cols-2 gap-2 text-sm mt-3">
-                    <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded">
-                        <span class="block text-xs text-gray-400">Avance</span>
-                        <span class="font-mono font-bold">{{ log.metersCompleted }}m</span>
+                <div class="card-stats-grid">
+                    <div class="stat-item-box">
+                        <span class="stat-item-label">Avance</span>
+                        <span class="stat-item-value">{{ log.metersCompleted }}m</span>
                     </div>
-                    <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded">
-                        <span class="block text-xs text-gray-400">Tiempo</span>
-                        <span class="font-mono font-bold">{{ log.hoursWorked }}h</span>
+                    <div class="stat-item-box">
+                        <span class="stat-item-label">Tiempo</span>
+                        <span class="stat-item-value">{{ log.hoursWorked }}h</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Floating Action Button (FAB) -->
-        <button (click)="openCreateModal()"
-            class="md:hidden fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-transform active:scale-95 z-50 flex items-center justify-center">
-            <span class="text-2xl font-bold">+</span>
+        <button (click)="openCreateModal()" class="fab-button">
+            <span class="fab-icon">+</span>
         </button>
     </div>
 
     <!-- Create Modal -->
-    <div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl">
-            <div class="p-6 border-b dark:border-gray-700">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Log Work</h2>
+    <div *ngIf="showModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Log Work</h2>
             </div>
 
-            <div class="p-6">
-                <div class="space-y-4">
+            <div class="modal-body">
+                <div class="form-stack">
                     <!-- AI Smart Tools -->
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <button type="button" (click)="startVoiceLog()"
-                            class="flex flex-col items-center justify-center p-4 bg-purple-50 dark:bg-purple-900/20 border-2 border-dashed border-purple-300 dark:border-purple-700 rounded-xl hover:bg-purple-100 transition-colors group">
-                            <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">🎙️</span>
-                            <span class="text-xs font-bold text-purple-700 dark:text-purple-300">Dictate Log</span>
+                    <div class="ai-tools-grid">
+                        <button type="button" (click)="startVoiceLog()" class="btn-ai-tool btn-voice">
+                            <span class="ai-tool-icon">🎙️</span>
+                            <span class="ai-tool-label text-voice">Dictate Log</span>
                         </button>
-                        <button type="button" (click)="triggerCamera()"
-                            class="flex flex-col items-center justify-center p-4 bg-green-50 dark:bg-green-900/20 border-2 border-dashed border-green-300 dark:border-green-700 rounded-xl hover:bg-green-100 transition-colors group">
-                            <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">📸</span>
-                            <span class="text-xs font-bold text-green-700 dark:text-green-300">Analyze Photo</span>
+                        <button type="button" (click)="triggerCamera()" class="btn-ai-tool btn-photo">
+                            <span class="ai-tool-icon">📸</span>
+                            <span class="ai-tool-label text-photo">Analyze Photo</span>
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Segment</label>
-                            <select [(ngModel)]="newWorkLog.segmentId"
-                                class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="form-grid-2">
+                        <div class="form-field">
+                            <label class="field-label">Segment</label>
+                            <select [(ngModel)]="newWorkLog.segmentId" class="form-select">
                                 <option [ngValue]="0">Select Segment</option>
                                 <option *ngFor="let segment of segments" [ngValue]="segment.id">{{ segment.streetName }}
                                 </option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Crew</label>
-                            <select [(ngModel)]="newWorkLog.crewId"
-                                class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div class="form-field">
+                            <label class="field-label">Crew</label>
+                            <select [(ngModel)]="newWorkLog.crewId" class="form-select">
                                 <option [ngValue]="0">Select Crew</option>
                                 <option *ngFor="let crew of crews" [ngValue]="crew.id">{{ crew.name }}</option>
                             </select>
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
-                        <input [(ngModel)]="newWorkLog.date" type="date"
-                            class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="form-field">
+                        <label class="field-label">Date</label>
+                        <input [(ngModel)]="newWorkLog.date" type="date" class="form-input">
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Meters
-                                Completed</label>
-                            <input [(ngModel)]="newWorkLog.metersCompleted" type="number" step="0.1"
-                                class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="form-grid-2">
+                        <div class="form-field">
+                            <label class="field-label">Meters Completed</label>
+                            <input [(ngModel)]="newWorkLog.metersCompleted" type="number" step="0.1" class="form-input">
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hours
-                                Worked</label>
-                            <input [(ngModel)]="newWorkLog.hoursWorked" type="number" step="0.5"
-                                class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div class="form-field">
+                            <label class="field-label">Hours Worked</label>
+                            <input [(ngModel)]="newWorkLog.hoursWorked" type="number" step="0.5" class="form-input">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Crossings
-                                Completed</label>
-                            <input [(ngModel)]="newWorkLog.crossingsCompleted" type="number"
-                                class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="form-grid-2">
+                        <div class="form-field">
+                            <label class="field-label">Crossings Completed</label>
+                            <input [(ngModel)]="newWorkLog.crossingsCompleted" type="number" class="form-input">
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rework
-                                (meters)</label>
-                            <input [(ngModel)]="newWorkLog.reworkMeters" type="number" step="0.1"
-                                class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div class="form-field">
+                            <label class="field-label">Rework (meters)</label>
+                            <input [(ngModel)]="newWorkLog.reworkMeters" type="number" step="0.1" class="form-input">
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
-                        <textarea [(ngModel)]="newWorkLog.notes" rows="3"
-                            class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    <div class="form-field">
+                        <label class="field-label">Notes</label>
+                        <textarea [(ngModel)]="newWorkLog.notes" rows="3" class="form-textarea"></textarea>
                     </div>
                 </div>
             </div>
 
-            <div
-                class="p-6 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex justify-end gap-3 rounded-b-lg">
-                <button (click)="closeModal()"
-                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium">
+            <div class="modal-footer">
+                <button (click)="closeModal()" class="btn-secondary">
                     Cancel
                 </button>
-                <button (click)="saveWorkLog()"
-                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-                    [disabled]="!newWorkLog.crewId">
+                <button (click)="saveWorkLog()" class="btn-save" [disabled]="!newWorkLog.crewId">
                     Save Log
                 </button>
             </div>

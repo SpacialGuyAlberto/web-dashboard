@@ -8,6 +8,7 @@ import { SubcontractorService, Subcontractor, Crew } from '../../services/subcon
     standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './subcontractors.component.html',
+    styleUrls: ['./subcontractors.component.css']
 })
 export class SubcontractorsComponent implements OnInit {
     subcontractors: Subcontractor[] = [];

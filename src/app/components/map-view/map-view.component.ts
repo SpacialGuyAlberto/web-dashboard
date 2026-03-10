@@ -1,10 +1,10 @@
 import { Component, OnInit, AfterViewInit, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GoogleMapsModule, GoogleMap, MapPolyline, MapMarker } from '@angular/google-maps';
-import { RiskScore } from '../../services/planning.service';
 import { RoutingService } from '../../services/routing.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import {RiskScore} from '../../pages/risk-dashboard/model/RiskScore.interface';
 
 @Component({
     selector: 'app-map-view',

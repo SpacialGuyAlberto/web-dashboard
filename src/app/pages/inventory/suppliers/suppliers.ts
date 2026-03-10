@@ -7,7 +7,8 @@ import { InventoryService, Supplier } from '../../../services/inventory.service'
   selector: 'app-suppliers',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './suppliers.html' // Adjusted based on file name
+  templateUrl: './suppliers.html',
+  styleUrls: ['./suppliers.css']
 })
 export class SuppliersComponent implements OnInit {
   suppliers: Supplier[] = [];

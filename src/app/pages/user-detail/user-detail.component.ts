@@ -9,6 +9,7 @@ import { User } from '../../services/auth.service';
     standalone: true,
     imports: [CommonModule],
     templateUrl: './user-detail.component.html',
+    styleUrls: ['./user-detail.component.css']
 })
 export class UserDetailComponent implements OnInit {
     user: User | null = null;

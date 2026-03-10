@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ScheduleService, CrewAssignment } from '../../services/schedule.service';
 import { SubcontractorService, Crew } from '../../services/subcontractor.service';
-import { PlanningService, Project } from '../../services/planning.service';
+import { PlanningService } from '../../services/planning.service';
 import { SegmentService, Segment } from '../../services/segment.service';
+import {Project} from '../projects/model/Project.interface';
 
 @Component({
     selector: 'app-schedule',

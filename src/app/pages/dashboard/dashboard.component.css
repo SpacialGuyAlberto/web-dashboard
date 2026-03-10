@@ -1,0 +1,254 @@
+.dashboard-container {
+    @apply min-h-screen bg-gray-100 dark:bg-gray-900 p-6 font-sans;
+}
+
+.dashboard-header {
+    @apply flex justify-between items-center mb-6;
+}
+
+.header-title-group h1 {
+    @apply text-2xl font-bold text-gray-800 dark:text-white tracking-tight;
+}
+
+.header-subtitle {
+    @apply text-sm text-gray-500 dark:text-gray-400;
+}
+
+.header-actions {
+    @apply flex gap-4 items-center;
+}
+
+.project-selector-wrapper {
+    @apply relative min-w-[200px];
+}
+
+.project-selector-label {
+    @apply block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1;
+}
+
+.project-selector {
+    @apply w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all shadow-sm appearance-none;
+}
+
+.selector-icon {
+    @apply absolute right-3 bottom-2.5 pointer-events-none text-gray-400;
+}
+
+.time-filter-group {
+    @apply flex gap-2 self-end;
+}
+
+.time-btn {
+    @apply px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors;
+}
+
+/* Project Summary Section */
+.project-summary-grid {
+    @apply mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6;
+}
+
+.project-overview-card {
+    @apply lg:col-span-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 shadow-xl text-white relative overflow-hidden;
+}
+
+.project-overview-content {
+    @apply relative z-10;
+}
+
+.badge-active {
+    @apply bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest;
+}
+
+.project-title {
+    @apply text-3xl font-extrabold mt-2;
+}
+
+.progress-label {
+    @apply text-blue-100 text-xs uppercase font-bold tracking-widest;
+}
+
+.progress-value {
+    @apply text-4xl font-black;
+}
+
+.project-description {
+    @apply text-blue-50 max-w-2xl text-sm leading-relaxed mb-6 opacity-90;
+}
+
+.project-stats-border {
+    @apply flex gap-8 border-t border-white/10 pt-6;
+}
+
+.stat-item-label {
+    @apply text-blue-200 text-[10px] uppercase font-bold tracking-widest mb-1;
+}
+
+.stat-item-value {
+    @apply text-xl font-bold;
+}
+
+.decorative-circle-1 {
+    @apply absolute -right-10 -top-10 w-64 h-64 bg-white/10 rounded-full blur-3xl;
+}
+
+.decorative-circle-2 {
+    @apply absolute -left-10 -bottom-10 w-48 h-48 bg-blue-400/20 rounded-full blur-2xl;
+}
+
+/* Health Card */
+.health-status-card {
+    @apply bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-100 dark:border-gray-700 flex flex-col justify-between;
+}
+
+.health-label {
+    @apply text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-4;
+}
+
+.health-metric-group {
+    @apply space-y-4;
+}
+
+.health-metric-row {
+    @apply flex justify-between items-center;
+}
+
+.health-metric-name {
+    @apply text-sm font-medium text-gray-700 dark:text-gray-300;
+}
+
+.health-metric-percent {
+    @apply font-bold text-sm;
+}
+
+.progress-bar-bg {
+    @apply w-full bg-gray-100 dark:bg-gray-700 h-2 rounded-full;
+}
+
+.progress-bar-fill {
+    @apply h-2 rounded-full;
+}
+
+.manage-btn-container {
+    @apply pt-6 border-t border-gray-50 dark:border-gray-700 mt-6;
+}
+
+.manage-btn {
+    @apply w-full py-3 bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white rounded-xl text-xs font-bold transition-all uppercase tracking-widest shadow-lg;
+}
+
+/* KPI Grid */
+.kpi-section-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6;
+}
+
+/* Main Grid */
+.main-layout-grid {
+    @apply grid grid-cols-12 gap-4 mb-6;
+}
+
+.map-view-container {
+    @apply col-span-12 lg:col-span-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden relative;
+}
+
+.map-legend {
+    @apply absolute bottom-4 right-4 z-[1000] bg-white/90 dark:bg-gray-900/90 backdrop-blur px-3 py-1 rounded shadow text-xs font-bold border border-gray-200 dark:border-gray-700;
+}
+
+.sidebar-container {
+    @apply col-span-12 lg:col-span-4 flex flex-col gap-4;
+}
+
+/* Risk Panel */
+.risk-panel-card {
+    @apply flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col;
+}
+
+.panel-header {
+    @apply p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50;
+}
+
+.panel-title {
+    @apply font-bold text-gray-800 dark:text-white flex justify-between items-center;
+}
+
+.risk-count-badge {
+    @apply bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full;
+}
+
+.panel-content-scroll {
+    @apply flex-1 overflow-y-auto p-2 space-y-2;
+}
+
+.risk-item {
+    @apply p-3 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer;
+}
+
+.risk-item-header {
+    @apply flex justify-between items-start;
+}
+
+.risk-item-title {
+    @apply font-bold text-sm text-gray-800 dark:text-gray-200;
+}
+
+.risk-delay-value {
+    @apply text-xs font-bold text-red-600;
+}
+
+.risk-cause {
+    @apply text-xs text-gray-600 dark:text-gray-400 mt-1 truncate;
+}
+
+.empty-state {
+    @apply text-center py-8 text-gray-400 text-sm;
+}
+
+/* Action Center */
+.action-center-wrapper {
+    @apply flex-1 overflow-hidden;
+}
+
+/* Table Section */
+.table-section-container {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden;
+}
+
+.table-header-group {
+    @apply p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50;
+}
+
+.table-view-all {
+    @apply text-blue-600 text-sm font-medium hover:underline;
+}
+
+.table-responsive-wrapper {
+    @apply overflow-x-auto;
+}
+
+.data-table {
+    @apply w-full text-sm text-left text-gray-500 dark:text-gray-400;
+}
+
+.data-table thead {
+    @apply text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400;
+}
+
+.data-table th {
+    @apply px-6 py-3;
+}
+
+.data-table-row {
+    @apply bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600;
+}
+
+.data-table-cell {
+    @apply px-6 py-4;
+}
+
+.cell-primary {
+    @apply font-medium text-gray-900 dark:text-white whitespace-nowrap;
+}
+
+.table-action-link {
+    @apply font-medium text-blue-600 dark:text-blue-500 hover:underline;
+}

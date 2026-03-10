@@ -8,7 +8,8 @@ import { ToastService } from '../../../services/toast.service';
     selector: 'app-material-stock',
     standalone: true,
     imports: [CommonModule, FormsModule],
-    templateUrl: './material-stock.component.html'
+    templateUrl: './material-stock.component.html',
+    styleUrls: ['./material-stock.component.css']
 })
 export class MaterialStockComponent implements OnInit {
     materials: Material[] = [];

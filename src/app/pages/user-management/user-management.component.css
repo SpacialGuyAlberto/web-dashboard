@@ -1,0 +1,202 @@
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.management-container {
+    @apply space-y-6;
+}
+
+/* Header Section */
+.page-header {
+    @apply flex flex-col md:flex-row md:items-center justify-between gap-4;
+}
+
+.header-title {
+    @apply text-2xl font-bold text-gray-800 dark:text-white;
+}
+
+.header-subtitle {
+    @apply text-gray-600 dark:text-gray-400 mt-1;
+}
+
+/* Filters & Toolbar Section */
+.toolbar-container {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 flex flex-col sm:flex-row gap-4 border border-gray-100 dark:border-gray-700;
+}
+
+.search-wrapper {
+    @apply relative flex-grow;
+}
+
+.search-input {
+    @apply w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all;
+}
+
+.search-icon {
+    @apply w-5 h-5 text-gray-400 absolute left-3 top-2.5;
+}
+
+.filter-pills {
+    @apply flex gap-2 overflow-x-auto pb-2 sm:pb-0;
+}
+
+.filter-btn {
+    @apply px-3 py-1.5 rounded-full text-sm font-medium border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap flex items-center;
+}
+
+.filter-btn-active-all {
+    @apply bg-blue-100 text-blue-700;
+}
+
+.filter-btn-active-workers {
+    @apply bg-emerald-100 text-emerald-700;
+}
+
+.filter-btn-active-managers {
+    @apply bg-purple-100 text-purple-700;
+}
+
+.filter-btn-active-admins {
+    @apply bg-gray-100 text-gray-700;
+}
+
+.status-dot {
+    @apply w-2 h-2 rounded-full mr-2;
+}
+
+/* Table Section */
+.table-card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden;
+}
+
+.table-wrapper {
+    @apply overflow-x-auto;
+}
+
+.data-table {
+    @apply w-full text-left;
+}
+
+.thead-light {
+    @apply bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700;
+}
+
+.table-th {
+    @apply px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider;
+}
+
+.tbody-main {
+    @apply divide-y divide-gray-100 dark:divide-gray-700;
+}
+
+.table-tr {
+    @apply hover:bg-blue-50/50 dark:hover:bg-gray-700/30 transition-colors;
+}
+
+.table-td {
+    @apply px-6 py-4;
+}
+
+/* User Identity Cell */
+.user-identity {
+    @apply flex items-center;
+}
+
+.avatar-initials {
+    @apply h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm shadow-md;
+}
+
+.user-info {
+    @apply ml-4;
+}
+
+.user-name-link {
+    @apply text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer block;
+}
+
+.user-email {
+    @apply text-sm text-gray-500 dark:text-gray-400;
+}
+
+.subcontractor-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 mt-1;
+}
+
+/* Role & Info Cell */
+.role-info-stack {
+    @apply space-y-2;
+}
+
+.role-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border shadow-sm;
+}
+
+.info-item {
+    @apply flex items-center text-xs;
+}
+
+.info-item-crew {
+    @apply text-gray-600 dark:text-gray-400;
+}
+
+.info-item-location {
+    @apply text-blue-600 dark:text-blue-400;
+}
+
+.info-item-activity {
+    @apply text-gray-500 dark:text-gray-500 italic;
+}
+
+.status-badge-active {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400;
+}
+
+.status-indicator-dot {
+    @apply w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5;
+}
+
+/* Actions Cell */
+.action-buttons-group {
+    @apply flex justify-end space-x-2 opacity-0 transition-opacity;
+}
+
+.table-tr:hover .action-buttons-group {
+    @apply opacity-100;
+}
+
+.btn-icon-action {
+    @apply p-1 text-gray-400 transition-colors;
+}
+
+.btn-edit:hover {
+    @apply text-blue-500;
+}
+
+.btn-deactivate:hover {
+    @apply text-red-500;
+}
+
+/* Empty State */
+.empty-state-container {
+    @apply px-6 py-12 text-center text-gray-500 dark:text-gray-400;
+}
+
+.empty-state-icon {
+    @apply mx-auto h-12 w-12 text-gray-300;
+}
+
+.empty-state-text {
+    @apply mt-2 text-sm font-medium;
+}

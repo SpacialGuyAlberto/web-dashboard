@@ -1,158 +1,140 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 font-sans">
-    <div class="max-w-7xl mx-auto">
+<div class="progress-container">
+    <div class="content-wrapper">
         <!-- Header -->
-        <div class="mb-8 flex justify-between items-center">
+        <div class="page-header">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Progress Tracking</h1>
-                <p class="text-gray-500 dark:text-gray-400 mt-2">Monitor construction velocity, productivity, and
-                    quality</p>
+                <h1 class="header-title">Progress Tracking</h1>
+                <p class="header-subtitle">Monitor construction velocity, productivity, and quality</p>
             </div>
 
             <!-- Date Filter -->
-            <div
-                class="flex gap-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <div class="filter-toolbar">
                 <div>
-                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Start Date</label>
-                    <input type="date" [(ngModel)]="startDate" (change)="onDateChange()"
-                        class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-2 py-1 text-sm">
+                    <label class="filter-group-label">Start Date</label>
+                    <input type="date" [(ngModel)]="startDate" (change)="onDateChange()" class="filter-input">
                 </div>
                 <div>
-                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">End Date</label>
-                    <input type="date" [(ngModel)]="endDate" (change)="onDateChange()"
-                        class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-2 py-1 text-sm">
+                    <label class="filter-group-label">End Date</label>
+                    <input type="date" [(ngModel)]="endDate" (change)="onDateChange()" class="filter-input">
                 </div>
             </div>
         </div>
 
         <!-- Loading State -->
-        <div *ngIf="loading" class="flex justify-center items-center h-64">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div *ngIf="loading" class="loading-spinner-box">
+            <div class="spinner"></div>
         </div>
 
         <!-- Error State -->
-        <div *ngIf="error"
-            class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-center text-red-600 dark:text-red-400">
+        <div *ngIf="error" class="error-banner">
             {{ error }}
         </div>
 
         <!-- Content -->
-        <div *ngIf="!loading && !error && advancedData" class="space-y-8">
+        <div *ngIf="!loading && !error && advancedData" class="sections-stack">
 
             <!-- A. Overall Progress -->
             <section>
-                <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Overall Progress</h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Progress</p>
-                        <div class="flex items-end gap-2 mt-2">
-                            <h3 class="text-3xl font-bold text-gray-900 dark:text-white">{{
+                <h2 class="section-title">Overall Progress</h2>
+                <div class="stats-row-grid">
+                    <div class="stat-card-elevated">
+                        <p class="stat-label-muted">Total Progress</p>
+                        <div class="stat-display-main">
+                            <h3 class="stat-value-xl">{{
                                 advancedData.overall.overallProgressPercentage | number:'1.1-1' }}%</h3>
-                            <span class="text-sm text-gray-500 mb-1">of {{ advancedData.overall.totalMetersPlanned |
+                            <span class="stat-subtext-sm">of {{ advancedData.overall.totalMetersPlanned |
                                 number:'1.0-0' }}m</span>
                         </div>
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-3">
-                            <div class="bg-blue-600 h-2 rounded-full"
+                        <div class="progress-track-bg">
+                            <div class="progress-filler-blue"
                                 [style.width.%]="advancedData.overall.overallProgressPercentage"></div>
                         </div>
                     </div>
 
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Daily Production</p>
-                        <div class="flex items-end gap-2 mt-2">
-                            <h3 class="text-3xl font-bold text-gray-900 dark:text-white">{{
+                    <div class="stat-card-elevated">
+                        <p class="stat-label-muted">Daily Production</p>
+                        <div class="stat-display-main">
+                            <h3 class="stat-value-xl">{{
                                 advancedData.overall.dailyProductionMeters | number:'1.0-0' }}m</h3>
-                            <span class="text-sm mb-1"
-                                [class.text-green-500]="advancedData.overall.dailyProductionMeters >= advancedData.overall.dailyTargetMeters"
-                                [class.text-red-500]="advancedData.overall.dailyProductionMeters < advancedData.overall.dailyTargetMeters">
+                            <span class="target-comparison-text"
+                                [class.text-status-good]="advancedData.overall.dailyProductionMeters >= advancedData.overall.dailyTargetMeters"
+                                [class.text-status-bad]="advancedData.overall.dailyProductionMeters < advancedData.overall.dailyTargetMeters">
                                 vs {{ advancedData.overall.dailyTargetMeters }}m target
                             </span>
                         </div>
                     </div>
 
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Segments Completed</p>
-                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{
+                    <div class="stat-card-elevated">
+                        <p class="stat-label-muted">Segments Completed</p>
+                        <h3 class="stat-value-xl mt-2">{{
                             advancedData.overall.segmentsFullyCompleted }}</h3>
-                        <p class="text-xs text-gray-500 mt-1">Fully finished & approved</p>
+                        <p class="stat-description-xs">Fully finished & approved</p>
                     </div>
 
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Forecast Completion</p>
-                        <h3 class="text-3xl font-bold text-blue-600 dark:text-blue-400 mt-2">{{
+                    <div class="stat-card-elevated">
+                        <p class="stat-label-muted">Forecast Completion</p>
+                        <h3 class="forecast-value">{{
                             advancedData.overall.forecastedCompletionPercentage | number:'1.1-1' }}%</h3>
-                        <p class="text-xs text-gray-500 mt-1">Based on current velocity</p>
+                        <p class="stat-description-xs">Based on current velocity</p>
                     </div>
                 </div>
             </section>
 
             <!-- B. Productivity -->
             <section>
-                <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Productivity & Leaderboard</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <h2 class="section-title">Productivity & Leaderboard</h2>
+                <div class="productivity-grid">
                     <!-- Top Crews -->
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                        <div class="p-4 border-b border-gray-100 dark:border-gray-700 bg-green-50 dark:bg-green-900/20">
-                            <h3 class="font-bold text-green-800 dark:text-green-400">🏆 Top Performers</h3>
+                    <div class="leaderboard-card">
+                        <div class="card-header-accent bg-top-performer">
+                            <h3 class="header-label-top">🏆 Top Performers</h3>
                         </div>
-                        <div class="p-4">
+                        <div class="card-body-p4">
                             <div *ngFor="let crew of advancedData.productivity.topCrews; let i = index"
-                                class="flex items-center justify-between py-3 border-b last:border-0 border-gray-100 dark:border-gray-700">
-                                <div class="flex items-center gap-3">
-                                    <span
-                                        class="w-6 h-6 flex items-center justify-center rounded-full bg-green-100 text-green-700 text-xs font-bold">{{
-                                        i + 1 }}</span>
-                                    <span class="font-medium text-gray-900 dark:text-white">{{ crew.crewName }}</span>
+                                class="list-item-ranking">
+                                <div class="rank-badge-wrapper">
+                                    <span class="rank-number-dot bg-rank-green">{{ i + 1 }}</span>
+                                    <span class="crew-name-main">{{ crew.crewName }}</span>
                                 </div>
-                                <span class="font-bold text-gray-700 dark:text-gray-300">{{ crew.score | number:'1.0-0'
-                                    }} m/day</span>
+                                <span class="rank-score-value">{{ crew.score | number:'1.0-0' }} m/day</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Bottom Crews -->
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                        <div class="p-4 border-b border-gray-100 dark:border-gray-700 bg-red-50 dark:bg-red-900/20">
-                            <h3 class="font-bold text-red-800 dark:text-red-400">⚠️ Needs Attention</h3>
+                    <div class="leaderboard-card">
+                        <div class="card-header-accent bg-needs-attention">
+                            <h3 class="header-label-problem">⚠️ Needs Attention</h3>
                         </div>
-                        <div class="p-4">
+                        <div class="card-body-p4">
                             <div *ngFor="let crew of advancedData.productivity.bottomCrews; let i = index"
-                                class="flex items-center justify-between py-3 border-b last:border-0 border-gray-100 dark:border-gray-700">
-                                <div class="flex items-center gap-3">
-                                    <span
-                                        class="w-6 h-6 flex items-center justify-center rounded-full bg-red-100 text-red-700 text-xs font-bold">{{
-                                        i + 1 }}</span>
-                                    <span class="font-medium text-gray-900 dark:text-white">{{ crew.crewName }}</span>
+                                class="list-item-ranking">
+                                <div class="rank-badge-wrapper">
+                                    <span class="rank-number-dot bg-rank-red">{{ i + 1 }}</span>
+                                    <span class="crew-name-main">{{ crew.crewName }}</span>
                                 </div>
-                                <span class="font-bold text-gray-700 dark:text-gray-300">{{ crew.score | number:'1.0-0'
-                                    }} m/day</span>
+                                <span class="rank-score-value">{{ crew.score | number:'1.0-0' }} m/day</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Efficiency Stats -->
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                        <h3 class="font-bold text-gray-900 dark:text-white mb-4">Efficiency Metrics</h3>
-                        <div class="space-y-6">
+                    <div class="stat-card-elevated">
+                        <h3 class="crew-name-main mb-4">Efficiency Metrics</h3>
+                        <div class="efficiency-metrics-box">
                             <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Avg Output (Last 7 Days)</p>
-                                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{
+                                <p class="stat-label-muted">Avg Output (Last 7 Days)</p>
+                                <p class="stat-value-xl">{{
                                     advancedData.productivity.averageMetersPerDayLast7Days | number:'1.0-0' }} m/day</p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Output per Worker</p>
-                                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{
+                                <p class="stat-label-muted">Output per Worker</p>
+                                <p class="stat-value-xl">{{
                                     advancedData.productivity.efficiencyOutputPerWorker | number:'1.1-1' }} m/hr</p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Absenteeism Rate</p>
-                                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{
+                                <p class="stat-label-muted">Absenteeism Rate</p>
+                                <p class="stat-value-xl">{{
                                     advancedData.productivity.absenteeismRate * 100 | number:'1.1-1' }}%</p>
                             </div>
                         </div>
@@ -162,56 +144,39 @@
 
             <!-- C. Area Performance -->
             <section>
-                <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Area Performance</h2>
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-700">
+                <h2 class="section-title">Area Performance</h2>
+                <div class="table-card-full">
+                    <table class="data-table-simple">
+                        <thead class="thead-gray">
                             <tr>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Area / Cluster</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Meters/Day</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Total Completed</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Soil Type</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Traffic Impact</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Status</th>
+                                <th class="table-th-sm">Area / Cluster</th>
+                                <th class="table-th-sm">Meters/Day</th>
+                                <th class="table-th-sm">Total Completed</th>
+                                <th class="table-th-sm">Soil Type</th>
+                                <th class="table-th-sm">Traffic Impact</th>
+                                <th class="table-th-sm">Status</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody class="tbody-main-divide">
                             <tr *ngFor="let area of advancedData.areaPerformance">
-                                <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">{{
-                                    area.areaName }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">{{
-                                    area.metersPerDay | number:'1.0-0' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-300">{{
-                                    area.totalMetersCompleted | number:'1.0-0' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs font-bold rounded"
-                                        [ngClass]="getSoilColor(area.soilType)">{{ area.soilType }}</span>
+                                <td class="table-td-nowrap crew-name-main">{{ area.areaName }}</td>
+                                <td class="table-td-nowrap rank-score-value">{{ area.metersPerDay | number:'1.0-0' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="w-24 bg-gray-200 rounded-full h-2">
-                                        <div class="bg-orange-500 h-2 rounded-full"
-                                            [style.width.%]="area.trafficImpactScore * 100"></div>
+                                <td class="table-td-nowrap rank-score-value">{{ area.totalMetersCompleted |
+                                    number:'1.0-0' }}</td>
+                                <td class="table-td-nowrap">
+                                    <span class="soil-badge" [ngClass]="getSoilColor(area.soilType)">{{ area.soilType
+                                        }}</span>
+                                </td>
+                                <td class="table-td-nowrap">
+                                    <div class="progress-track-bg mt-0 h-2 w-24">
+                                        <div class="traffic-impact-bar" [style.width.%]="area.trafficImpactScore * 100">
+                                        </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span *ngIf="area.delayCluster"
-                                        class="px-2 py-1 text-xs font-bold rounded bg-red-100 text-red-800">DELAYED</span>
-                                    <span *ngIf="!area.delayCluster"
-                                        class="px-2 py-1 text-xs font-bold rounded bg-green-100 text-green-800">ON
-                                        TRACK</span>
+                                <td class="table-td-nowrap">
+                                    <span *ngIf="area.delayCluster" class="status-tag-sm bg-delayed">DELAYED</span>
+                                    <span *ngIf="!area.delayCluster" class="status-tag-sm bg-on-track">ON TRACK</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -220,23 +185,19 @@
             </section>
 
             <!-- D. Trends & E. Quality -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="two-column-grid">
                 <!-- Trends -->
                 <section>
-                    <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Historical Trends</h2>
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                        <h3 class="font-bold text-gray-900 dark:text-white mb-4">Weekly Production</h3>
-                        <div class="space-y-3">
-                            <div *ngFor="let week of advancedData.trends.weeklyProduction"
-                                class="flex items-center gap-4">
-                                <span class="w-24 text-sm text-gray-500 dark:text-gray-400">{{ week.weekLabel }}</span>
-                                <div class="flex-1 bg-gray-100 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
-                                    <div class="bg-blue-600 h-full rounded-full"
-                                        [style.width.px]="week.metersCompleted / 10"></div>
+                    <h2 class="section-title">Historical Trends</h2>
+                    <div class="stat-card-elevated">
+                        <h3 class="crew-name-main mb-4">Weekly Production</h3>
+                        <div class="trends-chart-list">
+                            <div *ngFor="let week of advancedData.trends.weeklyProduction" class="chart-row">
+                                <span class="chart-row-label">{{ week.weekLabel }}</span>
+                                <div class="chart-bar-container">
+                                    <div class="chart-bar-blue" [style.width.px]="week.metersCompleted / 10"></div>
                                 </div>
-                                <span class="w-16 text-sm font-bold text-gray-700 dark:text-gray-300 text-right">{{
-                                    week.metersCompleted | number:'1.0-0' }}m</span>
+                                <span class="chart-row-value">{{ week.metersCompleted | number:'1.0-0' }}m</span>
                             </div>
                         </div>
                     </div>
@@ -244,30 +205,26 @@
 
                 <!-- Quality -->
                 <section>
-                    <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Quality & Safety</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div
-                            class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Defect Rate</p>
-                            <p class="text-2xl font-bold text-red-600">{{ advancedData.quality.defectRate |
+                    <h2 class="section-title">Quality & Safety</h2>
+                    <div class="quality-grid-compact">
+                        <div class="quality-stat-card">
+                            <p class="stat-label-muted">Defect Rate</p>
+                            <p class="stat-value-xl text-defect">{{ advancedData.quality.defectRate |
                                 number:'1.1-1' }}%</p>
                         </div>
-                        <div
-                            class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                            <p class="text-sm text-gray-500 dark:text-gray-400">First Time Right</p>
-                            <p class="text-2xl font-bold text-green-600">{{ advancedData.quality.firstTimeRightScore |
+                        <div class="quality-stat-card">
+                            <p class="stat-label-muted">First Time Right</p>
+                            <p class="stat-value-xl text-quality">{{ advancedData.quality.firstTimeRightScore |
                                 number:'1.1-1' }}%</p>
                         </div>
-                        <div
-                            class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Safety Score</p>
-                            <p class="text-2xl font-bold text-blue-600">{{ advancedData.quality.safetyComplianceScore |
+                        <div class="quality-stat-card">
+                            <p class="stat-label-muted">Safety Score</p>
+                            <p class="stat-value-xl text-safety">{{ advancedData.quality.safetyComplianceScore |
                                 number:'1.1-1' }}%</p>
                         </div>
-                        <div
-                            class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Rework Cost Est.</p>
-                            <p class="text-2xl font-bold text-orange-600">€{{
+                        <div class="quality-stat-card">
+                            <p class="stat-label-muted">Rework Cost Est.</p>
+                            <p class="stat-value-xl text-rework">€{{
                                 advancedData.quality.costInefficiencyEstimator | number:'1.0-0' }}</p>
                         </div>
                     </div>

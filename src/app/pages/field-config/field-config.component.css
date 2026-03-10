@@ -1,1 +1,177 @@
-/* Field Config Component Styles */
+.config-container {
+    @apply min-h-screen bg-gray-50 dark:bg-gray-900 p-6;
+}
+
+.config-wrapper {
+    @apply max-w-7xl mx-auto;
+}
+
+.page-header {
+    @apply mb-8 flex justify-between items-center;
+}
+
+.page-header h1 {
+    @apply text-3xl font-bold text-gray-900 dark:text-white;
+}
+
+.page-header p {
+    @apply text-gray-600 dark:text-gray-400 mt-2;
+}
+
+.btn-create {
+    @apply bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md;
+}
+
+.error-container {
+    @apply mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4;
+}
+
+.error-message {
+    @apply text-red-800 dark:text-red-400;
+}
+
+.loading-overlay {
+    @apply flex justify-center items-center py-12;
+}
+
+.spinner {
+    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600;
+}
+
+.table-container {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden;
+}
+
+.data-table {
+    @apply min-w-full divide-y divide-gray-200 dark:divide-gray-700;
+}
+
+.thead-light {
+    @apply bg-gray-50 dark:bg-gray-700;
+}
+
+.table-th {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider;
+}
+
+.table-tr {
+    @apply hover:bg-gray-50 dark:hover:bg-gray-700;
+}
+
+.table-td {
+    @apply px-6 py-4 text-sm;
+}
+
+.entity-type-badge {
+    @apply px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded text-xs;
+}
+
+.field-key-cell {
+    @apply whitespace-nowrap font-mono text-gray-500 dark:text-gray-400;
+}
+
+.field-label-cell {
+    @apply whitespace-nowrap font-medium text-gray-900 dark:text-white;
+}
+
+.field-type-badge {
+    @apply px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs;
+}
+
+.status-indicator-yes {
+    @apply text-green-600 dark:text-green-400;
+}
+
+.status-indicator-no {
+    @apply text-gray-400;
+}
+
+.action-links {
+    @apply whitespace-nowrap text-right font-medium;
+}
+
+.btn-edit-link {
+    @apply text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4;
+}
+
+.btn-delete-link {
+    @apply text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300;
+}
+
+.empty-state {
+    @apply text-center py-12;
+}
+
+.empty-state-text {
+    @apply text-gray-500 dark:text-gray-400;
+}
+
+/* Modal */
+.modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4;
+}
+
+.modal-content {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto;
+}
+
+.modal-header {
+    @apply p-6 border-b dark:border-gray-700;
+}
+
+.modal-header h2 {
+    @apply text-2xl font-bold text-gray-900 dark:text-white;
+}
+
+.form-body {
+    @apply p-6;
+}
+
+.field-list {
+    @apply space-y-4;
+}
+
+.checkbox-group-container {
+    @apply space-y-2 p-3 border border-gray-300 dark:border-gray-600 rounded-md;
+}
+
+.checkbox-item {
+    @apply flex items-center;
+}
+
+.checkbox-control {
+    @apply h-4 w-4 text-blue-600 border-gray-300 rounded;
+}
+
+.checkbox-label {
+    @apply ml-2 block text-sm text-gray-900 dark:text-white;
+}
+
+.form-group {
+    @apply mb-4;
+}
+
+.form-label {
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+}
+
+.form-control,
+.form-select {
+    @apply w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.help-text {
+    @apply text-xs text-gray-500 mt-1;
+}
+
+.form-footer {
+    @apply p-6 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex justify-end gap-3;
+}
+
+.btn-cancel {
+    @apply px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium;
+}
+
+.btn-save {
+    @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50;
+}

@@ -1,26 +1,24 @@
-<div class="space-y-6 animate-fade-in-up">
+<div class="detail-container animate-fade-in-up">
     <!-- Loading State -->
-    <div *ngIf="loading" class="flex justify-center items-center h-64">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <div *ngIf="loading" class="loading-container">
+        <div class="spinner"></div>
     </div>
 
     <!-- Error State -->
-    <div *ngIf="error && !loading" class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded shadow-sm">
+    <div *ngIf="error && !loading" class="error-banner">
         <div class="flex">
             <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                    fill="currentColor">
+                <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd"
                         d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                         clip-rule="evenodd" />
                 </svg>
             </div>
-            <div class="ml-3">
-                <p class="text-sm text-red-700 dark:text-red-200">
+            <div class="error-text">
+                <p>
                     {{ error }}
                 </p>
-                <button (click)="ngOnInit()"
-                    class="mt-2 text-sm font-medium text-red-700 dark:text-red-300 hover:text-red-600 underline">
+                <button (click)="ngOnInit()" class="btn-retry">
                     Intentar de nuevo
                 </button>
             </div>
@@ -30,29 +28,24 @@
     <!-- Content State -->
     <ng-container *ngIf="!loading && !error && user">
         <!-- Header Card -->
-        <div
-            class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative">
-            <div class="h-32 bg-gradient-to-r from-blue-600 to-cyan-500"></div>
-            <div class="px-6 pb-6">
-                <div class="relative flex justify-between items-end -mt-12 mb-4">
-                    <div class="flex items-end">
-                        <div
-                            class="h-24 w-24 rounded-full border-4 border-white dark:border-gray-800 bg-white dark:bg-gray-700 flex items-center justify-center text-3xl font-bold text-gray-400 shadow-md">
+        <div class="profile-card">
+            <div class="profile-banner"></div>
+            <div class="profile-content">
+                <div class="profile-header-meta">
+                    <div class="profile-identity">
+                        <div class="profile-avatar">
                             {{ getInitials(user) }}
                         </div>
-                        <div class="ml-4 mb-1">
-                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ user.firstName }} {{
-                                user.lastName }}</h1>
-                            <p class="text-gray-500 dark:text-gray-400">{{ user.email }}</p>
+                        <div class="profile-info">
+                            <h1 class="profile-name">{{ user.firstName }} {{ user.lastName }}</h1>
+                            <p class="profile-email">{{ user.email }}</p>
                         </div>
                     </div>
-                    <div class="flex gap-2 mb-1">
-                        <span [ngClass]="getRoleBadgeClass(user.role)"
-                            class="px-3 py-1 rounded-full text-sm font-medium border">
+                    <div class="badge-container">
+                        <span [ngClass]="getRoleBadgeClass(user.role)" class="badge">
                             {{ getRoleLabel(user.role) }}
                         </span>
-                        <span *ngIf="user.isSubcontractor"
-                            class="px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800 border border-amber-200">
+                        <span *ngIf="user.isSubcontractor" class="badge subcontractor-badge">
                             Subcontratado
                         </span>
                     </div>
@@ -60,49 +53,45 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="detail-grid">
             <!-- Contact Info -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
-                <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Información Personal</h3>
-                <div class="space-y-3 text-sm">
+            <div class="info-box">
+                <h3 class="box-title">Información Personal</h3>
+                <div class="info-stack">
                     <div>
-                        <span class="block text-xs uppercase text-gray-500 font-semibold mb-1">Email</span>
-                        <a href="mailto:{{user.email}}" class="text-blue-600 hover:underline">{{ user.email }}</a>
+                        <span class="info-label">Email</span>
+                        <a href="mailto:{{user.email}}" class="info-link">{{ user.email }}</a>
                     </div>
                     <div>
-                        <span class="block text-xs uppercase text-gray-500 font-semibold mb-1">Teléfono</span>
-                        <span class="text-gray-800 dark:text-gray-200">+34 600 000 000 (Simulado)</span>
+                        <span class="info-label">Teléfono</span>
+                        <span class="info-value">+34 600 000 000 (Simulado)</span>
                     </div>
                     <div>
-                        <span class="block text-xs uppercase text-gray-500 font-semibold mb-1">ID Empleado</span>
-                        <span class="text-gray-800 dark:text-gray-200">EMP-{{ user.id }}</span>
+                        <span class="info-label">ID Empleado</span>
+                        <span class="info-value">EMP-{{ user.id }}</span>
                     </div>
                     <div>
-                        <span class="block text-xs uppercase text-gray-500 font-semibold mb-1">Estado</span>
-                        <span class="inline-flex items-center text-green-600 font-medium">
-                            <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span> Activo
+                        <span class="info-label">Estado</span>
+                        <span class="status-active">
+                            <span class="dot-active"></span> Activo
                         </span>
                     </div>
                 </div>
             </div>
 
             <!-- Field Data (Conditional) -->
-            <div
-                class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6 md:col-span-2">
-                <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center">
+            <div class="field-data-box">
+                <h3 class="box-title-flex">
                     <span>Estado en Campo</span>
-                    <span class="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full"
-                        *ngIf="user.location">En Vivo</span>
+                    <span class="live-indicator" *ngIf="user.location">En Vivo</span>
                 </h3>
 
-                <div *ngIf="user.location || user.crewName; else noFieldData"
-                    class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div *ngIf="user.location || user.crewName; else noFieldData" class="sub-card-grid">
                     <!-- Location Card -->
-                    <div
-                        class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-100 dark:border-gray-600">
-                        <div class="text-xs text-gray-500 uppercase font-semibold mb-2">Ubicación Actual</div>
-                        <div class="flex items-start gap-3">
-                            <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                    <div class="sub-card">
+                        <div class="sub-card-header">Ubicación Actual</div>
+                        <div class="sub-card-body">
+                            <div class="icon-wrapper icon-blue">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
@@ -112,37 +101,33 @@
                                 </svg>
                             </div>
                             <div>
-                                <div class="font-medium text-gray-900 dark:text-white">{{ user.location || 'No
-                                    disponible' }}</div>
-                                <div class="text-xs text-gray-500 mt-1">Confirmado hace 5 min</div>
+                                <div class="sub-card-title">{{ user.location || 'No disponible' }}</div>
+                                <div class="sub-card-subtitle">Confirmado hace 5 min</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Last Activity Card -->
-                    <div
-                        class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-100 dark:border-gray-600">
-                        <div class="text-xs text-gray-500 uppercase font-semibold mb-2">Última Actividad</div>
-                        <div class="flex items-start gap-3">
-                            <div class="p-2 bg-purple-100 text-purple-600 rounded-lg">
+                    <div class="sub-card">
+                        <div class="sub-card-header">Última Actividad</div>
+                        <div class="sub-card-body">
+                            <div class="icon-wrapper icon-purple">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
                             <div>
-                                <div class="font-medium text-gray-900 dark:text-white">{{ user.lastActivity || 'Sin
-                                    actividad reciente' }}</div>
-                                <div class="text-xs text-gray-500 mt-1">Turno actual</div>
+                                <div class="sub-card-title">{{ user.lastActivity || 'Sin actividad reciente' }}</div>
+                                <div class="sub-card-subtitle">Turno actual</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Crew Info -->
-                    <div
-                        class="sm:col-span-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-100 dark:border-gray-600 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-orange-100 text-orange-600 rounded-lg">
+                    <div class="wide-card">
+                        <div class="wide-card-body">
+                            <div class="icon-wrapper icon-orange">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
@@ -150,19 +135,16 @@
                                 </svg>
                             </div>
                             <div>
-                                <div class="text-xs text-gray-500 uppercase font-semibold">Cuadrilla Asignada</div>
-                                <div class="font-medium text-gray-900 dark:text-white text-lg">{{ user.crewName || 'Sin
-                                    asignar' }}</div>
+                                <div class="wide-card-title">Cuadrilla Asignada</div>
+                                <div class="wide-card-value">{{ user.crewName || 'Sin asignar' }}</div>
                             </div>
                         </div>
-                        <button class="text-sm text-blue-600 hover:text-blue-700 font-medium">Ver Detalles
-                            &rarr;</button>
+                        <button class="btn-link">Ver Detalles &rarr;</button>
                     </div>
                 </div>
 
                 <ng-template #noFieldData>
-                    <div
-                        class="text-center py-8 text-gray-500 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+                    <div class="empty-state">
                         <p>Este usuario no tiene datos de campo asociados.</p>
                     </div>
                 </ng-template>

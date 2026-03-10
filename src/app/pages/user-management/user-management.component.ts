@@ -9,6 +9,7 @@ import { User } from '../../services/auth.service';
     standalone: true,
     imports: [CommonModule, RouterModule],
     templateUrl: './user-management.component.html',
+    styleUrls: ['./user-management.component.css'],
 })
 export class UserManagementComponent implements OnInit {
     users: User[] = [];

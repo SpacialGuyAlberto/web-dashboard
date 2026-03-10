@@ -1,0 +1,272 @@
+.progress-container {
+    @apply min-h-screen bg-gray-50 dark:bg-gray-900 p-6 font-sans;
+}
+
+.content-wrapper {
+    @apply max-w-7xl mx-auto;
+}
+
+/* Header Section */
+.page-header {
+    @apply mb-8 flex justify-between items-center;
+}
+
+.header-title {
+    @apply text-3xl font-bold text-gray-900 dark:text-white tracking-tight;
+}
+
+.header-subtitle {
+    @apply text-gray-500 dark:text-gray-400 mt-2;
+}
+
+.filter-toolbar {
+    @apply flex gap-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700;
+}
+
+.filter-group-label {
+    @apply block text-xs text-gray-500 dark:text-gray-400 mb-1;
+}
+
+.filter-input {
+    @apply border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-2 py-1 text-sm;
+}
+
+/* Status Indicators */
+.loading-spinner-box {
+    @apply flex justify-center items-center h-64;
+}
+
+.spinner {
+    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600;
+}
+
+.error-banner {
+    @apply bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-center text-red-600 dark:text-red-400;
+}
+
+/* Layout Sections */
+.sections-stack {
+    @apply space-y-8;
+}
+
+.section-title {
+    @apply text-xl font-bold text-gray-800 dark:text-white mb-4;
+}
+
+/* Overall Progress Card */
+.stats-row-grid {
+    @apply grid grid-cols-1 md:grid-cols-4 gap-6;
+}
+
+.stat-card-elevated {
+    @apply bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700;
+}
+
+.stat-label-muted {
+    @apply text-sm font-medium text-gray-500 dark:text-gray-400;
+}
+
+.stat-display-main {
+    @apply flex items-end gap-2 mt-2;
+}
+
+.stat-value-xl {
+    @apply text-3xl font-bold text-gray-900 dark:text-white;
+}
+
+.stat-subtext-sm {
+    @apply text-sm text-gray-500 mb-1;
+}
+
+.progress-track-bg {
+    @apply w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-3;
+}
+
+.progress-filler-blue {
+    @apply bg-blue-600 h-2 rounded-full;
+}
+
+.target-comparison-text {
+    @apply text-sm mb-1;
+}
+
+.text-status-good {
+    @apply text-green-500;
+}
+
+.text-status-bad {
+    @apply text-red-500;
+}
+
+.stat-description-xs {
+    @apply text-xs text-gray-500 mt-1;
+}
+
+.forecast-value {
+    @apply text-3xl font-bold text-blue-600 dark:text-blue-400 mt-2;
+}
+
+/* Productivity Leaderboard */
+.productivity-grid {
+    @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
+}
+
+.leaderboard-card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden;
+}
+
+.card-header-accent {
+    @apply p-4 border-b border-gray-100 dark:border-gray-700;
+}
+
+.bg-top-performer {
+    @apply bg-green-50 dark:bg-green-900/20;
+}
+
+.bg-needs-attention {
+    @apply bg-red-50 dark:bg-red-900/20;
+}
+
+.header-label-top {
+    @apply font-bold text-green-800 dark:text-green-400;
+}
+
+.header-label-problem {
+    @apply font-bold text-red-800 dark:text-red-400;
+}
+
+.card-body-p4 {
+    @apply p-4;
+}
+
+.list-item-ranking {
+    @apply flex items-center justify-between py-3 border-b last:border-0 border-gray-100 dark:border-gray-700;
+}
+
+.rank-badge-wrapper {
+    @apply flex items-center gap-3;
+}
+
+.rank-number-dot {
+    @apply w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold;
+}
+
+.bg-rank-green {
+    @apply bg-green-100 text-green-700;
+}
+
+.bg-rank-red {
+    @apply bg-red-100 text-red-700;
+}
+
+.crew-name-main {
+    @apply font-medium text-gray-900 dark:text-white;
+}
+
+.rank-score-value {
+    @apply font-bold text-gray-700 dark:text-gray-300;
+}
+
+/* Efficiency Stats */
+.efficiency-metrics-box {
+    @apply space-y-6;
+}
+
+/* Area Performance Table */
+.table-card-full {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden;
+}
+
+.data-table-simple {
+    @apply min-w-full divide-y divide-gray-200 dark:divide-gray-700;
+}
+
+.thead-gray {
+    @apply bg-gray-50 dark:bg-gray-700;
+}
+
+.table-th-sm {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider;
+}
+
+.tbody-main-divide {
+    @apply bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700;
+}
+
+.table-td-nowrap {
+    @apply px-6 py-4 whitespace-nowrap;
+}
+
+.soil-badge {
+    @apply px-2 py-1 text-xs font-bold rounded;
+}
+
+.traffic-impact-bar {
+    @apply bg-orange-500 h-2 rounded-full;
+}
+
+.status-tag-sm {
+    @apply px-2 py-1 text-xs font-bold rounded;
+}
+
+.bg-on-track {
+    @apply bg-green-100 text-green-800;
+}
+
+.bg-delayed {
+    @apply bg-red-100 text-red-800;
+}
+
+/* Historical Trends & Quality */
+.two-column-grid {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+}
+
+.trends-chart-list {
+    @apply space-y-3;
+}
+
+.chart-row {
+    @apply flex items-center gap-4;
+}
+
+.chart-row-label {
+    @apply w-24 text-sm text-gray-500 dark:text-gray-400;
+}
+
+.chart-bar-container {
+    @apply flex-1 bg-gray-100 dark:bg-gray-700 rounded-full h-4 overflow-hidden;
+}
+
+.chart-bar-blue {
+    @apply bg-blue-600 h-full rounded-full;
+}
+
+.chart-row-value {
+    @apply w-16 text-sm font-bold text-gray-700 dark:text-gray-300 text-right;
+}
+
+/* Quality Cards */
+.quality-grid-compact {
+    @apply grid grid-cols-2 gap-4;
+}
+
+.quality-stat-card {
+    @apply bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700;
+}
+
+.text-defect {
+    @apply text-red-600;
+}
+
+.text-quality {
+    @apply text-green-600;
+}
+
+.text-safety {
+    @apply text-blue-600;
+}
+
+.text-rework {
+    @apply text-orange-600;
+}

@@ -6,7 +6,8 @@ import { PredictionService, ProjectRisk, RiskScore } from '../../../services/pre
     selector: 'app-risk-dashboard',
     standalone: true,
     imports: [CommonModule],
-    templateUrl: './risk-dashboard.component.html'
+    templateUrl: './risk-dashboard.component.html',
+    styleUrls: ['./risk-dashboard.component.css']
 })
 export class RiskDashboardComponent implements OnInit {
     projectRisk: ProjectRisk | null = null;

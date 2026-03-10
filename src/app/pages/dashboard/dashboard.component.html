@@ -1,32 +1,28 @@
-<div class="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 font-sans">
+<div class="dashboard-container">
 
     <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-white tracking-tight">COMMAND CENTER</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Real-time construction oversight</p>
+    <div class="dashboard-header">
+        <div class="header-title-group">
+            <h1>COMMAND CENTER</h1>
+            <p class="header-subtitle">Real-time construction oversight</p>
         </div>
-        <div class="flex gap-4 items-center">
+        <div class="header-actions">
             <!-- Project Selector -->
-            <div class="relative min-w-[200px]">
-                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1">Select
-                    Project</label>
-                <select [value]="selectedProjectId" (change)="onProjectChange($event)"
-                    class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all shadow-sm appearance-none">
+            <div class="project-selector-wrapper">
+                <label class="project-selector-label">Select Project</label>
+                <select [value]="selectedProjectId" (change)="onProjectChange($event)" class="project-selector">
                     <option *ngFor="let p of projects" [value]="p.id">{{ p.name }}</option>
                 </select>
-                <div class="absolute right-3 bottom-2.5 pointer-events-none text-gray-400">
+                <div class="selector-icon">
                     <span class="text-xs">▼</span>
                 </div>
             </div>
 
-            <div class="flex gap-2 self-end">
-                <button
-                    class="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+            <div class="time-filter-group">
+                <button class="time-btn">
                     Last 24h
                 </button>
-                <button
-                    class="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                <button class="time-btn">
                     Last 7d
                 </button>
             </div>
@@ -34,73 +30,65 @@
     </div>
 
     <!-- Project Specific Summary Section -->
-    <div *ngIf="selectedProject" class="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div
-            class="lg:col-span-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 shadow-xl text-white relative overflow-hidden">
-            <div class="relative z-10">
+    <div *ngIf="selectedProject" class="project-summary-grid">
+        <div class="project-overview-card">
+            <div class="project-overview-content">
                 <div class="flex justify-between items-start mb-4">
                     <div>
-                        <span
-                            class="bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest">Active
-                            Project</span>
-                        <h2 class="text-3xl font-extrabold mt-2">{{ selectedProject.name }}</h2>
+                        <span class="badge-active">Active Project</span>
+                        <h2 class="project-title">{{ selectedProject.name }}</h2>
                     </div>
                     <div class="text-right">
-                        <p class="text-blue-100 text-xs uppercase font-bold tracking-widest">Global Progress</p>
-                        <p class="text-4xl font-black">78%</p>
+                        <p class="progress-label">Global Progress</p>
+                        <p class="progress-value">78%</p>
                     </div>
                 </div>
-                <p class="text-blue-50 max-w-2xl text-sm leading-relaxed mb-6 opacity-90">
-                    {{ selectedProject.description || 'System-wide infrastructure optimization and fiber rollout
-                    deployment in the specified area.' }}
+                <p class="project-description">
+                    {{ selectedProject.description || 'System-wide infrastructure optimization and fiber rollout deployment in the specified area.' }}
                 </p>
-                <div class="flex gap-8 border-t border-white/10 pt-6">
+                <div class="project-stats-border">
                     <div>
-                        <p class="text-blue-200 text-[10px] uppercase font-bold tracking-widest mb-1">Total Segments</p>
-                        <p class="text-xl font-bold">{{ segments.length }}</p>
+                        <p class="stat-item-label">Total Segments</p>
+                        <p class="stat-item-value">{{ segments.length }}</p>
                     </div>
                     <div>
-                        <p class="text-blue-200 text-[10px] uppercase font-bold tracking-widest mb-1">Start Date</p>
-                        <p class="text-xl font-bold">{{ selectedProject.startDate || 'Jan 2026' }}</p>
+                        <p class="stat-item-label">Start Date</p>
+                        <p class="stat-item-value">{{ selectedProject.startDate || 'Jan 2026' }}</p>
                     </div>
                     <div>
-                        <p class="text-blue-200 text-[10px] uppercase font-bold tracking-widest mb-1">Target Completion
-                        </p>
-                        <p class="text-xl font-bold">{{ selectedProject.endDate || 'Dec 2026' }}</p>
+                        <p class="stat-item-label">Target Completion</p>
+                        <p class="stat-item-value">{{ selectedProject.endDate || 'Dec 2026' }}</p>
                     </div>
                 </div>
             </div>
             <!-- Decorative SVG circles -->
-            <div class="absolute -right-10 -top-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-            <div class="absolute -left-10 -bottom-10 w-48 h-48 bg-blue-400/20 rounded-full blur-2xl"></div>
+            <div class="decorative-circle-1"></div>
+            <div class="decorative-circle-2"></div>
         </div>
 
-        <div
-            class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-100 dark:border-gray-700 flex flex-col justify-between">
+        <div class="health-status-card">
             <div>
-                <h3 class="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-4">
-                    Construction Health</h3>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Permit Compliance</span>
-                        <span class="text-green-500 font-bold text-sm">94%</span>
+                <h3 class="health-label">Construction Health</h3>
+                <div class="health-metric-group">
+                    <div class="health-metric-row">
+                        <span class="health-metric-name">Permit Compliance</span>
+                        <span class="health-metric-percent text-green-500">94%</span>
                     </div>
-                    <div class="w-full bg-gray-100 dark:bg-gray-700 h-2 rounded-full">
-                        <div class="bg-green-500 h-2 rounded-full" style="width: 94%"></div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill bg-green-500" style="width: 94%"></div>
                     </div>
 
-                    <div class="flex justify-between items-center mt-4">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Safety Score (RSA-21)</span>
-                        <span class="text-blue-500 font-bold text-sm">98/100</span>
+                    <div class="health-metric-row mt-4">
+                        <span class="health-metric-name">Safety Score (RSA-21)</span>
+                        <span class="health-metric-percent text-blue-500">98/100</span>
                     </div>
-                    <div class="w-full bg-gray-100 dark:bg-gray-700 h-2 rounded-full">
-                        <div class="bg-blue-500 h-2 rounded-full" style="width: 98%"></div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill bg-blue-500" style="width: 98%"></div>
                     </div>
                 </div>
             </div>
-            <div class="pt-6 border-t border-gray-50 dark:border-gray-700 mt-6">
-                <button
-                    class="w-full py-3 bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white rounded-xl text-xs font-bold transition-all uppercase tracking-widest shadow-lg">
+            <div class="manage-btn-container">
+                <button class="manage-btn">
                     Manage Project Details
                 </button>
             </div>
@@ -108,7 +96,7 @@
     </div>
 
     <!-- KPI Cards Section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="kpi-section-grid">
         <app-kpi-card title="Active Projects" [value]="kpiData.activeProjects" [trend]="12" trendLabel="vs last month"
             status="success" (cardClick)="navigateToProjects()">
         </app-kpi-card>
@@ -124,15 +112,13 @@
     </div>
 
     <!-- Main Grid: Map + Sidebar -->
-    <div class="grid grid-cols-12 gap-4 mb-6">
+    <div class="main-layout-grid">
         <!-- Map View -->
-        <div class="col-span-12 lg:col-span-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden relative"
-            style="height: 500px;">
+        <div class="map-view-container" style="height: 500px;">
             <app-map-view [segments]="segments" [riskData]="riskData" class="h-full w-full block"></app-map-view>
 
             <!-- Legend (Bottom-Right) -->
-            <div
-                class="absolute bottom-4 right-4 z-[1000] bg-white/90 dark:bg-gray-900/90 backdrop-blur px-3 py-1 rounded shadow text-xs font-bold border border-gray-200 dark:border-gray-700">
+            <div class="map-legend">
                 <span class="text-green-500">●</span> Low Risk
                 <span class="text-yellow-500 ml-2">●</span> Medium Risk
                 <span class="text-red-500 ml-2">●</span> High Risk
@@ -140,79 +126,70 @@
         </div>
 
         <!-- Right Sidebar -->
-        <div class="col-span-12 lg:col-span-4 flex flex-col gap-4" style="height: 500px;">
+        <div class="sidebar-container" style="height: 500px;">
 
             <!-- C. Risk Panel -->
-            <div
-                class="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col">
-                <div class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                    <h3 class="font-bold text-gray-800 dark:text-white flex justify-between items-center">
+            <div class="risk-panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title">
                         <span>🔥 High Risk Segments</span>
-                        <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full">{{
-                            highRiskSegments.length }}</span>
+                        <span class="risk-count-badge">{{ highRiskSegments.length }}</span>
                     </h3>
                 </div>
-                <div class="flex-1 overflow-y-auto p-2 space-y-2">
-                    <div *ngFor="let risk of highRiskSegments" (click)="focusOnSegment(risk.segmentId)"
-                        class="p-3 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer">
-                        <div class="flex justify-between items-start">
-                            <span class="font-bold text-sm text-gray-800 dark:text-gray-200">Segment #{{ risk.segmentId
-                                }}</span>
-                            <span class="text-xs font-bold text-red-600">+{{ risk.delayProbability | number:'1.0-1'
-                                }}d</span>
+                <div class="panel-content-scroll">
+                    <div *ngFor="let risk of highRiskSegments" (click)="focusOnSegment(risk.segmentId)" class="risk-item">
+                        <div class="risk-item-header">
+                            <span class="risk-item-title">Segment #{{ risk.segmentId }}</span>
+                            <span class="risk-delay-value">+{{ risk.delayProbability | number:'1.0-1' }}d</span>
                         </div>
-                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-1 truncate">{{ risk.topCauses[0] ||
-                            'Unknown Cause' }}</p>
+                        <p class="risk-cause">{{ risk.topCauses[0] || 'Unknown Cause' }}</p>
                     </div>
-                    <div *ngIf="highRiskSegments.length === 0" class="text-center py-8 text-gray-400 text-sm">
+                    <div *ngIf="highRiskSegments.length === 0" class="empty-state">
                         No high risk segments detected.
                     </div>
                 </div>
             </div>
 
             <!-- D. Action Center -->
-            <div class="flex-1 overflow-hidden">
+            <div class="action-center-wrapper">
                 <app-action-center [actions]="actions" (onApply)="handleApplyAction($event)"></app-action-center>
             </div>
         </div>
     </div>
 
     <!-- E. Project Overview Table -->
-    <div
-        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div
-            class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+    <div class="table-section-container">
+        <div class="table-header-group">
             <h3 class="font-bold text-gray-800 dark:text-white">Active Projects Overview</h3>
-            <button class="text-blue-600 text-sm font-medium hover:underline">View All Projects</button>
+            <button class="table-view-all">View All Projects</button>
         </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <div class="table-responsive-wrapper">
+            <table class="data-table">
+                <thead>
                     <tr>
-                        <th scope="col" class="px-6 py-3">Project Name</th>
-                        <th scope="col" class="px-6 py-3">Description</th>
-                        <th scope="col" class="px-6 py-3">Start Date</th>
-                        <th scope="col" class="px-6 py-3">End Date</th>
-                        <th scope="col" class="px-6 py-3 text-right">Actions</th>
+                        <th scope="col">Project Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Start Date</th>
+                        <th scope="col">End Date</th>
+                        <th scope="col" class="text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let project of projects"
-                        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                    <tr *ngFor="let project of projects" class="data-table-row">
+                        <td class="data-table-cell cell-primary">
                             {{ project.name }}
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="data-table-cell">
                             {{ project.description || 'N/A' }}
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="data-table-cell">
                             {{ project.startDate || 'N/A' }}
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="data-table-cell">
                             {{ project.endDate || 'N/A' }}
                         </td>
-                        <td class="px-6 py-4 text-right">
-                            <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Details</a>
+                        <td class="data-table-cell text-right">
+                            <a href="#" class="table-action-link">Details</a>
                         </td>
                     </tr>
                 </tbody>

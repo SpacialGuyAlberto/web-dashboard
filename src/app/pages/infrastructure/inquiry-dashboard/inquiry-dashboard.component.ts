@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InfrastructureService, Inquiry } from '../../../services/infrastructure.service';
-import { PlanningService, Project } from '../../../services/planning.service';
+import { PlanningService } from '../../../services/planning.service';
+import {Project} from '../../projects/model/Project.interface';
 
 @Component({
     selector: 'app-inquiry-dashboard',
