@@ -24,13 +24,24 @@ export class RiskDashboardComponent implements OnInit {
 
     loadRiskData() {
         this.isLoading = true;
-        this.predictionService.getProjectRisk(this.projectId).subscribe(data => {
-            this.projectRisk = data;
-            this.isLoading = false;
+        this.predictionService.getProjectRisk(this.projectId).subscribe({
+            next: (data) => {
+                this.projectRisk = data;
+                this.isLoading = false;
+            },
+            error: (err) => {
+                console.error('Failed to load risk data:', err);
+                this.isLoading = false;
+            }
         });
 
-        this.predictionService.getProjectRiskDetails(this.projectId).subscribe(data => {
-            this.riskDetails = data;
+        this.predictionService.getProjectRiskDetails(this.projectId).subscribe({
+            next: (data) => {
+                this.riskDetails = data;
+            },
+            error: (err) => {
+                console.error('Failed to load risk details:', err);
+            }
         });
     }
 
