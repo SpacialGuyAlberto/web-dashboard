@@ -103,20 +103,24 @@
                 (mapMousemove)="onMouseMove($event)" class="block w-full h-full">
 
                 <!-- Marker Style synced with PlanningScreen.kt -->
-                <map-marker *ngFor="let point of points; let i = index" [position]="point"
-                    [options]="{ icon: { path: googleMaps.maps.SymbolPath.CIRCLE, strokeColor: '#FFFFFF', strokeWeight: 2, fillColor: strokeColor, fillOpacity: 1.0, scale: 8 }, label: { text: (i+1).toString(), color: 'white', fontSize: '10px', fontWeight: '900' }, title: 'Key Point ' + (i+1), clickable: activeTool !== CADTool.PEN }"
-                    (mapClick)="onMarkerClick(i)"></map-marker>
+                <map-marker *ngFor="let point of points; let i = index" [position]="point" [options]="{ 
+                        icon: { path: googleMaps.maps.SymbolPath.CIRCLE, strokeColor: '#FFFFFF', strokeWeight: 2, fillColor: strokeColor, fillOpacity: 1.0, scale: 8 }, 
+                        label: { text: (i+1).toString(), color: 'white', fontSize: '10px', fontWeight: '900' }, 
+                        title: 'Key Point ' + (i+1), 
+                        clickable: activeTool !== CADTool.PEN,
+                        draggable: activeTool !== CADTool.PEN && !viewOnly
+                    }" (mapClick)="onMarkerClick(i)" (mapDragend)="onMarkerDragEnd(i, $event)"></map-marker>
 
                 <!-- Professional Ghost Line / Pen Preview -->
                 <map-polyline *ngIf="getGhostPath().length > 1" [path]="getGhostPath()"
-                    [options]="{ strokeColor: strokeColor, strokeOpacity: 0.4, strokeWeight: 3, zIndex: 50, icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 2 }, offset: '0', repeat: '12px' }] }">
+                    [options]="{ strokeColor: strokeColor, strokeOpacity: 0.4, strokeWeight: 3, zIndex: 50, clickable: false, icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 2 }, offset: '0', repeat: '12px' }] }">
                 </map-polyline>
 
                 <!-- Core Segments -->
                 <map-polyline *ngFor="let seg of segments; let sIdx = index" [path]="seg" [options]="{
                         strokeColor: sIdx === activeSegmentIndex ? strokeColor : '#94a3b8',
                         strokeOpacity: 0.85,
-                        strokeWeight: 10,
+                        strokeWeight: trenchWidth * 10,
                         editable: activeTool === CADTool.SELECT,
                         clickable: activeTool === CADTool.SELECT
                     }" (polylineDragend)="onPolylinePathChange()"

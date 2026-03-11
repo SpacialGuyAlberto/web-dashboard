@@ -424,6 +424,9 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
     }
 
     ngOnChanges(changes: SimpleChanges): void {
+        // Prevent external updates from overriding the map state while the user is actively drawing
+        if (this.activeTool === CADTool.PEN) return;
+
         if ((changes['startLat'] || changes['endLat']) && !changes['startLat']?.firstChange) {
             this.updateMapFromInputs();
         }
@@ -464,12 +467,36 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         }
     }
 
+    onMarkerDragEnd(index: number, event: google.maps.MapMouseEvent) {
+        if (this.viewOnly || !event.latLng) return;
+
+        const newPos = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+
+        // Find which segment this point belongs to and update it
+        let flatIndex = 0;
+        for (let s = 0; s < this.segments.length; s++) {
+            const segment = this.segments[s];
+            if (index >= flatIndex && index < flatIndex + segment.length) {
+                const updatedSeg = [...segment];
+                updatedSeg[index - flatIndex] = { ...updatedSeg[index - flatIndex], ...newPos };
+                this.segments[s] = updatedSeg;
+                break;
+            }
+            flatIndex += segment.length;
+        }
+
+        this.syncStateAfterTransform();
+        this.updatePlanningState(false);
+    }
+
     undoLastPoint() {
         const seg = this.segments[this.activeSegmentIndex];
         if (seg.length > 0) {
-            seg.splice(seg.length - 1, 1);
+            const newSeg = [...seg];
+            newSeg.splice(newSeg.length - 1, 1);
+            this.segments[this.activeSegmentIndex] = newSeg;
             // If segment becomes empty and not the first one, go back to previous segment
-            if (seg.length === 0 && this.activeSegmentIndex > 0) {
+            if (this.segments[this.activeSegmentIndex].length === 0 && this.activeSegmentIndex > 0) {
                 this.segments.splice(this.activeSegmentIndex, 1);
                 this.activeSegmentIndex--;
             }
@@ -583,7 +610,8 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
 
     private addPoint(pos: google.maps.LatLngLiteral, isFromStreetView: boolean = false) {
         const newPoint = { ...pos, z: 0 };
-        this.segments[this.activeSegmentIndex].push(newPoint);
+        // Create new array reference for the active segment to trigger change detection in 2D map
+        this.segments[this.activeSegmentIndex] = [...this.segments[this.activeSegmentIndex], newPoint];
         this.updateCachedPoints();
         this.streetViewPos = pos;
 
@@ -716,6 +744,9 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
     private calculateRoute(): void {
         if (!this.startPos || !this.endPos) return;
 
+        // Skip heavy routing/bounds fitting while in PEN mode to keep interaction fluid
+        if (this.activeTool === CADTool.PEN) return;
+
         this.routingService.getStreetRoute(this.startPos.lat, this.startPos.lng, this.endPos.lat, this.endPos.lng)
             .subscribe(route => {
                 this.routePoints = route.map(c => ({ lat: c.lat, lng: c.lng }));
@@ -745,7 +776,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
     }
 
     private fitBounds() {
-        if (this.routePoints.length < 2) return;
+        if (this.routePoints.length < 2 || this.activeTool === CADTool.PEN) return;
         const bounds = new google.maps.LatLngBounds();
         this.routePoints.forEach(p => bounds.extend(p));
         if (this.map) {
@@ -774,7 +805,8 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
                     position: { lat: pos.lat(), lng: pos.lng() },
                     title: 'Fencing Barrier',
                     options: {
-                        label: { text: '🚧', color: 'orange', fontSize: '16px' }
+                        label: { text: '🚧', color: 'orange', fontSize: '16px' },
+                        clickable: false
                     }
                 });
                 currentDist += barrierSpacing;
@@ -787,7 +819,8 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
                 position: this.routePoints[0],
                 title: 'Traffic Light Required',
                 options: {
-                    label: { text: '🚦', fontSize: '24px' }
+                    label: { text: '🚦', fontSize: '24px' },
+                    clickable: false
                 }
             });
         }

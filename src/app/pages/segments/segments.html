@@ -304,7 +304,7 @@
                             [endLng]="newSegment.endLongitude || 0" [isEditing]="isEditing" [smartPlan]="smartPlan"
                             (coordinatesChanged)="onCoordinatesChanged($event)">
                         </app-segment-creation-map>
-                        <p class="text-xs text-gray-500 mt-1">Calculated Length: {{ newSegment.length }}m</p>
+                        <p class="length-callout">Calculated Length: <strong>{{ newSegment.length }}m</strong></p>
                     </div>
 
                     <!-- Smart Planning Suggestions -->
