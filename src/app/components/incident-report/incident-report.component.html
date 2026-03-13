@@ -1,59 +1,72 @@
-<div class="py-6">
+<div class="py-2">
     <div class="flex justify-between items-center mb-8">
-        <h3 class="text-xs font-black uppercase text-rose-500 tracking-[0.2em] flex items-center gap-2">
-            <span>⚠️</span> Active Alerts
-        </h3>
+        <div>
+            <h3 class="text-[11px] font-black uppercase text-rose-500 tracking-[0.2em] flex items-center gap-2">
+                <span>⚠️</span> Hazard Registry
+            </h3>
+            <p class="text-xs text-slate-500">Real-time safety incident monitoring</p>
+        </div>
         <button (click)="openModal()"
-            class="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-rose-500/20 transition-all flex items-center gap-2">
+            class="bg-rose-500 hover:bg-rose-600 text-white px-6 py-3 rounded-2xl font-bold text-xs shadow-xl shadow-rose-500/20 transition-all flex items-center gap-2 active:scale-95">
             <span>➕</span> Log Incident
         </button>
     </div>
 
-    <div class="space-y-6">
+    <div class="grid grid-cols-1 gap-6">
         <div *ngFor="let incident of incidents"
-            class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 relative overflow-hidden group hover:border-rose-300/30 transition-all">
+            class="bg-white dark:bg-slate-900/40 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 relative overflow-hidden group hover:border-rose-500/20 transition-all duration-300">
+            
+            <!-- Severity Indicator Side Strip -->
+            <div [class]="'absolute top-0 left-0 w-1.5 h-full severity-' + incident.severity.toLowerCase()"></div>
 
-            <div class="flex flex-col md:flex-row justify-between gap-6">
+            <div class="flex flex-col md:flex-row justify-between gap-8">
                 <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-3">
+                    <div class="flex items-center flex-wrap gap-3 mb-4">
                         <span [class]="getSeverityClass(incident.severity)"
-                            class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                            class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border border-current">
                             {{ incident.severity }}
                         </span>
-                        <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">
-                            {{ incident.reportedAt | date:'medium' }}
+                        <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1">
+                            <span class="opacity-30">🕒</span> {{ incident.reportedAt | date:'medium' }}
                         </span>
                     </div>
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="text-lg font-bold text-slate-800 dark:text-slate-100">{{ incident.type }}</span>
-                        <span class="text-xs text-slate-400 font-medium">— Reported by {{ incident.reportedBy }}</span>
+                    
+                    <div class="mb-4">
+                        <h4 class="text-xl font-black text-slate-800 dark:text-slate-100 mb-1">{{ incident.type }}</h4>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Reported by <span class="text-blue-500">{{ incident.reportedBy }}</span></p>
                     </div>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">{{ incident.description || 'No additional
-                        details provided.' }}</p>
+
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
+                        {{ incident.description || 'No detailed log provided for this incident.' }}
+                    </p>
                 </div>
 
-                <div
-                    class="flex flex-row md:flex-col justify-between md:justify-center items-center md:items-end gap-4 min-w-[120px]">
+                <div class="flex flex-row md:flex-col justify-between md:justify-center items-center md:items-end gap-6 min-w-[140px]">
                     <span [class]="getStatusClass(incident.status)"
-                        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-current bg-transparent">
+                        class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-current bg-transparent">
                         {{ incident.status }}
                     </span>
                     <button *ngIf="incident.status === 'OPEN'" (click)="resolveIncident(incident)"
-                        class="text-[10px] font-black uppercase text-emerald-500 hover:text-emerald-600 tracking-widest transition-colors flex items-center gap-1">
-                        <span>Check Fix</span> Resolve
+                        class="text-[10px] font-black uppercase text-emerald-500 hover:text-emerald-600 tracking-widest transition-all flex items-center gap-2 group/btn">
+                        <span class="bg-emerald-50 dark:bg-emerald-500/10 p-2 rounded-lg group-hover/btn:scale-110 transition-transform">✅</span> 
+                        <span>Resolve</span>
                     </button>
                 </div>
             </div>
         </div>
 
+        <!-- Empty State -->
         <div *ngIf="incidents.length === 0"
-            class="text-center py-16 bg-slate-50/50 dark:bg-slate-800/10 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
-            <span class="text-4xl mb-4 block opacity-20">🛡️</span>
-            <p class="text-slate-400 font-bold text-sm tracking-tight">Zero incidents reported. Segment is operating
-                safely.</p>
+            class="text-center py-20 bg-slate-50/30 dark:bg-slate-800/10 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+            <div class="mb-6 inline-flex w-20 h-20 items-center justify-center bg-emerald-50 dark:bg-emerald-500/5 rounded-full">
+                <span class="text-4xl">🛡️</span>
+            </div>
+            <h5 class="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest mb-1">Status Nominal</h5>
+            <p class="text-xs text-slate-400 font-medium">No active hazards detected in this segment.</p>
         </div>
     </div>
 </div>
+
 
 <!-- Report Modal -->
 <div *ngIf="showModal" class="modal-overlay">

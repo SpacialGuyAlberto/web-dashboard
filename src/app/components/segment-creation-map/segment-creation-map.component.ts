@@ -489,6 +489,33 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         this.updatePlanningState(false);
     }
 
+    addManualPoint() {
+        if (this.viewOnly) return;
+
+        // Add at map center or a default position
+        const centerPos = this.center || { lat: 52.5200, lng: 13.4050 };
+        this.addPoint(centerPos);
+    }
+
+    updateManualPoint(index: number, lat: number, lng: number) {
+        if (this.viewOnly) return;
+
+        let flatIndex = 0;
+        for (let s = 0; s < this.segments.length; s++) {
+            const segment = this.segments[s];
+            if (index >= flatIndex && index < flatIndex + segment.length) {
+                const updatedSeg = [...segment];
+                updatedSeg[index - flatIndex] = { ...updatedSeg[index - flatIndex], lat, lng };
+                this.segments[s] = updatedSeg;
+                break;
+            }
+            flatIndex += segment.length;
+        }
+
+        this.syncStateAfterTransform();
+        this.updatePlanningState(false);
+    }
+
     undoLastPoint() {
         const seg = this.segments[this.activeSegmentIndex];
         if (seg.length > 0) {
@@ -742,12 +769,12 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
     }
 
     private calculateRoute(): void {
-        if (!this.startPos || !this.endPos) return;
+        if (!this.points || this.points.length < 2) return;
 
         // Skip heavy routing/bounds fitting while in PEN mode to keep interaction fluid
         if (this.activeTool === CADTool.PEN) return;
 
-        this.routingService.getStreetRoute(this.startPos.lat, this.startPos.lng, this.endPos.lat, this.endPos.lng)
+        this.routingService.getStreetRoute(this.points)
             .subscribe(route => {
                 this.routePoints = route.map(c => ({ lat: c.lat, lng: c.lng }));
 
@@ -764,13 +791,14 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
 
                 // Emit
                 this.coordinatesChanged.emit({
-                    startLat: this.startPos!.lat,
-                    startLng: this.startPos!.lng,
-                    endLat: this.endPos!.lat,
-                    endLng: this.endPos!.lng,
+                    startLat: this.points[0].lat,
+                    startLng: this.points[0].lng,
+                    endLat: this.points[this.points.length - 1].lat,
+                    endLng: this.points[this.points.length - 1].lng,
                     length: Math.round(length),
                     startAddress: this.startAddress,
-                    endAddress: this.endAddress
+                    endAddress: this.endAddress,
+                    geometry: this.points
                 });
             });
     }
@@ -830,6 +858,12 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         if (!this.startLat || !this.endLat) return;
         this.startPos = { lat: this.startLat, lng: this.startLng };
         this.endPos = { lat: this.endLat, lng: this.endLng };
+
+        // If we have geometry from inputs, use it, otherwise use points A and B
+        if (!this.points || this.points.length < 2) {
+            this.segments = [[this.startPos, this.endPos]];
+        }
+
         this.calculateRoute();
     }
 

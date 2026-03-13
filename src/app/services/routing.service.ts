@@ -17,17 +17,15 @@ export class RoutingService {
     constructor(private http: HttpClient) { }
 
     /**
-     * Get a route between two points that follows actual streets.
-     * Uses OSRM (Open Source Routing Machine) public API.
+     * Get a route between multiple points that follows actual streets.
      */
     getStreetRoute(
-        startLat: number,
-        startLng: number,
-        endLat: number,
-        endLng: number
+        waypoints: RouteCoordinate[]
     ): Observable<RouteCoordinate[]> {
+        if (!waypoints || waypoints.length < 2) return of([]);
+
         // Create cache key
-        const cacheKey = `${startLat},${startLng};${endLat},${endLng}`;
+        const cacheKey = waypoints.map(w => `${w.lat},${w.lng}`).join(';');
 
         // Check cache first
         if (this.routeCache.has(cacheKey)) {
@@ -35,51 +33,43 @@ export class RoutingService {
             return of(this.routeCache.get(cacheKey)!);
         }
 
-        // OSRM expects coordinates in format: lng,lat;lng,lat
-        const url = `${this.osrmUrl}/${startLng},${startLat};${endLng},${endLat}?geometries=geojson&overview=full`;
-        console.log('🛣️ Fetching route from OSRM:', url);
+        // OSRM expects coordinates in format: lng1,lat1;lng2,lat2;...;lngn,latn
+        const coordString = waypoints.map(w => `${w.lng},${w.lat}`).join(';');
+        const url = `${this.osrmUrl}/${coordString}?geometries=geojson&overview=full`;
+
+        console.log('🛣️ Fetching multi-point route from OSRM:', url);
 
         return this.http.get<OSRMResponse>(url).pipe(
             map(response => {
-                console.log('📍 OSRM response code:', response.code, 'routes:', response.routes?.length);
                 if (response.code === 'Ok' && response.routes && response.routes.length > 0) {
-                    // OSRM returns coordinates as [lng, lat], convert to {lat, lng}
                     const coordinates = response.routes[0].geometry.coordinates.map(coord => ({
                         lat: coord[1],
                         lng: coord[0]
                     }));
 
-                    console.log(`✅ Route found with ${coordinates.length} waypoints`);
-                    // Cache the result
+                    console.log(`✅ Multi-point route found with ${coordinates.length} waypoints`);
                     this.routeCache.set(cacheKey, coordinates);
-
                     return coordinates;
                 }
 
                 console.warn('⚠️ No routes in OSRM response, using fallback');
-                return this.getStraightLine(startLat, startLng, endLat, endLng);
+                return this.getStraightLineThroughWaypoints(waypoints);
             }),
             catchError(error => {
                 console.error('❌ OSRM routing failed:', error);
-                return of(this.getStraightLine(startLat, startLng, endLat, endLng));
+                return of(this.getStraightLineThroughWaypoints(waypoints));
             })
         );
     }
 
     /**
-     * Fallback: returns just start and end points (straight line)
+     * Fallback: returns the waypoints as a straight line path
      */
-    private getStraightLine(
-        startLat: number,
-        startLng: number,
-        endLat: number,
-        endLng: number
+    private getStraightLineThroughWaypoints(
+        waypoints: RouteCoordinate[]
     ): RouteCoordinate[] {
-        console.log('📏 Using straight line fallback');
-        return [
-            { lat: startLat, lng: startLng },
-            { lat: endLat, lng: endLng }
-        ];
+        console.log('📏 Using straight line fallback for waypoints');
+        return waypoints;
     }
 
     /**

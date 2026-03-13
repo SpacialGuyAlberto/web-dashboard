@@ -8,11 +8,7 @@ import { SafetyProtocol, TrafficPermit } from '../../models/safety.model';
     selector: 'app-safety-protocols',
     standalone: true,
     imports: [CommonModule, FormsModule],
-    templateUrl: './safety-protocols.component.html',
-    styles: [`
-    .tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; }
-    .tab-inactive { color: #6b7280; }
-  `]
+    templateUrl: './safety-protocols.component.html'
 })
 export class SafetyProtocolsComponent implements OnInit, OnChanges {
     @Input() segmentId!: number;

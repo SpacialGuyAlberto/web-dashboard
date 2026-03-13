@@ -61,12 +61,10 @@ export class MapViewComponent implements OnChanges {
         );
 
         const routeRequests = validSegments.map(segment =>
-            this.routingService.getStreetRoute(
-                segment.startLatitude,
-                segment.startLongitude,
-                segment.endLatitude,
-                segment.endLongitude
-            ).pipe(
+            this.routingService.getStreetRoute([
+                { lat: segment.startLatitude, lng: segment.startLongitude },
+                { lat: segment.endLatitude, lng: segment.endLongitude }
+            ]).pipe(
                 catchError(() => of([
                     { lat: segment.startLatitude, lng: segment.startLongitude },
                     { lat: segment.endLatitude, lng: segment.endLongitude }

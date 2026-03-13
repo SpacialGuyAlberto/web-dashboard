@@ -2,3 +2,90 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    /* Shared Form Styles */
+    .form-label {
+        @apply block text-[11px] font-black uppercase text-slate-400 mb-2 tracking-widest;
+    }
+
+    .form-input,
+    .form-select {
+        @apply w-full bg-slate-50 dark:bg-slate-800/50 border border-transparent rounded-2xl px-5 py-4 font-bold text-slate-800 dark:text-slate-200 transition-all hover:bg-slate-100 dark:hover:bg-slate-800/80;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+        @apply ring-2 ring-blue-500/50 outline-none bg-white dark:bg-slate-800 border-blue-500/30;
+    }
+
+    .form-input-readonly {
+        @apply bg-slate-100/50 dark:bg-slate-800/30 text-slate-500 dark:text-slate-400 cursor-default border-slate-200 dark:border-slate-800;
+    }
+
+    /* Shared Tab Styles */
+    .tab-nav {
+        @apply flex bg-slate-200/50 dark:bg-slate-800/50 p-1 rounded-2xl w-fit backdrop-blur-md;
+    }
+
+    .tab-btn {
+        @apply px-6 py-2.5 rounded-xl font-bold text-sm transition-all text-slate-500 hover:text-slate-700 dark:hover:text-slate-300;
+    }
+
+    .tab-btn-active {
+        @apply bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400;
+    }
+
+    /* Details Grid */
+    .details-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+    }
+
+    .details-box {
+        @apply bg-slate-50 dark:bg-slate-800/30 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 transition-all hover:border-blue-500/20;
+    }
+
+    .details-box-label {
+        @apply text-[10px] font-black uppercase text-slate-400 mb-2 tracking-wider;
+    }
+
+    .details-box-value {
+        @apply text-lg font-bold text-slate-800 dark:text-slate-100;
+    }
+
+    /* Modal Standard Styles */
+    .modal-overlay {
+        @apply fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-[100] p-4;
+    }
+
+    .modal-container-medium {
+        @apply bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800;
+    }
+
+    .modal-header-with-close {
+        @apply p-10 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900;
+    }
+
+    .modal-footer {
+        @apply p-8 bg-slate-50 dark:bg-slate-900/50 flex justify-end gap-4;
+    }
+
+    .modal-content-scroll {
+        @apply p-10 overflow-y-auto flex-1;
+    }
+
+    /* Component specific but shared patterns */
+    .btn-save {
+        @apply bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-10 py-4 rounded-2xl font-black text-xs tracking-widest shadow-xl hover:opacity-90 active:scale-95 transition-all;
+    }
+
+    .btn-action-outline {
+        @apply border-2 border-slate-100 dark:border-slate-800 py-3 rounded-2xl font-bold text-xs hover:border-blue-400/40 transition-all text-slate-500 active:scale-95;
+    }
+
+    /* Severity Indicators */
+    .severity-low { @apply bg-blue-500/20; }
+    .severity-medium { @apply bg-amber-500/40; }
+    .severity-high { @apply bg-orange-500/60; }
+    .severity-critical { @apply bg-rose-600; }
+}
