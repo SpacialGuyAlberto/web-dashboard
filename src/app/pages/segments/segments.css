@@ -362,3 +362,20 @@
 .context-item {
     @apply flex items-center gap-2 bg-white/50 dark:bg-slate-800/50 px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-600 dark:text-slate-300 border border-blue-50 dark:border-blue-500/5;
 }
+
+/* Empty State */
+.empty-state-card {
+    @apply flex flex-col items-center justify-center py-24 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[3rem] col-span-full text-center transition-all duration-300 hover:border-blue-400/40 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer;
+}
+
+.empty-state-icon {
+    @apply text-blue-500/80 dark:text-blue-400/80 mb-6 bg-blue-50 dark:bg-blue-900/30 p-6 rounded-3xl shadow-sm transform transition-transform group-hover:scale-110;
+}
+
+.empty-state-card h3 {
+    @apply text-2xl font-black text-slate-800 dark:text-white mb-3;
+}
+
+.empty-state-card p {
+    @apply text-slate-500 dark:text-slate-400 font-medium text-lg;
+}
