@@ -74,9 +74,15 @@ export class AuthService {
         this.router.navigate(['/login']);
     }
 
-    getToken(): string | null {
-        return sessionStorage.getItem('token');
+  getToken(): string | null {
+    const token = sessionStorage.getItem('token');
+
+    if (!token || token === 'null' || token === 'undefined' || token.trim() === '') {
+      return null;
     }
+
+    return token;
+  }
 
     isAuthenticated(): boolean {
         return !!this.getToken();

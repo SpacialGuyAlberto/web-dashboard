@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 
 import { GeometryPoint, Segment } from '../models/segment.model';
 
@@ -12,9 +12,12 @@ export class SegmentService {
 
     constructor(private http: HttpClient) { }
 
-    createSegment(projectId: number, segment: Segment): Observable<Segment> {
-        return this.http.post<Segment>(`${this.apiUrl}/projects/${projectId}/segments`, segment);
+  createSegment(projectId: number, segment: Segment): Observable<Segment> {
+    if (!projectId || !segment) {
+      return throwError(() => new Error('Datos de segmento o ID de proyecto inválidos.'));
     }
+    return this.http.post<Segment>(`${this.apiUrl}/projects/${projectId}/segments`, segment);
+  }
 
     getProjectSegments(projectId: number): Observable<Segment[]> {
         return this.http.get<Segment[]>(`${this.apiUrl}/projects/${projectId}/segments`);

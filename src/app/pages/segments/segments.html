@@ -1,471 +1,470 @@
 <div class="segments-container">
-    <div class="segments-wrapper">
-        <!-- Header -->
-        <div class="segments-header">
-            <div>
-                <button (click)="goBack()" class="btn-back">
-                    ← Back to Projects
-                </button>
-                <h1>{{ projectName }}</h1>
-                <p>Manage fiber optic deployment segments</p>
+  <div class="segments-wrapper">
+    <div class="segments-header">
+      <div>
+        <button (click)="goBack()" class="btn-back">
+          ← Back to Projects
+        </button>
+        <h1>{{ projectName }}</h1>
+        <p>Manage fiber optic deployment segments</p>
+      </div>
+      <div class="header-actions">
+        @if (activeTab === 'segments') {
+          <button (click)="openCreateModal()" class="btn-new-segment">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"/>
+            </svg>
+            <span>New Segment</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="tabs-container">
+      <nav class="tab-nav" aria-label="Tabs">
+        <button (click)="switchTab('segments')" class="tab-btn"
+                [class.tab-btn-active]="activeTab === 'segments'">
+          Segments
+        </button>
+        <button (click)="switchTab('materials')" class="tab-btn"
+                [class.tab-btn-active]="activeTab === 'materials'">
+          Project Materials
+        </button>
+      </nav>
+    </div>
+
+    @if (error) {
+      <div class="error-container">
+        <p class="error-message">{{ error }}</p>
+      </div>
+    }
+
+    @if (loading) {
+      <div class="loading-container">
+        <div class="spinner"></div>
+      </div>
+    }
+
+    @if (!loading && activeTab === 'segments') {
+      <div class="segments-grid">
+        @for (segment of segments; track segment.id || $index) {
+          <div class="segment-card">
+            <div class="card-edge-glow"></div>
+
+            <div class="segment-card-header">
+              <div class="header-main">
+                <div class="title-row">
+                  <span class="location-icon">📍</span>
+                  <h3>{{ segment.streetName }}</h3>
+                </div>
+                <span class="street-type-tag">{{ segment.streetType }}</span>
+              </div>
+              <div class="status-stack">
+                                <span [class]="'status-badge ' + segment.currentState.toLowerCase()">
+                                    {{ getStateText(segment.currentState) }}
+                                </span>
+                @if (segment.volume) {
+                  <span class="bim-badge">
+                                        <i class="icon-bim"></i> BIM READY
+                                    </span>
+                }
+              </div>
             </div>
-            <div class="header-actions">
-                <button *ngIf="activeTab === 'segments'" (click)="openCreateModal()" class="btn-new-segment">
-                    + New Segment
-                </button>
+
+            <div class="segment-info-grid">
+              <div class="info-item">
+                <span class="info-label">Service</span>
+                <span class="info-value">{{ segment.workType }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Length</span>
+                <span class="info-value">{{ segment.length }}<small>m</small></span>
+              </div>
+              <div class="info-item full-width">
+                <span class="info-label">Timeline</span>
+                <span class="info-value timeline">
+                                    <span class="date">{{ segment.plannedStartDate }}</span>
+                                    <span class="arrow">→</span>
+                                    <span class="date">{{ segment.plannedEndDate }}</span>
+                                </span>
+              </div>
             </div>
-        </div>
 
-        <!-- Tabs -->
-        <div class="tabs-container">
-            <nav class="tab-nav" aria-label="Tabs">
-                <button (click)="switchTab('segments')" class="tab-btn"
-                    [class.tab-btn-active]="activeTab === 'segments'">
-                    Segments
+            <div class="card-footer-actions">
+              <div class="primary-actions">
+                <button (click)="openDetailsModal(segment)" class="btn-action-glass">
+                  <span>Details</span>
                 </button>
-                <button (click)="switchTab('materials')" class="tab-btn"
-                    [class.tab-btn-active]="activeTab === 'materials'">
-                    Project Materials
+                <button (click)="openEditModal(segment)" class="btn-action-outline">
+                  <span>Edit</span>
                 </button>
-            </nav>
-        </div>
+              </div>
+              <button (click)="downloadReport(segment.id!)" class="btn-report-gradient">
+                <span class="icon">📊</span>
+                <span>CERTIFIED PDF REPORT</span>
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state-card group">
+            <div class="empty-state-icon">
+              <svg class="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
+                </path>
+              </svg>
+            </div>
+            <h3>No segments found</h3>
+            <p>Create your first segment to get started</p>
+          </div>
+        }
+      </div>
+    }
 
-        <!-- Error Message -->
-        <div *ngIf="error" class="error-container">
-            <p class="error-message">{{ error }}</p>
-        </div>
-
-        <!-- Loading State -->
-        <div *ngIf="loading" class="loading-container">
-            <div class="spinner"></div>
-        </div>
-
-        <!-- Segments Grid -->
-        <div *ngIf="!loading && activeTab === 'segments'" class="segments-grid">
-            <div *ngFor="let segment of segments" class="segment-card">
-                <!-- Card Glow effect (CSS) -->
+    @if (!loading && activeTab === 'materials') {
+      <div>
+        @if (projectMaterials.length > 0) {
+          <div class="materials-grid">
+            @for (material of projectMaterials; track material.id || $index) {
+              <div class="material-card group">
                 <div class="card-edge-glow"></div>
 
-                <!-- Segment Header -->
-                <div class="segment-card-header">
-                    <div class="header-main">
-                        <div class="title-row">
-                            <span class="location-icon">📍</span>
-                            <h3>{{ segment.streetName }}</h3>
-                        </div>
-                        <span class="street-type-tag">{{ segment.streetType }}</span>
-                    </div>
-                    <div class="status-stack">
-                        <span [class]="'status-badge ' + segment.currentState.toLowerCase()">
-                            {{ getStateText(segment.currentState) }}
-                        </span>
-                        <span *ngIf="segment.volume" class="bim-badge">
-                            <i class="icon-bim"></i> BIM READY
-                        </span>
-                    </div>
+                <div class="material-card-header">
+                  <div class="material-icon-box">
+                    @if (material.name.toLowerCase().includes('cable')) {
+                      <span>🔌</span>
+                    } @else if (material.name.toLowerCase().includes('duct')) {
+                      <span>🕳️</span>
+                    } @else if (material.name.toLowerCase().includes('joint')) {
+                      <span>🔗</span>
+                    } @else {
+                      <span>📦</span>
+                    }
+                  </div>
+                  <span class="material-status-pill status-available">Available</span>
                 </div>
 
-                <!-- Segment Details -->
-                <div class="segment-info-grid">
-                    <div class="info-item">
-                        <span class="info-label">Service</span>
-                        <span class="info-value">{{ segment.workType }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Length</span>
-                        <span class="info-value">{{ segment.length }}<small>m</small></span>
-                    </div>
-                    <div class="info-item full-width">
-                        <span class="info-label">Timeline</span>
-                        <span class="info-value timeline">
-                            <span class="date">{{ segment.plannedStartDate }}</span>
-                            <span class="arrow">→</span>
-                            <span class="date">{{ segment.plannedEndDate }}</span>
-                        </span>
-                    </div>
+                <div class="material-body">
+                  <h3 class="material-name">{{ material.name }}</h3>
+                  <span class="material-sku-tag">SKU: {{ material.sku }}</span>
                 </div>
 
-                <div class="card-footer-actions">
-                    <div class="primary-actions">
-                        <button (click)="openDetailsModal(segment)" class="btn-action-glass">
-                            <span>Details</span>
-                        </button>
-                        <button (click)="openEditModal(segment)" class="btn-action-outline">
-                            <span>Edit</span>
-                        </button>
+                <div class="material-footer">
+                  <div class="material-stats-row">
+                    <div class="flex flex-col">
+                      <span class="stat-label">Allocated</span>
+                      <div class="flex items-baseline">
+                                                <span class="stat-value">
+                                                    {{ material.projectAllocations && material.projectAllocations[0] ?
+                                                  material.projectAllocations[0].quantityAllocated : 0 }}
+                                                </span>
+                        <span class="stat-unit">{{ material.unit }}</span>
+                      </div>
                     </div>
-                    <button (click)="downloadReport(segment.id!)" class="btn-report-gradient">
-                        <span class="icon">📊</span>
-                        <span>CERTIFIED PDF REPORT</span>
-                    </button>
-                </div>
-            </div>
+                    <div class="flex flex-col items-end">
+                      <span class="stat-label">Stock Level</span>
+                      <span class="text-xs font-bold text-emerald-500">100%</span>
+                    </div>
+                  </div>
 
-            <!-- Empty State Segments -->
-            <div *ngIf="segments.length === 0" class="empty-state-card group">
-                <div class="empty-state-icon">
-                    <svg class="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
-                        </path>
-                    </svg>
+                  <div class="supplier-box">
+                    <div class="supplier-avatar">{{ (material.supplier?.name || 'NA').substring(0, 1) }}</div>
+                    <span class="supplier-name">{{ material.supplier?.name || 'Internal Warehouse' }}</span>
+                  </div>
                 </div>
-                <h3>No segments found</h3>
-                <p>Create your first segment to get started</p>
-            </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="flex flex-col items-center justify-center py-24 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[3rem]">
+            <span class="text-6xl mb-6 opacity-20">📦</span>
+            <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">No Materials Allocated</h3>
+            <p class="text-slate-500 dark:text-slate-400 font-medium">This project currently has no materials assigned.</p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  @if (showCreateModal) {
+    <div class="modal-overlay">
+      <div class="modal-container-large">
+        <div class="modal-header">
+          <h2>{{ isEditing ? 'Edit Segment' : 'New Segment' }}</h2>
         </div>
 
-        <!-- Project Materials View -->
-        <div *ngIf="!loading && activeTab === 'materials'">
-            <div class="materials-grid" *ngIf="projectMaterials.length > 0">
-                <div *ngFor="let material of projectMaterials" class="material-card group">
+        <div class="modal-content-scroll">
+          <div class="form-group-list">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">Street Name</label>
+                <input [(ngModel)]="newSegment.streetName" type="text" class="form-input" placeholder="e.g., Hauptstraße">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Street Type</label>
+                <select [(ngModel)]="newSegment.streetType" class="form-select">
+                  <option value="residential">Residential</option>
+                  <option value="highway">Highway</option>
+                  <option value="commercial">Commercial</option>
+                  <option value="industrial">Industrial</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">Work Type</label>
+                <select [(ngModel)]="newSegment.workType" class="form-select">
+                    @for (type of workTypeOptions; track type){
+                      <option [value]="type" class="select-option">
+                        {{type}}
+                      </option>
+                    }
+                </select>
+              </div>
+
+              @if (isEditing && availableTransitions.length > 0) {
+                <div class="form-group">
+                  <label class="form-label">Available Actions</label>
+                  <div class="transition-actions">
+                    @for (transition of availableTransitions; track transition.actionName) {
+                      <button (click)="executeTransition(transition)" class="btn-transition">
+                        {{ transition.actionName }}
+                      </button>
+                    }
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">Current State: {{ getStateText(newSegment.currentState) }}</p>
+                </div>
+              } @else {
+                <div class="form-group">
+                  <label class="form-label">Current State</label>
+                  <select [(ngModel)]="newSegment.currentState" [disabled]="isEditing" class="form-select disabled:opacity-50">
+                    <option value="PLAN">Plan</option>
+                    <option value="EXCAVATION">Excavation</option>
+                    <option value="DUCT_INSTALLATION">Duct Installation</option>
+                    <option value="BACKFILL">Backfill</option>
+                    <option value="ASPHALT">Asphalt</option>
+                    <option value="DOCUMENTATION">Documentation</option>
+                    <option value="QA_APPROVAL">QA Approval</option>
+                    <option value="COMPLETED">Completed</option>
+                  </select>
+                </div>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Assigned Crew</label>
+              <select [(ngModel)]="newSegment.assignedCrewId" class="form-select">
+                <option [ngValue]="null">-- No Crew Assigned --</option>
+                @for (crew of crews; track crew.id) {
+                  <option [ngValue]="crew.id">
+                    {{crew.name}} ({{crew.size}} ppl)
+                  </option>
+                }
+              </select>
+            </div>
+
+            <div class="form-grid-2 mt-4">
+              <div class="form-group">
+                <label class="form-label">Start Address</label>
+                <input [ngModel]="startAddress || 'Click on map to get address'" type="text" readonly class="form-input form-input-readonly text-sm">
+              </div>
+              <div class="form-group">
+                <label class="form-label">End Address</label>
+                <input [ngModel]="endAddress || 'Click on map to get address'" type="text" readonly class="form-input form-input-readonly text-sm">
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">Start Point (Lat, Lng)</label>
+                <input [ngModel]="newSegment.startLatitude + ', ' + newSegment.startLongitude" type="text" readonly class="form-input form-input-readonly text-sm">
+              </div>
+              <div class="form-group">
+                <label class="form-label">End Point (Lat, Lng)</label>
+                <input [ngModel]="newSegment.endLatitude + ', ' + newSegment.endLongitude" type="text" readonly class="form-input form-input-readonly text-sm">
+              </div>
+            </div>
+
+            @if (customFieldDefinitions.length > 0) {
+              <div class="mt-6 border-t dark:border-gray-700 pt-4">
+                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Additional Information</h4>
+                <div class="form-grid-2">
+                  @for (field of customFieldDefinitions; track field.fieldKey) {
+                    <div>
+                      <app-dynamic-input [field]="field" [value]="customFieldsData[field.fieldKey]"
+                                         (valueChange)="customFieldsData[field.fieldKey] = $event">
+                      </app-dynamic-input>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="form-group mt-4">
+              <label class="form-label mb-2">Route Selection</label>
+              <app-segment-creation-map [startLat]="newSegment.startLatitude || 0"
+                                        [startLng]="newSegment.startLongitude || 0" [endLat]="newSegment.endLatitude || 0"
+                                        [endLng]="newSegment.endLongitude || 0" [isEditing]="isEditing" [smartPlan]="smartPlan"
+                                        (coordinatesChanged)="onCoordinatesChanged($event)">
+              </app-segment-creation-map>
+              <p class="length-callout">Calculated Length: <strong>{{ newSegment.length }}m</strong></p>
+            </div>
+
+            @if (smartPlan) {
+              <div class="smart-plan-container">
+                <div class="smart-plan-header">
+                  <span class="text-xl">💡</span>
+                  <h4>Smart Planning Suggestion</h4>
+                </div>
+
+                <div class="smart-plan-grid">
+                  <div>
+                    <p class="smart-plan-label">Recommended Regelplan</p>
+                    <p class="smart-plan-value">{{ smartPlan.suggestedRegelplan }}</p>
+                  </div>
+                  <div>
+                    <p class="smart-plan-label">Safety Score</p>
+                    <p class="font-bold" [class.text-green-600]="smartPlan.safetyScore > 80"
+                       [class.text-yellow-600]="smartPlan.safetyScore <= 80">
+                      {{ smartPlan.safetyScore }}/100
+                    </p>
+                  </div>
+                </div>
+
+                @if (smartPlan.requiresPermit) {
+                  <div class="smart-plan-alert">
+                    <span>⚠️</span>
+                    <strong>PERMIT REQUIRED:</strong> High traffic density detected. Mandatory LSA (Ampel) setup.
+                  </div>
+                }
+
+                <div class="mt-4">
+                  <p class="smart-plan-list-label">Required Safety Materials (Auto-Calculated):</p>
+                  <ul class="smart-plan-list">
+                    @for (material of smartPlan.requiredMaterials; track $index) {
+                      <li class="smart-plan-list-item">
+                        <span class="bullet-blue"></span>
+                        {{ material }}
+                      </li>
+                    }
+                  </ul>
+                </div>
+
+                <div class="environmental-context">
+                  <div class="context-item">
+                    <span>🌡️</span>
+                    <span>{{ smartPlan.environmentalContext.weather.temperature }}°C ({{ smartPlan.environmentalContext.weather.condition }})</span>
+                  </div>
+                  <div class="context-item">
+                    <span>🚗</span>
+                    <span>Traffic: {{ smartPlan.environmentalContext.traffic.congestionLevel }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeCreateModal()" class="btn-edit-outline">Cancel</button>
+          <button (click)="saveSegment()" class="btn-view" [disabled]="!newSegment.streetName">
+            {{ isEditing ? 'Save Changes' : 'Create Segment' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showDetailsModal && selectedSegment) {
+    <div class="modal-overlay">
+      <div class="modal-container-medium">
+        <div class="modal-header-with-close">
+          <div>
+            <span class="text-[10px] font-black uppercase text-accent tracking-[0.2em] mb-1 block">Quick Look</span>
+            <h2 class="text-3xl font-black text-slate-900 dark:text-white">{{ selectedSegment.streetName }}</h2>
+          </div>
+          <button (click)="closeDetailsModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-content-scroll">
+          <div class="details-section">
+            <div class="section-group">
+              <h3 class="section-title">Technical Specifications</h3>
+              <div class="details-grid">
+                <div class="details-box">
+                  <span class="details-box-label">Current State</span>
+                  <div class="details-box-value">
+                                        <span [class]="'status-badge ' + selectedSegment.currentState.toLowerCase()">
+                                            {{ getStateText(selectedSegment.currentState) }}
+                                        </span>
+                  </div>
+                </div>
+                <div class="details-box">
+                  <span class="details-box-label">Work Type</span>
+                  <div class="details-box-value">{{ selectedSegment.workType }}</div>
+                </div>
+                <div class="details-box">
+                  <span class="details-box-label">Total Length</span>
+                  <div class="details-box-value">{{ selectedSegment.length }}<small class="text-slate-400 ml-1">meters</small></div>
+                </div>
+                <div class="details-box">
+                  <span class="details-box-label">Project ID</span>
+                  <div class="details-box-value mono-text">#{{ selectedSegment.projectId }}</div>
+                </div>
+
+                @if (selectedSegment.volume) {
+                  <div class="details-box-bim">
                     <div class="card-edge-glow"></div>
-
-                    <div class="material-card-header">
-                        <div class="material-icon-box">
-                            <span *ngIf="material.name.toLowerCase().includes('cable')">🔌</span>
-                            <span *ngIf="material.name.toLowerCase().includes('duct')">🕳️</span>
-                            <span *ngIf="material.name.toLowerCase().includes('joint')">🔗</span>
-                            <span
-                                *ngIf="!material.name.toLowerCase().includes('cable') && !material.name.toLowerCase().includes('duct') && !material.name.toLowerCase().includes('joint')">📦</span>
-                        </div>
-                        <span class="material-status-pill status-available">Available</span>
+                    <span class="bim-title">
+                                            <span class="text-lg">🏗️</span> BIM Volumetry (Phase 3)
+                                        </span>
+                    <div class="bim-value-group">
+                      <span class="bim-value">{{ selectedSegment.volume }}</span>
+                      <span class="bim-unit">m³ calculated</span>
                     </div>
+                    <p class="bim-footer">Precise volume extracted from AR Ruler & LiDAR scanning</p>
+                  </div>
+                }
+              </div>
+            </div>
 
-                    <div class="material-body">
-                        <h3 class="material-name">{{ material.name }}</h3>
-                        <span class="material-sku-tag">SKU: {{ material.sku }}</span>
-                    </div>
-
-                    <div class="material-footer">
-                        <div class="material-stats-row">
-                            <div class="flex flex-col">
-                                <span class="stat-label">Allocated</span>
-                                <div class="flex items-baseline">
-                                    <span class="stat-value">
-                                        {{ material.projectAllocations && material.projectAllocations[0] ?
-                                        material.projectAllocations[0].quantityAllocated : 0 }}
-                                    </span>
-                                    <span class="stat-unit">{{ material.unit }}</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col items-end">
-                                <span class="stat-label">Stock Level</span>
-                                <span class="text-xs font-bold text-emerald-500">100%</span>
-                            </div>
-                        </div>
-
-                        <div class="supplier-box">
-                            <div class="supplier-avatar">{{ (material.supplier?.name || 'NA').substring(0, 1) }}</div>
-                            <span class="supplier-name">{{ material.supplier?.name || 'Internal Warehouse' }}</span>
-                        </div>
-                    </div>
+            <div class="section-group">
+              <h3 class="section-title">Schedule & Logistics</h3>
+              <div class="details-grid">
+                <div class="details-box">
+                  <span class="details-box-label">Planned Start</span>
+                  <div class="details-box-value">{{ selectedSegment.plannedStartDate || 'Not set' }}</div>
                 </div>
+                <div class="details-box">
+                  <span class="details-box-label">Planned End</span>
+                  <div class="details-box-value">{{ selectedSegment.plannedEndDate || 'Not set' }}</div>
+                </div>
+              </div>
             </div>
 
-            <!-- Empty State Materials -->
-            <div *ngIf="projectMaterials.length === 0"
-                class="flex flex-col items-center justify-center py-24 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[3rem]">
-                <span class="text-6xl mb-6 opacity-20">📦</span>
-                <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">No Materials Allocated</h3>
-                <p class="text-slate-500 dark:text-slate-400 font-medium">This project currently has no materials
-                    assigned.</p>
+            <div class="section-group">
+              <h3 class="section-title">Safety & Compliance</h3>
+              <app-safety-protocols [segmentId]="selectedSegment.id!"></app-safety-protocols>
             </div>
+
+            <div class="section-group">
+              <h3 class="section-title">Incident Awareness</h3>
+              <app-incident-report [segmentId]="selectedSegment.id!"></app-incident-report>
+            </div>
+          </div>
         </div>
-    </div>
 
-    <!-- Create/Edit Segment Modal -->
-    <div *ngIf="showCreateModal" class="modal-overlay">
-        <div class="modal-container-large">
-            <!-- Header -->
-            <div class="modal-header">
-                <h2>{{ isEditing ? 'Edit Segment' : 'New Segment' }}</h2>
-            </div>
-
-            <!-- Scrollable Content -->
-            <div class="modal-content-scroll">
-                <div class="form-group-list">
-                    <div class="form-grid-2">
-                        <div class="form-group">
-                            <label class="form-label">Street Name</label>
-                            <input [(ngModel)]="newSegment.streetName" type="text" class="form-input"
-                                placeholder="e.g., Hauptstraße">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Street Type</label>
-                            <select [(ngModel)]="newSegment.streetType" class="form-select">
-                                <option value="residential">Residential</option>
-                                <option value="highway">Highway</option>
-                                <option value="commercial">Commercial</option>
-                                <option value="industrial">Industrial</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-grid-2">
-                        <div class="form-group">
-                            <label class="form-label">Work Type</label>
-                            <select [(ngModel)]="newSegment.workType" class="form-select">
-                                <option value="EXCAVATION">Excavation</option>
-                                <option value="DUCT_INSTALLATION">Duct Installation</option>
-                                <option value="BACKFILL">Backfill</option>
-                                <option value="ASPHALT">Asphalt</option>
-                                <option value="DOCUMENTATION">Documentation</option>
-                            </select>
-                        </div>
-
-                        <!-- Workflow Actions or Current State -->
-                        <div *ngIf="isEditing && availableTransitions.length > 0; else staticState" class="form-group">
-                            <label class="form-label">Available Actions</label>
-                            <div class="transition-actions">
-                                <button *ngFor="let transition of availableTransitions"
-                                    (click)="executeTransition(transition)" class="btn-transition">
-                                    {{ transition.actionName }}
-                                </button>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1">Current State: {{
-                                getStateText(newSegment.currentState) }}</p>
-                        </div>
-                        <ng-template #staticState>
-                            <div class="form-group">
-                                <label class="form-label">Current State</label>
-                                <select [(ngModel)]="newSegment.currentState" [disabled]="isEditing"
-                                    class="form-select disabled:opacity-50">
-                                    <option value="PLAN">Plan</option>
-                                    <option value="EXCAVATION">Excavation</option>
-                                    <option value="DUCT_INSTALLATION">Duct Installation</option>
-                                    <option value="BACKFILL">Backfill</option>
-                                    <option value="ASPHALT">Asphalt</option>
-                                    <option value="DOCUMENTATION">Documentation</option>
-                                    <option value="QA_APPROVAL">QA Approval</option>
-                                    <option value="COMPLETED">Completed</option>
-                                </select>
-                            </div>
-                        </ng-template>
-                    </div>
-
-                    <!-- Assigned Crew Dropdown -->
-                    <div class="form-group">
-                        <label class="form-label">Assigned Crew</label>
-                        <select [(ngModel)]="newSegment.assignedCrewId" class="form-select">
-                            <option [ngValue]="null">-- No Crew Assigned --</option>
-                            <option *ngFor="let crew of crews" [ngValue]="crew.id">
-                                {{crew.name}} ({{crew.size}} ppl)
-                            </option>
-                        </select>
-                    </div>
-
-                    <!-- Address Display -->
-                    <div class="form-grid-2 mt-4">
-                        <div class="form-group">
-                            <label class="form-label">Start Address</label>
-                            <input [ngModel]="startAddress || 'Click on map to get address'" type="text" readonly
-                                class="form-input form-input-readonly text-sm">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">End Address</label>
-                            <input [ngModel]="endAddress || 'Click on map to get address'" type="text" readonly
-                                class="form-input form-input-readonly text-sm">
-                        </div>
-                    </div>
-
-                    <!-- Coordinates Display -->
-                    <div class="form-grid-2">
-                        <div class="form-group">
-                            <label class="form-label">Start Point (Lat, Lng)</label>
-                            <input [ngModel]="newSegment.startLatitude + ', ' + newSegment.startLongitude" type="text"
-                                readonly class="form-input form-input-readonly text-sm">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">End Point (Lat, Lng)</label>
-                            <input [ngModel]="newSegment.endLatitude + ', ' + newSegment.endLongitude" type="text"
-                                readonly class="form-input form-input-readonly text-sm">
-                        </div>
-                    </div>
-
-                    <!-- Dynamic Custom Fields -->
-                    <div *ngIf="customFieldDefinitions.length > 0" class="mt-6 border-t dark:border-gray-700 pt-4">
-                        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Additional Information</h4>
-                        <div class="form-grid-2">
-                            <div *ngFor="let field of customFieldDefinitions">
-                                <app-dynamic-input [field]="field" [value]="customFieldsData[field.fieldKey]"
-                                    (valueChange)="customFieldsData[field.fieldKey] = $event">
-                                </app-dynamic-input>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Map Selection -->
-                    <div class="form-group mt-4">
-                        <label class="form-label mb-2">Route Selection</label>
-                        <app-segment-creation-map [startLat]="newSegment.startLatitude || 0"
-                            [startLng]="newSegment.startLongitude || 0" [endLat]="newSegment.endLatitude || 0"
-                            [endLng]="newSegment.endLongitude || 0" [isEditing]="isEditing" [smartPlan]="smartPlan"
-                            (coordinatesChanged)="onCoordinatesChanged($event)">
-                        </app-segment-creation-map>
-                        <p class="length-callout">Calculated Length: <strong>{{ newSegment.length }}m</strong></p>
-                    </div>
-
-                    <!-- Smart Planning Suggestions -->
-                    <div *ngIf="smartPlan" class="smart-plan-container">
-                        <div class="smart-plan-header">
-                            <span class="text-xl">💡</span>
-                            <h4>Smart Planning Suggestion</h4>
-                        </div>
-
-                        <div class="smart-plan-grid">
-                            <div>
-                                <p class="smart-plan-label">Recommended Regelplan</p>
-                                <p class="smart-plan-value">{{ smartPlan.suggestedRegelplan }}</p>
-                            </div>
-                            <div>
-                                <p class="smart-plan-label">Safety Score</p>
-                                <p class="font-bold" [class.text-green-600]="smartPlan.safetyScore > 80"
-                                    [class.text-yellow-600]="smartPlan.safetyScore <= 80">
-                                    {{ smartPlan.safetyScore }}/100
-                                </p>
-                            </div>
-                        </div>
-
-                        <div *ngIf="smartPlan.requiresPermit" class="smart-plan-alert">
-                            <span>⚠️</span>
-                            <strong>PERMIT REQUIRED:</strong> High traffic density detected. Mandatory LSA (Ampel)
-                            setup.
-                        </div>
-
-                        <div class="mt-4">
-                            <p class="smart-plan-list-label">Required Safety Materials (Auto-Calculated):</p>
-                            <ul class="smart-plan-list">
-                                <li *ngFor="let material of smartPlan.requiredMaterials" class="smart-plan-list-item">
-                                    <span class="bullet-blue"></span>
-                                    {{ material }}
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="environmental-context">
-                            <div class="context-item">
-                                <span>🌡️</span>
-                                <span>{{ smartPlan.environmentalContext.weather.temperature }}°C ({{
-                                    smartPlan.environmentalContext.weather.condition }})</span>
-                            </div>
-                            <div class="context-item">
-                                <span>🚗</span>
-                                <span>Traffic: {{ smartPlan.environmentalContext.traffic.congestionLevel }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="modal-footer">
-                <button (click)="closeCreateModal()" class="btn-edit-outline">
-                    Cancel
-                </button>
-                <button (click)="saveSegment()" class="btn-view" [disabled]="!newSegment.streetName">
-                    {{ isEditing ? 'Save Changes' : 'Create Segment' }}
-                </button>
-            </div>
+        <div class="modal-footer">
+          <button (click)="closeDetailsModal()" class="btn-action-outline px-8">Close Overview</button>
+          <button (click)="openEditModal(selectedSegment)" class="btn-save shadow-blue-500/20">Edit Details</button>
         </div>
+      </div>
     </div>
-
-    <!-- Segment Details Modal -->
-    <div *ngIf="showDetailsModal && selectedSegment" class="modal-overlay">
-        <div class="modal-container-medium">
-            <div class="modal-header-with-close">
-                <div>
-                    <span class="text-[10px] font-black uppercase text-accent tracking-[0.2em] mb-1 block">Quick
-                        Look</span>
-                    <h2 class="text-3xl font-black text-slate-900 dark:text-white">{{ selectedSegment.streetName }}</h2>
-                </div>
-                <button (click)="closeDetailsModal()"
-                    class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </button>
-            </div>
-
-            <div class="modal-content-scroll">
-                <div class="details-section">
-                    <!-- Technical Box -->
-                    <div class="section-group">
-                        <h3 class="section-title">Technical Specifications</h3>
-                        <div class="details-grid">
-                            <div class="details-box">
-                                <span class="details-box-label">Current State</span>
-                                <div class="details-box-value">
-                                    <span [class]="'status-badge ' + selectedSegment.currentState.toLowerCase()">
-                                        {{ getStateText(selectedSegment.currentState) }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="details-box">
-                                <span class="details-box-label">Work Type</span>
-                                <div class="details-box-value">{{ selectedSegment.workType }}</div>
-                            </div>
-                            <div class="details-box">
-                                <span class="details-box-label">Total Length</span>
-                                <div class="details-box-value">{{ selectedSegment.length }}<small
-                                        class="text-slate-400 ml-1">meters</small></div>
-                            </div>
-                            <div class="details-box">
-                                <span class="details-box-label">Project ID</span>
-                                <div class="details-box-value mono-text">#{{ selectedSegment.projectId }}</div>
-                            </div>
-
-                            <!-- BIM Box (Premium highlight) -->
-                            <div *ngIf="selectedSegment.volume" class="details-box-bim">
-                                <div class="card-edge-glow"></div>
-                                <span class="bim-title">
-                                    <span class="text-lg">🏗️</span> BIM Volumetry (Phase 3)
-                                </span>
-                                <div class="bim-value-group">
-                                    <span class="bim-value">{{ selectedSegment.volume }}</span>
-                                    <span class="bim-unit">m³ calculated</span>
-                                </div>
-                                <p class="bim-footer">Precise volume extracted from AR Ruler & LiDAR scanning</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Timeline & Location -->
-                    <div class="section-group">
-                        <h3 class="section-title">Schedule & Logistics</h3>
-                        <div class="details-grid">
-                            <div class="details-box">
-                                <span class="details-box-label">Planned Start</span>
-                                <div class="details-box-value">{{ selectedSegment.plannedStartDate || 'Not set' }}</div>
-                            </div>
-                            <div class="details-box">
-                                <span class="details-box-label">Planned End</span>
-                                <div class="details-box-value">{{ selectedSegment.plannedEndDate || 'Not set' }}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Safety & Traffic (Sub-components) -->
-                    <div class="section-group">
-                        <h3 class="section-title">Safety & Compliance</h3>
-                        <app-safety-protocols [segmentId]="selectedSegment.id!"></app-safety-protocols>
-                    </div>
-
-                    <!-- Incidents -->
-                    <div class="section-group">
-                        <h3 class="section-title">Incident Awareness</h3>
-                        <app-incident-report [segmentId]="selectedSegment.id!"></app-incident-report>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button (click)="closeDetailsModal()" class="btn-action-outline px-8">Close Overview</button>
-                <button (click)="openEditModal(selectedSegment)" class="btn-save shadow-blue-500/20">Edit
-                    Details</button>
-            </div>
-        </div>
-    </div>
+  }
 </div>

@@ -15,7 +15,7 @@ import { SegmentService } from '../../services/segment.service';
 import { SubcontractorService } from '../../services/subcontractor.service';
 import { CustomFieldService } from '../../services/custom-field.service';
 import { SafetyService } from '../../services/safety.service';
-
+import { WorkType } from '../../models/work-type.enum';
 import { GoogleMapsModule } from '@angular/google-maps';
 
 @Component({
@@ -55,11 +55,13 @@ export class SegmentsComponent implements OnInit {
 
   // Workflow
   availableTransitions: any[] = [];
+  workType = WorkType;
+  workTypeOptions = Object.values(this.workType);
 
   newSegment: Segment = {
     streetName: '',
     streetType: 'residential',
-    workType: 'EXCAVATION',
+    workType: this.workType.EXCAVATION,
     currentState: 'PLAN',
     length: 0,
     startLatitude: 0,
@@ -157,7 +159,7 @@ export class SegmentsComponent implements OnInit {
     this.newSegment = {
       streetName: '',
       streetType: 'residential',
-      workType: 'EXCAVATION',
+      workType: this.workType.EXCAVATION,
       currentState: 'PLAN',
       length: 0,
       startLatitude: 0,
