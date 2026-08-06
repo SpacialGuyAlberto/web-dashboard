@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import {userRole }  from '../../models/role.model';
 
 @Component({
     selector: 'app-register',
@@ -16,6 +17,8 @@ export class RegisterComponent {
     loading = false;
     submitted = false;
     error = '';
+    public userRole = userRole;
+    public roleOptions = Object.values(userRole);
 
     constructor(
         private formBuilder: FormBuilder,
@@ -31,7 +34,8 @@ export class RegisterComponent {
             lastName: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
             password: ['', [Validators.required, Validators.minLength(6)]],
-            role: ['PROJECT_MANAGER', Validators.required]
+            role: ['PROJECT_MANAGER', Validators.required],
+            organizationId: [null, [Validators.required, Validators.min(1)]]
         });
     }
 

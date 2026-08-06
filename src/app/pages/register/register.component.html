@@ -1,138 +1,174 @@
 <div class="register-container">
-    <!-- Left Side: Hero Image & Branding (Hidden on mobile) -->
-    <div class="hero-section">
-        <div class="hero-bg-image" style="background-image: url('/assets/fiber-hero.png');"></div>
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <h1>
-                Únete a la<br>
-                <span>revolución.</span>
-            </h1>
-            <p class="hero-description">
-                Empieza hoy mismo a gestionar tus proyectos de fibra óptica con tecnología de vanguardia.
-            </p>
-            <div class="hero-indicators">
-                <div class="indicator-main"></div>
-                <div class="indicator-alt"></div>
-            </div>
-        </div>
+  <div class="hero-section">
+    <div class="hero-bg-image" style="background-image: url('/assets/fiber-hero.png');"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>
+        Únete a la<br>
+        <span>revolución.</span>
+      </h1>
+      <p class="hero-description">
+        Empieza hoy mismo a gestionar tus proyectos de fibra óptica con tecnología de vanguardia.
+      </p>
+      <div class="hero-indicators">
+        <div class="indicator-main"></div>
+        <div class="indicator-alt"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="register-form-area">
+    <div class="vibrant-bg-layer">
+      <div class="bg-image-dimmed" style="background-image: url('/assets/fiber-cables.png');"></div>
+      <div class="bg-gradient-radial"></div>
     </div>
 
-    <!-- Right Side: Register Form with Glassmorphism -->
-    <div class="register-form-area">
-        <!-- Vibrant Background Layer -->
-        <div class="vibrant-bg-layer">
-            <div class="bg-image-dimmed" style="background-image: url('/assets/fiber-cables.png');"></div>
-            <div class="bg-gradient-radial"></div>
+    <div class="register-card">
+      <div class="card-header">
+        <div class="icon-wrapper">
+          <svg class="brand-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z">
+            </path>
+          </svg>
+        </div>
+        <h2 class="brand-title">
+          <span class="title-gradient">Crear Cuenta</span>
+        </h2>
+        <p class="card-subtitle">
+          Regístrate para acceder a QuarkBau
+        </p>
+      </div>
+
+      <form class="form-group-list" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="name-grid">
+          <div class="form-field">
+            <label for="firstName" class="field-label">Nombre</label>
+            <input id="firstName" type="text" formControlName="firstName" class="form-input"
+                   placeholder="Nombre" [ngClass]="{ 'input-error': submitted && f['firstName'].errors }">
+          </div>
+          <div class="form-field">
+            <label for="lastName" class="field-label">Apellido</label>
+            <input id="lastName" type="text" formControlName="lastName" class="form-input"
+                   placeholder="Apellido" [ngClass]="{ 'input-error': submitted && f['lastName'].errors }">
+          </div>
         </div>
 
-        <!-- Glass Register Card -->
-        <div class="register-card">
-            <!-- Header -->
-            <div class="card-header">
-                <div class="icon-wrapper">
-                    <svg class="brand-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z">
-                        </path>
-                    </svg>
-                </div>
-                <h2 class="brand-title">
-                    <span class="title-gradient">Crear Cuenta</span>
-                </h2>
-                <p class="card-subtitle">
-                    Regístrate para acceder a QuarkBau
-                </p>
+        <div class="form-field">
+          <label for="email-address" class="field-label">Email</label>
+          <input id="email-address" type="email" formControlName="email" class="form-input"
+                 placeholder="tu@email.com" [ngClass]="{ 'input-error': submitted && f['email'].errors }">
+
+          @if (submitted && f['email'].errors) {
+            <div class="error-text">
+              @if (f['email'].errors['required']) {
+                <span>Requerido</span>
+              }
+              @if (f['email'].errors['email']) {
+                <span>Inválido</span>
+              }
             </div>
+          }
+        </div>
 
-            <form class="form-group-list" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-                <!-- Name Grid -->
-                <div class="name-grid">
-                    <div class="form-field">
-                        <label for="firstName" class="field-label">Nombre</label>
-                        <input id="firstName" type="text" formControlName="firstName" class="form-input"
-                            placeholder="Nombre" [ngClass]="{ 'input-error': submitted && f['firstName'].errors }">
-                    </div>
-                    <div class="form-field">
-                        <label for="lastName" class="field-label">Apellido</label>
-                        <input id="lastName" type="text" formControlName="lastName" class="form-input"
-                            placeholder="Apellido" [ngClass]="{ 'input-error': submitted && f['lastName'].errors }">
-                    </div>
-                </div>
+        <div class="form-field">
+          <label for="password" class="field-label">Contraseña</label>
+          <input id="password" type="password" formControlName="password" class="form-input"
+                 placeholder="••••••••" [ngClass]="{ 'input-error': submitted && f['password'].errors }">
 
-                <!-- Email Input -->
-                <div class="form-field">
-                    <label for="email-address" class="field-label">Email</label>
-                    <input id="email-address" type="email" formControlName="email" class="form-input"
-                        placeholder="tu@email.com" [ngClass]="{ 'input-error': submitted && f['email'].errors }">
-                    <div *ngIf="submitted && f['email'].errors" class="error-text">
-                        <span *ngIf="f['email'].errors['required']">Requerido</span>
-                        <span *ngIf="f['email'].errors['email']">Inválido</span>
-                    </div>
-                </div>
+          @if (submitted && f['password'].errors) {
+            <div class="error-text">
+              @if (f['password'].errors['required']) {
+                <span>Requerida</span>
+              }
+              @if (f['password'].errors['minlength']) {
+                <span>Mínimo 6 caracteres</span>
+              }
+            </div>
+          }
+        </div>
 
-                <!-- Password Input -->
-                <div class="form-field">
-                    <label for="password" class="field-label">Contraseña</label>
-                    <input id="password" type="password" formControlName="password" class="form-input"
-                        placeholder="••••••••" [ngClass]="{ 'input-error': submitted && f['password'].errors }">
-                    <div *ngIf="submitted && f['password'].errors" class="error-text">
-                        <span *ngIf="f['password'].errors['required']">Requerida</span>
-                        <span *ngIf="f['password'].errors['minlength']">Mínimo 6 caracteres</span>
-                    </div>
-                </div>
+        <div class="form-field">
+          <label for="role" class="field-label">Rol</label>
+          <select formControlName="role" class="form-select">
+            @for (role of roleOptions; track role) {
+              <option [value]="role" class="select-option">
+                {{ role }}
+              </option>
+            }
+          </select>
+        </div>
 
-                <!-- Role Select -->
-                <div class="form-field">
-                    <label for="role" class="field-label">Rol</label>
-                    <select id="role" formControlName="role" class="form-select">
-                        <option value="PROJECT_MANAGER" class="select-option">Project Manager</option>
-                        <option value="FIELD_WORKER" class="select-option">Field Worker</option>
-                        <option value="SUBCONTRACTOR" class="select-option">Subcontractor</option>
-                    </select>
-                </div>
+        <div class="name-grid">
+          <div class="form-field">
+            <label for="organizationId" class="field-label">Organization ID</label>
+            <input
+              id="organizationId"
+              type="number"
+              formControlName="organizationId"
+              class="form-input"
+              placeholder="Id Organization"
+              [ngClass]="{ 'input-error': submitted && f['organizationId'].errors }"
+            >
 
-                <!-- Error Message -->
-                <div *ngIf="error" class="server-error-banner" role="alert">
-                    <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span>{{ error }}</span>
-                </div>
+            @if (submitted && f['organizationId'].errors) {
+              <div class="error-text">
+                @if (f['organizationId'].errors['required']) {
+                  <span>ID de organización requerido</span>
+                }
+                @if (f['organizationId'].errors['min']) {
+                  <span>Debe ser un número mayor a 0</span>
+                }
+              </div>
+            }
+          </div>
+        </div>
 
-                <div class="mt-8">
-                    <button type="submit" [disabled]="registerForm.invalid || loading" class="btn-submit group">
+        @if (error) {
+          <div class="server-error-banner" role="alert">
+            <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>{{ error }}</span>
+          </div>
+        }
+
+        <div class="mt-8">
+          <button type="submit" [disabled]="registerForm.invalid || loading" class="btn-submit group">
                         <span class="btn-icon-container">
-                            <svg *ngIf="!loading" class="btn-icon" xmlns="http://www.w3.org/2001/svg"
-                                viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            <svg *ngIf="loading" class="spinner" xmlns="http://www.w3.org/2001/svg" fill="none"
-                                viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                    stroke-width="4">
-                                </circle>
-                                <path class="opacity-75" fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                </path>
-                            </svg>
+                            @if (!loading) {
+                              <svg class="btn-icon" xmlns="http://www.w3.org/2001/svg"
+                                   viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                          clip-rule="evenodd" />
+                                </svg>
+                            } @else {
+                              <svg class="spinner" xmlns="http://www.w3.org/2001/svg" fill="none"
+                                   viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                            stroke-width="4">
+                                    </circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                            }
                         </span>
-                        {{ loading ? 'Registrando...' : 'Crear Cuenta' }}
-                    </button>
-                </div>
-
-                <div class="form-footer">
-                    <p class="footer-text">
-                        ¿Ya tienes cuenta?
-                        <a routerLink="/login" class="footer-link">
-                            Inicia sesión aquí
-                        </a>
-                    </p>
-                </div>
-            </form>
+            {{ loading ? 'Registrando...' : 'Crear Cuenta' }}
+          </button>
         </div>
+
+        <div class="form-footer">
+          <p class="footer-text">
+            ¿Ya tienes cuenta?
+            <a routerLink="/login" class="footer-link">
+              Inicia sesión aquí
+            </a>
+          </p>
+        </div>
+      </form>
     </div>
+  </div>
 </div>

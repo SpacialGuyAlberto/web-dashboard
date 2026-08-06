@@ -3,7 +3,7 @@ export interface User {
     email: string;
     firstName: string;
     lastName: string;
-    role: 'ADMIN' | 'PROJECT_MANAGER' | 'SITE_MANAGER' | 'FIELD_WORKER' | 'SUBCONTRACTOR';
+    role: string,
     organizationId?: number;
     // Field Data Extensions
     crewName?: string;
