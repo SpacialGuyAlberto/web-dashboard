@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-
-import { Evidence, FieldCrew } from './field.model';
+import { FieldCrew } from './models/field-crew.model';
+import { Evidence } from './models/evidence.model';
 
 @Injectable({
     providedIn: 'root'

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { BillingService } from '@features/billing/billing.service';
 import { WorkLog, WorkLogDTO } from '@features/billing/billing.model';
 import { FieldService } from '../field.service';
-import { FieldCrew } from '../field.model';
+import { FieldCrew } from '../models/field-crew.model';
 import { SegmentService } from '@features/segments/segment.service';
 import { Segment } from '@features/segments/segment.model';
 
