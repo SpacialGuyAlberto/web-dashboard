@@ -77,8 +77,9 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
     filletRadius: number = 5; // Meters
 
     // Google Map State
-    center: google.maps.LatLngLiteral = { lat: 52.5200, lng: 13.4050 }; // Berlin
-    zoom = 13;
+    center: google.maps.LatLngLiteral = { lat: this.startLat, lng: this.startLng }; // Berlin
+
+    zoom = 17;
     mapTypeId = google.maps.MapTypeId.ROADMAP;
 
     mapOptions: google.maps.MapOptions = {
@@ -123,7 +124,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
 
     // Multi-point planning
     showStreetView = true;
-    streetViewPos: google.maps.LatLngLiteral = { lat: 52.5200, lng: 13.4050 };
+    streetViewPos: google.maps.LatLngLiteral =  { lat: 0, lng: 0 } ;
 
     @HostListener('window:keydown', ['$event'])
     handleKeyDown(event: KeyboardEvent) {
@@ -162,6 +163,9 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         if ((this.isEditing || this.viewOnly) && this.startLat && this.endLat) {
             this.updateMapFromInputs();
         }
+        this.streetViewPos = { lat: this.startLat, lng: this.startLng } ;
+        this.center = { lat: this.startLat, lng: this.startLng };
+
     }
 
     ngAfterViewInit(): void {
@@ -255,7 +259,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         this.streetViewMarkers = [];
 
         // 2. Draw Simulated Line using dense markers (since Polyline is not supported in Panoramas)
-        const segmentStep = 2.0; // Place a dot every 2 meters
+        const segmentStep = 1.0; // Place a dot every 2 meters
         if (this.points.length >= 2) {
             for (let i = 0; i < this.points.length - 1; i++) {
                 const p1 = new google.maps.LatLng(this.points[i].lat, this.points[i].lng);
@@ -277,7 +281,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
                             fillOpacity: 1.0,
                             strokeColor: '#ffffff',
                             strokeWeight: 2,
-                            scale: Math.max(6, this.trenchWidth * 8)
+                            scale: Math.max(6, this.trenchWidth * 10)
                         },
                         zIndex: 4999, // Below the numbered pins
                         clickable: false,
@@ -692,7 +696,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
                 this.panorama!.setPano(data.location.pano!);
                 this.panorama!.setPov({ heading: 34, pitch: 10 }); // Reset to standard pitch if jumping far
                 this.panorama!.setVisible(true);
-                // REMOVED: this.center = { lat: data.location.latLng.lat(), lng: data.location.latLng.lng() }; // Prevent map jumping 
+                // REMOVED: this.center = { lat: data.location.latLng.lat(), lng: data.location.latLng.lng() }; // Prevent map jumping
 
                 // Multiple triggers to force redraw under different container states
                 google.maps.event.trigger(this.panorama as any, 'resize');

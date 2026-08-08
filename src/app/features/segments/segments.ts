@@ -164,13 +164,13 @@ export class SegmentsComponent implements OnInit {
       length: 0,
       startLatitude: 0,
       startLongitude: 0,
+      startAddress: '',
+      endAddress: '',
       endLatitude: 0,
       endLongitude: 0,
       plannedStartDate: '',
       plannedEndDate: ''
     };
-    this.startAddress = '';
-    this.endAddress = '';
     this.customFieldsData = {}; // Reset custom fields
     this.availableTransitions = []; // No transitions for new segment (starts at initial state)
     this.showCreateModal = true;
@@ -187,12 +187,11 @@ export class SegmentsComponent implements OnInit {
     this.isEditing = true;
     this.currentSegmentId = segment.id!;
     this.newSegment = { ...segment };
-    this.startAddress = ''; // TODO: If we saved address, load it here
-    this.endAddress = '';
+    this.startAddress = segment.startAddress || '';
+    this.endAddress = segment.endAddress || '';
     this.customFieldsData = segment.customFields || {}; // Load existing custom fields
     this.showCreateModal = true;
 
-    // Load available transitions
     this.segmentService.getAvailableTransitions(segment.id!).subscribe(transitions => {
       this.availableTransitions = transitions;
     });
