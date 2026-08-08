@@ -1,8 +1,8 @@
 import { ApplicationConfig, APP_INITIALIZER } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { ThemeService } from './services/theme.service';
-import { authInterceptor } from './interceptors/auth.interceptor';
+import { ThemeService } from '@core/theme/theme.service';
+import { authInterceptor } from '@core/auth/auth.interceptor';
 import { routes } from './app.routes';
 
 export function initializeTheme(themeService: ThemeService) {
