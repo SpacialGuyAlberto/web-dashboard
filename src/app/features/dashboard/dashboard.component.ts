@@ -192,8 +192,8 @@ export class DashboardComponent implements OnInit {
         this.router.navigate(['/work-logs']);
     }
 
-    navigateToSegments() {
-        this.router.navigate(['/segments']);
+    navigateToSegments(projectId: number |null = null) {
+        this.router.navigate(['/segments'], { queryParams: { projectId } });
     }
 
     navigateToSubcontractors() {

@@ -100,8 +100,9 @@
         <app-kpi-card title="Active Projects" [value]="kpiData.activeProjects" [trend]="12" trendLabel="vs last month"
             status="success" (cardClick)="navigateToProjects()">
         </app-kpi-card>
-        <app-kpi-card title="Total Segments" [value]="kpiData.totalSegments" [trend]="8" trendLabel="vs last month"
-            status="info" (cardClick)="navigateToSegments()">
+        <app-kpi-card title="Total Segments" [value]="kpiData.totalSegments" [trend]="8"  trendLabel="vs last month"
+            status="info" (cardClick)="navigateToSegments(selectedProjectId)"
+        >
         </app-kpi-card>
         <app-kpi-card title="Active Crews" [value]="kpiData.activeCrews" [trend]="-3" trendLabel="vs last month"
             status="warning" (cardClick)="navigateToSubcontractors()">
