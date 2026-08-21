@@ -50,6 +50,7 @@ export class AuthService {
                 sessionStorage.setItem('token', response.accessToken);
                 sessionStorage.setItem('refreshToken', response.refreshToken);
                 sessionStorage.setItem('user', JSON.stringify(response.user));
+                console.log(response.user.organizationId)
                 this.currentUserSubject.next(response.user);
             })
         );

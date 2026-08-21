@@ -18,7 +18,7 @@ export class SegmentService {
     }
     return this.http.post<Segment>(`${this.apiUrl}/projects/${projectId}/segments`, segment);
   }
-
+ // cambiar todo esto a post
     getProjectSegments(projectId: number): Observable<Segment[]> {
         return this.http.get<Segment[]>(`${this.apiUrl}/projects/${projectId}/segments`);
     }

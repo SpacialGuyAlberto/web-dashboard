@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
 import { Subcontractor, Crew } from './subcontractor.model';
+import {Segment} from '@features/segments/segment.model';
 
 @Injectable({
     providedIn: 'root'
@@ -12,9 +13,21 @@ export class SubcontractorService {
     private readonly SUBCONTRACTORS_KEY = 'subcontractor_list';
     private readonly CREWS_KEY = 'subcontractor_crews';
 
+    private apiUrl = 'http://localhost:8080/api';
+
     constructor(private http: HttpClient) {
         this.initializeMockData();
     }
+
+  createSubcontractor(organizationId: number, subcontractor: Subcontractor): Observable<Subcontractor> {
+    return this.http.post<Subcontractor>(`${this.apiUrl}/subcontractors/${organizationId}`, subcontractor);
+  }
+
+  //Los subcontractors deberian estar ordenados por organization
+  // cambiar todo esto a post
+  getSubcontractors(organizationId: number): Observable<Subcontractor[]> {
+    return this.http.get<Subcontractor[]>(`${this.apiUrl}/subcontractors/${organizationId}`);
+  }
 
     private initializeMockData() {
         if (!sessionStorage.getItem(this.SUBCONTRACTORS_KEY)) {
@@ -62,17 +75,6 @@ export class SubcontractorService {
         sessionStorage.setItem(key, JSON.stringify(data));
     }
 
-    getSubcontractors(): Observable<Subcontractor[]> {
-        return of(this.get<Subcontractor>(this.SUBCONTRACTORS_KEY));
-    }
-
-    createSubcontractor(subcontractor: Subcontractor): Observable<Subcontractor> {
-        const list = this.get<Subcontractor>(this.SUBCONTRACTORS_KEY);
-        subcontractor.id = Math.floor(Math.random() * 10000);
-        list.push(subcontractor);
-        this.save(this.SUBCONTRACTORS_KEY, list);
-        return of(subcontractor);
-    }
 
     getSubcontractorCrews(subcontractorId: number): Observable<Crew[]> {
         const allCrews = this.get<Crew>(this.CREWS_KEY);

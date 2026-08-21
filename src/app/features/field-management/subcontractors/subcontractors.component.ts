@@ -14,6 +14,7 @@ import { Subcontractor, Crew } from '../subcontractor.model';
 export class SubcontractorsComponent implements OnInit {
     subcontractors: Subcontractor[] = [];
     crews: { [key: number]: Crew[] } = {};
+    organizationId = 1;
 
     showAddSubModal = false;
     showAddCrewModal = false;
@@ -49,7 +50,7 @@ export class SubcontractorsComponent implements OnInit {
     }
 
     loadSubcontractors() {
-        this.subcontractorService.getSubcontractors().subscribe(subs => {
+        this.subcontractorService.getSubcontractors(this.organizationId).subscribe(subs => {
             this.subcontractors = subs;
             subs.forEach(sub => {
                 if (sub.id) {
@@ -76,7 +77,7 @@ export class SubcontractorsComponent implements OnInit {
     }
 
     saveSubcontractor() {
-        this.subcontractorService.createSubcontractor(this.newSubcontractor).subscribe(() => {
+        this.subcontractorService.createSubcontractor(this.organizationId, this.newSubcontractor).subscribe(() => {
             this.loadSubcontractors();
             this.closeAddSubModal();
             this.newSubcontractor = {
