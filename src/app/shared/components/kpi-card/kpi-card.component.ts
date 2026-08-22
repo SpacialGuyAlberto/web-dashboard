@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border-l-4 transition-all hover:shadow-lg cursor-pointer" 
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-5 border border-gray-100 dark:border-slate-700 border-l-4 transition-all hover:shadow-md cursor-pointer" 
          [ngClass]="getBorderClass()"
          (click)="onCardClick()">
       <div class="flex justify-between items-start">

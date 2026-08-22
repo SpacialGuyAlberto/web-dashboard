@@ -1,4 +1,4 @@
-<div class="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
+<div class="flex h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden">
     <!-- Sidebar (Only visible when logged in) -->
     <app-sidebar *ngIf="authService.currentUser$ | async" [class.hidden]="!sidebarOpen" class="lg:block"
         [class.lg:w-64]="true" [class.fixed]="true" [class.lg:relative]="true" [class.z-50]="true"></app-sidebar>
@@ -11,7 +11,7 @@
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col overflow-hidden">
         <!-- Top Header with Hamburger Menu (Only visible when logged in) -->
-        <header *ngIf="authService.currentUser$ | async" class="bg-white dark:bg-gray-800 shadow-sm z-30">
+        <header *ngIf="authService.currentUser$ | async" class="bg-white dark:bg-slate-800 shadow-sm z-30 border-b border-gray-100 dark:border-slate-700">
             <div class="flex items-center justify-between p-4">
                 <button (click)="toggleSidebar()"
                     class="lg:hidden p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -21,7 +21,7 @@
                     </svg>
                 </button>
                 <div class="flex-1 lg:ml-0 ml-4">
-                    <h1 class="text-xl font-bold text-gray-800 dark:text-white">QuarkBau Management System</h1>
+                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">QuarkBau Management System</h1>
                 </div>
 
                 <button (click)="logout()"
@@ -33,7 +33,7 @@
         </header>
 
         <!-- Page Content -->
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-gray-900 flex flex-col">
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 dark:bg-slate-900 flex flex-col">
             <div class="flex-grow">
                 <router-outlet></router-outlet>
             </div>
