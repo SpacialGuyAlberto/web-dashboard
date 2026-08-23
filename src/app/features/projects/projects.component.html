@@ -78,42 +78,106 @@
         </div>
     </div>
 
-    <!-- Create/Edit Project Modal -->
+    <!-- Create/Edit Project Progressive Modal -->
     <div *ngIf="showCreateModal" class="modal-overlay">
-        <div class="modal-container">
-            <h2>{{ isEditing ? 'Edit Project' : 'Create New Project' }}</h2>
-
-            <div class="form-group-list">
-                <div class="form-group">
-                    <label>Project Name</label>
-                    <input [(ngModel)]="newProject.name" type="text" class="form-control"
-                        placeholder="e.g., Berlin Fiber Deployment">
+        <div class="modal-container apple-pay-modal">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <button (click)="closeCreateModal()" class="btn-close">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <h2>{{ isEditing ? 'Edit Project' : 'New Project' }}</h2>
+                <div class="step-indicator">
+                    Step {{ currentStep }} of 3
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea [(ngModel)]="newProject.description" class="form-control" rows="3"
-                        placeholder="Project details..."></textarea>
-                </div>
+            <div class="modal-content-scroll progressive-content">
+                <!-- STEP 1: Details -->
+                <div *ngIf="currentStep === 1" class="step-container animate-fade-in">
+                    <h3 class="step-title">Project Details</h3>
+                    <p class="step-subtitle">Enter the basic information for this deployment.</p>
+                    
+                    <div class="form-group-list mt-6">
+                        <div class="form-group">
+                            <label>Project Name</label>
+                            <input [(ngModel)]="newProject.name" type="text" class="form-control"
+                                placeholder="e.g., Berlin Fiber Deployment">
+                        </div>
 
-                <div class="date-grid">
-                    <div class="form-group">
-                        <label>Start Date</label>
-                        <input [(ngModel)]="newProject.startDate" type="date" class="form-control">
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea [(ngModel)]="newProject.description" class="form-control" rows="3"
+                                placeholder="Project details..."></textarea>
+                        </div>
+
+                        <div class="date-grid">
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <input [(ngModel)]="newProject.startDate" type="date" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <input [(ngModel)]="newProject.endDate" type="date" class="form-control">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>End Date</label>
-                        <input [(ngModel)]="newProject.endDate" type="date" class="form-control">
+                </div>
+
+                <!-- STEP 2: Lifecycle Tasks -->
+                <div *ngIf="currentStep === 2" class="step-container animate-fade-in">
+                    <h3 class="step-title">Lifecycle Tasks</h3>
+                    <p class="step-subtitle">Select the tasks required for this project and their current status.</p>
+                    
+                    <div class="task-grid mt-6">
+                        <div *ngFor="let task of workTypes" class="task-row">
+                            <div class="task-name">{{ task }}</div>
+                            <div class="task-actions">
+                                <button 
+                                    (click)="toggleLifecycle(task, 'todo')"
+                                    [class.active]="isWorkTypeSelected(task, 'todo')"
+                                    class="task-btn btn-todo">
+                                    To Do
+                                </button>
+                                <button 
+                                    (click)="toggleLifecycle(task, 'done')"
+                                    [class.active]="isWorkTypeSelected(task, 'done')"
+                                    class="task-btn btn-done">
+                                    Done
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Geometry (Map) -->
+                <div *ngIf="currentStep === 3" class="step-container animate-fade-in h-full flex flex-col">
+                    <h3 class="step-title">Project Area</h3>
+                    <p class="step-subtitle">Draw a closed polygon (A->B->C->A) defining the project area.</p>
+                    
+                    <div class="map-wrapper mt-4 flex-1 min-h-[400px] border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden relative">
+                        <app-segment-creation-map 
+                            (coordinatesChanged)="onCoordinatesChanged($event)"
+                            class="absolute inset-0 w-full h-full">
+                        </app-segment-creation-map>
                     </div>
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button (click)="closeCreateModal()" class="btn-cancel">
-                    Cancel
+            <!-- Modal Footer Controls -->
+            <div class="modal-footer progressive-footer">
+                <button *ngIf="currentStep > 1" (click)="prevStep()" class="btn-secondary">
+                    Back
                 </button>
-                <button (click)="saveProject()" class="btn-save" [disabled]="!newProject.name">
-                    {{ isEditing ? 'Save Changes' : 'Create Project' }}
+                <div class="flex-1"></div>
+                <button *ngIf="currentStep < 3" (click)="nextStep()" class="btn-primary" [disabled]="currentStep === 1 && !newProject.name">
+                    Continue
+                </button>
+                <button *ngIf="currentStep === 3" (click)="saveProject()" class="btn-primary btn-pay" [disabled]="!newProject.name || loading">
+                    <span *ngIf="!loading">{{ isEditing ? 'Save Changes' : 'Create Project' }}</span>
+                    <span *ngIf="loading" class="spinner-small"></span>
                 </button>
             </div>
         </div>

@@ -309,6 +309,7 @@
               <app-segment-creation-map [startLat]="newSegment.startLatitude || 0"
                                         [startLng]="newSegment.startLongitude || 0" [endLat]="newSegment.endLatitude || 0"
                                         [endLng]="newSegment.endLongitude || 0" [isEditing]="isEditing" [smartPlan]="smartPlan"
+                                        [projectGeometry]="projectGeometry"
                                         (coordinatesChanged)="onCoordinatesChanged($event)">
               </app-segment-creation-map>
               <p class="length-callout">Calculated Length: <strong>{{ newSegment.length }}m</strong></p>

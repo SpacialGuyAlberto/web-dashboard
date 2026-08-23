@@ -15,6 +15,7 @@ import { SegmentService } from './segment.service';
 import { SubcontractorService } from '@features/field-management/subcontractor.service';
 import { CustomFieldService } from '@features/field-config/custom-field.service';
 import { SafetyService } from '@features/risk-planning/safety.service';
+import { PlanningService } from '@features/risk-planning/planning.service';
 import { WorkType } from '@shared/models/work-type.enum';
 import { GoogleMapsModule } from '@angular/google-maps';
 
@@ -34,6 +35,8 @@ export class SegmentsComponent implements OnInit {
   crews: Crew[] = [];
   loading = false;
   error: string | null = null;
+  
+  projectGeometry: {lat: number, lng: number}[] | null = null;
 
   // Tabs
   activeTab: 'segments' | 'materials' = 'segments';
@@ -80,7 +83,8 @@ export class SegmentsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private customFieldService: CustomFieldService
+    private customFieldService: CustomFieldService,
+    private planningService: PlanningService
   ) { }
 
   smartPlan: any = null;
@@ -92,7 +96,17 @@ export class SegmentsComponent implements OnInit {
       this.projectId = +params['projectId'];
       this.projectName = params['projectName'] || 'Project';
       if (this.projectId) {
+        this.loadProjectDetails();
         this.loadSegments();
+      }
+    });
+  }
+
+  loadProjectDetails() {
+    this.planningService.getProjects().subscribe(projects => {
+      const proj = projects.find(p => p.id === this.projectId);
+      if (proj && proj.geometry && proj.geometry.length > 2) {
+        this.projectGeometry = proj.geometry;
       }
     });
   }

@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PlanningService } from '@features/risk-planning/planning.service';
-import { Project } from './project.model';
+import { Project, WorkType } from './project.model';
+import { SegmentCreationMapComponent } from '@features/segments/components/segment-creation-map/segment-creation-map.component';
+import { GeometryPoint } from '@features/segments/segment.model';
 
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, SegmentCreationMapComponent],
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.css']
 })
@@ -57,32 +59,94 @@ export class ProjectsComponent implements OnInit {
     name: '',
     description: '',
     startDate: '',
-    endDate: ''
+    endDate: '',
+    organizationId: 1,
+    lifecycle_todo: [],
+    lifecycle_done: [],
+    geometry: []
   };
+
+  currentStep: number = 1;
+  workTypes = Object.values(WorkType);
+
+  toggleLifecycle(workType: WorkType, type: 'todo' | 'done') {
+    const list = type === 'todo' ? this.newProject.lifecycle_todo! : this.newProject.lifecycle_done!;
+    const otherList = type === 'todo' ? this.newProject.lifecycle_done! : this.newProject.lifecycle_todo!;
+
+    // Remove from the other list if present
+    const otherIdx = otherList.indexOf(workType);
+    if (otherIdx > -1) {
+      otherList.splice(otherIdx, 1);
+    }
+
+    const idx = list.indexOf(workType);
+    if (idx > -1) {
+      list.splice(idx, 1);
+    } else {
+      list.push(workType);
+    }
+  }
+
+  isWorkTypeSelected(workType: WorkType, type: 'todo' | 'done'): boolean {
+    const list = type === 'todo' ? this.newProject.lifecycle_todo! : this.newProject.lifecycle_done!;
+    return list.includes(workType);
+  }
+
+  nextStep() {
+    if (this.currentStep < 3) this.currentStep++;
+  }
+
+  prevStep() {
+    if (this.currentStep > 1) this.currentStep--;
+  }
+
+  onCoordinatesChanged(event: any) {
+    if (event && event.geometry) {
+      this.newProject.geometry = event.geometry;
+    }
+  }
 
   openCreateModal() {
     this.isEditing = false;
     this.currentProjectId = null;
-    this.newProject = { name: '', description: '', startDate: '', endDate: '' };
+    this.newProject = { name: '', description: '', startDate: '', endDate: '', lifecycle_todo: [], lifecycle_done: [], geometry: [] };
+    this.currentStep = 1;
     this.showCreateModal = true;
   }
 
   openEditModal(project: Project) {
     this.isEditing = true;
     this.currentProjectId = project.id!;
-    this.newProject = { ...project }; // Copy data
+    this.newProject = {
+        ...project,
+        lifecycle_todo: project.lifecycle_todo || [],
+        lifecycle_done: project.lifecycle_done || [],
+        geometry: project.geometry || []
+    }; // Copy data
+    this.currentStep = 1;
     this.showCreateModal = true;
   }
 
   closeCreateModal() {
     this.showCreateModal = false;
-    this.newProject = { name: '', description: '', startDate: '', endDate: '' };
+    this.newProject = { name: '', description: '', startDate: '', endDate: '', lifecycle_todo: [], lifecycle_done: [], geometry: [] };
     this.isEditing = false;
     this.currentProjectId = null;
+    this.currentStep = 1;
   }
 
   saveProject() {
     if (!this.newProject.name) return;
+
+    // Ensure geometry is a closed polygon
+    if (this.newProject.geometry && this.newProject.geometry.length > 2) {
+      const first = this.newProject.geometry[0];
+      const last = this.newProject.geometry[this.newProject.geometry.length - 1];
+      if (first.lat !== last.lat || first.lng !== last.lng) {
+        // Append first point to the end to close the circle (A->B->C->D->A)
+        this.newProject.geometry.push({ ...first });
+      }
+    }
 
     this.loading = true;
 

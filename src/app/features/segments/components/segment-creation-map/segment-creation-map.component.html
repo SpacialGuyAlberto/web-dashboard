@@ -102,6 +102,19 @@
                 [mapTypeId]="mapTypeId" (mapTypeIdChange)="onMapTypeChange()" (mapClick)="onMapClick($event)"
                 (mapMousemove)="onMouseMove($event)" class="block w-full h-full">
 
+                <!-- Mask Polygon for Project Area -->
+                <map-polygon *ngIf="getMaskPaths().length > 0"
+                    [paths]="getMaskPaths()"
+                    [options]="{
+                        strokeColor: '#000000',
+                        strokeOpacity: 0.1,
+                        strokeWeight: 1,
+                        fillColor: '#000000',
+                        fillOpacity: 0.6,
+                        clickable: false
+                    }">
+                </map-polygon>
+
                 <!-- Marker Style synced with PlanningScreen.kt -->
                 <map-marker *ngFor="let point of points; let i = index" [position]="point" [options]="{ 
                         icon: { path: googleMaps.maps.SymbolPath.CIRCLE, strokeColor: '#FFFFFF', strokeWeight: 2, fillColor: strokeColor, fillOpacity: 1.0, scale: 8 }, 

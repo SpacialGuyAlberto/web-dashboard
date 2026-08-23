@@ -108,41 +108,130 @@
 
 /* Modal */
 .modal-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+    @apply fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4;
 }
 
-.modal-container {
-    @apply bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full shadow-xl;
+.apple-pay-modal {
+    @apply bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 transition-all duration-300 transform scale-100;
 }
 
-.modal-container h2 {
-    @apply text-2xl font-bold mb-6 text-gray-900 dark:text-white;
+.modal-header {
+    @apply p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col items-center relative bg-white dark:bg-slate-900;
 }
 
+.modal-header h2 {
+    @apply text-xl font-bold text-slate-900 dark:text-white mt-2;
+}
+
+.btn-close {
+    @apply absolute left-6 top-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800;
+}
+
+.step-indicator {
+    @apply mt-2 text-xs font-semibold text-slate-500 uppercase tracking-widest;
+}
+
+.progressive-content {
+    @apply p-8 overflow-y-auto flex-1 bg-slate-50 dark:bg-slate-900/50 relative;
+}
+
+.step-container {
+    @apply w-full h-full flex flex-col;
+}
+
+.step-title {
+    @apply text-2xl font-black text-slate-900 dark:text-white;
+}
+
+.step-subtitle {
+    @apply text-sm text-slate-500 dark:text-slate-400 mt-2;
+}
+
+.progressive-footer {
+    @apply p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center gap-4;
+}
+
+.btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-2xl font-bold text-sm shadow-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[140px];
+}
+
+.btn-secondary {
+    @apply bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 px-8 py-3 rounded-2xl font-bold text-sm transition-all active:scale-95;
+}
+
+.btn-pay {
+    @apply bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xl;
+}
+
+/* Lifecycle Tasks Grid */
+.task-grid {
+    @apply flex flex-col gap-3;
+}
+
+.task-row {
+    @apply flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm transition-all hover:border-blue-500/30;
+}
+
+.task-name {
+    @apply text-sm font-bold text-slate-700 dark:text-slate-200;
+}
+
+.task-actions {
+    @apply flex gap-2;
+}
+
+.task-btn {
+    @apply px-4 py-1.5 rounded-xl text-xs font-bold border-2 border-transparent transition-all;
+}
+
+.btn-todo {
+    @apply bg-slate-100 dark:bg-slate-700 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-600;
+}
+
+.btn-todo.active {
+    @apply bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border-blue-500/50 shadow-sm;
+}
+
+.btn-done {
+    @apply bg-slate-100 dark:bg-slate-700 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-600;
+}
+
+.btn-done.active {
+    @apply bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border-emerald-500/50 shadow-sm;
+}
+
+/* Animations */
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.spinner-small {
+    @apply w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin;
+}
+
+/* Ensure map component fills space */
+.map-wrapper {
+    min-height: 50vh;
+}
+
+/* Base form fields (retained for layout) */
 .form-group-list {
     @apply space-y-4;
 }
 
 .form-group label {
-    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+    @apply block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1;
 }
 
 .form-control {
-    @apply w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+    @apply w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 font-medium text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 transition-all;
 }
 
 .date-grid {
     @apply grid grid-cols-2 gap-4;
-}
-
-.modal-footer {
-    @apply mt-8 flex justify-end gap-3;
-}
-
-.btn-cancel {
-    @apply px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium;
-}
-
-.btn-save {
-    @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50;
 }

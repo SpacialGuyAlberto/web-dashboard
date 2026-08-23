@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, AfterViewInit, Output, SimpleChanges, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { GoogleMapsModule, GoogleMap, MapPolyline, MapMarker } from '@angular/google-maps';
+import { GoogleMapsModule, GoogleMap, MapPolyline, MapMarker, MapPolygon } from '@angular/google-maps';
 import { RoutingService } from '@features/gis/routing.service';
 
 export interface SegmentCoordinates {
@@ -47,6 +47,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
     @Input() isEditing: boolean = false;
     @Input() viewOnly: boolean = false;
     @Input() smartPlan: any = null;
+    @Input() projectGeometry: {lat: number, lng: number}[] | null = null;
 
     @Output() coordinatesChanged = new EventEmitter<SegmentCoordinates>();
 
@@ -165,12 +166,33 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         }
         this.streetViewPos = { lat: this.startLat, lng: this.startLng } ;
         this.center = { lat: this.startLat, lng: this.startLng };
-
     }
 
     ngAfterViewInit(): void {
         this.initPanorama();
         this.initSearchAutocomplete();
+        this.fitToProjectGeometry();
+    }
+
+    private fitToProjectGeometry() {
+        if (this.projectGeometry && this.projectGeometry.length > 0 && this.map && this.map.googleMap) {
+            const bounds = new google.maps.LatLngBounds();
+            this.projectGeometry.forEach(p => bounds.extend(p));
+            this.map.googleMap.fitBounds(bounds);
+        }
+    }
+
+    getMaskPaths(): any {
+        if (!this.projectGeometry || this.projectGeometry.length < 3) return [];
+        // Create an outer ring covering the whole world
+        const earthRing = [
+            { lat: 85, lng: -180 },
+            { lat: 85, lng: 180 },
+            { lat: -85, lng: 180 },
+            { lat: -85, lng: -180 }
+        ];
+        // The inner ring cuts a hole (the project area)
+        return [earthRing, this.projectGeometry];
     }
 
     private initSearchAutocomplete() {
@@ -436,6 +458,9 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         }
         if (changes['smartPlan'] && this.smartPlan) {
             this.renderFencingPlan();
+        }
+        if (changes['projectGeometry'] && this.projectGeometry) {
+            this.fitToProjectGeometry();
         }
     }
 
