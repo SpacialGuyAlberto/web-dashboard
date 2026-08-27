@@ -61,6 +61,12 @@ export class PlanningService {
         return this.http.put<Project>(`${this.apiUrl}/projects/${id}`, project);
     }
 
+    processPlanauskunft(projectId: number, file: File): Observable<any> {
+        const formData = new FormData();
+        formData.append('file', file);
+        return this.http.post(`${this.apiUrl}/projects/${projectId}/planauskunft/process`, formData);
+    }
+
     // Risk API (Keep as mock for now, but could be integrated with Analysis later)
     getProjectRiskDetails(projectId: number): Observable<RiskScore[]> {
         const allRisks = JSON.parse(sessionStorage.getItem(this.RISKS_KEY) || '[]');

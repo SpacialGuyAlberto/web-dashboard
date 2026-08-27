@@ -90,7 +90,7 @@
                 </button>
                 <h2>{{ isEditing ? 'Edit Project' : 'New Project' }}</h2>
                 <div class="step-indicator">
-                    Step {{ currentStep }} of 3
+                    Step {{ currentStep }} of 4
                 </div>
             </div>
 
@@ -164,18 +164,40 @@
                         </app-segment-creation-map>
                     </div>
                 </div>
+
+                <!-- STEP 4: Smart Segment Recognition -->
+                <div *ngIf="currentStep === 4" class="step-container animate-fade-in">
+                    <h3 class="step-title">Smart Segment Recognition</h3>
+                    <p class="step-subtitle">Upload your "Planauskunft" (PDF, PNG, JPG, DWG, DXF, GeoJSON) to automatically generate segments using AI and determinist logic.</p>
+                    
+                    <div class="file-upload-wrapper mt-6 border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-8 text-center bg-gray-50 dark:bg-slate-800">
+                        <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Drag and drop your file here, or click to browse.</p>
+                        <input type="file" (change)="onFileSelected($event)" class="hidden" id="file-upload" accept=".pdf,.png,.jpg,.jpeg,.dwg,.dxf,.geojson" />
+                        <label for="file-upload" class="cursor-pointer bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-md py-2 px-4 inline-flex items-center text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors">
+                            Select File
+                        </label>
+
+                        <div *ngIf="selectedFile" class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 rounded-md text-sm flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            {{ selectedFile.name }}
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Modal Footer Controls -->
             <div class="modal-footer progressive-footer">
-                <button *ngIf="currentStep > 1" (click)="prevStep()" class="btn-secondary">
+                <button *ngIf="currentStep > 1" (click)="prevStep()" class="btn-secondary" [disabled]="loading">
                     Back
                 </button>
                 <div class="flex-1"></div>
-                <button *ngIf="currentStep < 3" (click)="nextStep()" class="btn-primary" [disabled]="currentStep === 1 && !newProject.name">
+                <button *ngIf="currentStep < 4" (click)="nextStep()" class="btn-primary" [disabled]="(currentStep === 1 && !newProject.name) || loading">
                     Continue
                 </button>
-                <button *ngIf="currentStep === 3" (click)="saveProject()" class="btn-primary btn-pay" [disabled]="!newProject.name || loading">
+                <button *ngIf="currentStep === 4" (click)="saveProject()" class="btn-primary btn-pay" [disabled]="!newProject.name || loading">
                     <span *ngIf="!loading">{{ isEditing ? 'Save Changes' : 'Create Project' }}</span>
                     <span *ngIf="loading" class="spinner-small"></span>
                 </button>

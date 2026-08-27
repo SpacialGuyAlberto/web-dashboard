@@ -66,6 +66,8 @@ export class ProjectsComponent implements OnInit {
     geometry: []
   };
 
+  selectedFile: File | null = null;
+
   currentStep: number = 1;
   workTypes = Object.values(WorkType);
 
@@ -93,7 +95,7 @@ export class ProjectsComponent implements OnInit {
   }
 
   nextStep() {
-    if (this.currentStep < 3) this.currentStep++;
+    if (this.currentStep < 4) this.currentStep++;
   }
 
   prevStep() {
@@ -106,10 +108,18 @@ export class ProjectsComponent implements OnInit {
     }
   }
 
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
+
   openCreateModal() {
     this.isEditing = false;
     this.currentProjectId = null;
     this.newProject = { name: '', description: '', startDate: '', endDate: '', lifecycle_todo: [], lifecycle_done: [], geometry: [] };
+    this.selectedFile = null;
     this.currentStep = 1;
     this.showCreateModal = true;
   }
@@ -123,6 +133,7 @@ export class ProjectsComponent implements OnInit {
         lifecycle_done: project.lifecycle_done || [],
         geometry: project.geometry || []
     }; // Copy data
+    this.selectedFile = null;
     this.currentStep = 1;
     this.showCreateModal = true;
   }
@@ -132,6 +143,7 @@ export class ProjectsComponent implements OnInit {
     this.newProject = { name: '', description: '', startDate: '', endDate: '', lifecycle_todo: [], lifecycle_done: [], geometry: [] };
     this.isEditing = false;
     this.currentProjectId = null;
+    this.selectedFile = null;
     this.currentStep = 1;
   }
 
@@ -163,9 +175,7 @@ export class ProjectsComponent implements OnInit {
           if (index !== -1) {
             this.projects[index] = updatedProject;
           }
-          this.closeCreateModal();
-          this.loading = false;
-          this.cdr.detectChanges();
+          this.handleFileUploadAndClose(updatedProject.id!);
         },
         error: (err) => {
           console.error('Error updating project:', err);
@@ -180,9 +190,7 @@ export class ProjectsComponent implements OnInit {
         next: (project) => {
           console.log('Project created:', project);
           this.projects.push(project);
-          this.closeCreateModal();
-          this.loading = false;
-          this.cdr.detectChanges();
+          this.handleFileUploadAndClose(project.id!);
         },
         error: (err) => {
           console.error('Error creating project:', err);
@@ -191,6 +199,30 @@ export class ProjectsComponent implements OnInit {
           this.cdr.detectChanges();
         }
       });
+    }
+  }
+
+  private handleFileUploadAndClose(projectId: number) {
+    if (this.selectedFile) {
+        this.planningService.processPlanauskunft(projectId, this.selectedFile).subscribe({
+            next: (segments) => {
+                console.log('Planauskunft processed, segments generated:', segments);
+                this.closeCreateModal();
+                this.loading = false;
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('Error processing planauskunft:', err);
+                this.error = 'Project saved, but failed to process Planauskunft.';
+                this.closeCreateModal();
+                this.loading = false;
+                this.cdr.detectChanges();
+            }
+        });
+    } else {
+        this.closeCreateModal();
+        this.loading = false;
+        this.cdr.detectChanges();
     }
   }
 
