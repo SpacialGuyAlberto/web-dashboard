@@ -1,5 +1,5 @@
 .projects-container {
-    @apply min-h-screen bg-gray-50 dark:bg-gray-900 p-6;
+    @apply min-h-screen bg-[#0a0a0c] p-6 lg:p-12 font-sans;
 }
 
 .projects-wrapper {
@@ -7,132 +7,135 @@
 }
 
 .projects-header {
-    @apply mb-8;
+    @apply mb-12 border-b border-white/5 pb-8;
 }
 
 .projects-header h1 {
-    @apply text-3xl font-bold text-gray-900 dark:text-white;
+    @apply font-display text-5xl font-normal text-white/90 tracking-tight leading-none;
 }
 
 .projects-header p {
-    @apply text-gray-600 dark:text-gray-400 mt-2;
+    @apply text-white/40 mt-4 font-sans text-sm;
 }
 
 .error-container {
-    @apply mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4;
+    @apply mb-6 bg-red-900/10 border border-red-500/20 rounded-lg p-4;
 }
 
 .error-message {
-    @apply text-red-800 dark:text-red-400;
+    @apply text-red-400 font-mono text-[10px] uppercase tracking-widest;
 }
 
 .loading-spinner-container {
-    @apply flex justify-center items-center py-12;
+    @apply flex justify-center items-center py-20;
 }
 
 .spinner {
-    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600;
+    @apply animate-spin rounded-full h-8 w-8 border-2 border-white/10 border-t-white/80;
 }
 
 .projects-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8;
 }
 
 .project-card {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200 dark:border-gray-700;
+    @apply bg-[#131415] rounded-xl p-8 border border-white/5 transition-all hover:border-white/10 flex flex-col;
 }
 
 .project-card-header {
-    @apply flex justify-between items-start mb-4;
+    @apply flex justify-between items-start mb-6;
 }
 
 .project-card-header h3 {
-    @apply text-xl font-semibold text-gray-900 dark:text-white;
+    @apply font-mono text-xs uppercase tracking-widest text-white/90;
 }
 
 .status-badge {
-    @apply px-3 py-1 rounded-full text-xs font-medium;
+    @apply px-2 py-0.5 rounded border text-[9px] font-mono uppercase tracking-widest bg-transparent;
 }
 
 .project-description {
-    @apply text-gray-600 dark:text-gray-400 mb-4 line-clamp-2;
+    @apply text-white/40 text-xs mb-8 flex-1 leading-relaxed font-sans;
 }
 
 .project-dates {
-    @apply space-y-2 text-sm text-gray-500 dark:text-gray-400;
+    @apply space-y-3 border-t border-white/5 pt-6;
 }
 
 .date-row {
-    @apply flex items-center gap-2;
+    @apply flex justify-between items-center text-[10px] font-mono uppercase tracking-widest;
 }
 
 .date-label {
-    @apply font-medium;
+    @apply text-white/30;
+}
+.date-row span:last-child {
+    @apply text-white/60;
 }
 
 .project-actions {
-    @apply mt-6 flex gap-2;
+    @apply mt-8 flex gap-3;
 }
 
 .btn-view {
-    @apply flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium;
+    @apply flex-1 bg-white/5 text-white/70 px-4 py-2.5 rounded-md hover:bg-white/10 hover:text-white transition-colors text-[9px] font-mono uppercase tracking-widest border border-white/5 text-center;
 }
 
 .btn-edit {
-    @apply px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300;
+    @apply px-4 py-2.5 bg-transparent border border-white/5 rounded-md hover:bg-white/5 transition-colors text-[9px] font-mono uppercase tracking-widest text-white/50 hover:text-white;
 }
 
 .empty-state-container {
-    @apply col-span-full text-center py-12;
+    @apply col-span-full text-center py-20 border border-white/5 border-dashed rounded-xl bg-[#131415]/50;
 }
 
 .empty-state-icon {
-    @apply text-gray-400 dark:text-gray-500 mb-4;
+    @apply text-white/20 mb-6;
 }
 
 .empty-state-container h3 {
-    @apply text-lg font-medium text-gray-900 dark:text-white mb-2;
+    @apply font-display text-3xl font-normal text-white/80 mb-2;
 }
 
 .empty-state-container p {
-    @apply text-gray-500 dark:text-gray-400;
+    @apply text-white/40 text-xs font-mono uppercase tracking-widest mt-4;
 }
 
 .btn-new-project-wrapper {
-    @apply mt-8;
+    @apply mt-10 text-right;
 }
 
 .btn-new-project {
-    @apply bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md;
+    @apply bg-[#6938ef] text-white px-6 py-3 rounded-md hover:bg-[#5b2ecf] transition-colors font-mono text-[10px] uppercase tracking-widest;
 }
 
 /* Modal */
 .modal-overlay {
-    @apply fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4;
+    @apply fixed inset-0 bg-[#0a0a0c]/80 backdrop-blur-md flex items-center justify-center z-[100] p-4;
 }
 
 .apple-pay-modal {
-    @apply bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 transition-all duration-300 transform scale-100;
+    @apply bg-[#131415] rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10 transition-all duration-300 transform scale-100;
 }
 
 .modal-header {
-    @apply p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col items-center relative bg-white dark:bg-slate-900;
+    @apply p-6 border-b border-white/5 flex flex-col items-center relative bg-[#161719];
 }
 
 .modal-header h2 {
-    @apply text-xl font-bold text-slate-900 dark:text-white mt-2;
+    @apply font-display text-3xl font-normal text-white mt-4;
 }
 
 .btn-close {
-    @apply absolute left-6 top-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800;
+    @apply absolute left-6 top-6 text-white/30 hover:text-white transition-colors p-2;
 }
 
 .step-indicator {
-    @apply mt-2 text-xs font-semibold text-slate-500 uppercase tracking-widest;
+    @apply mt-4 text-[9px] font-mono text-white/40 uppercase tracking-[0.2em];
 }
 
 .progressive-content {
-    @apply p-8 overflow-y-auto flex-1 bg-slate-50 dark:bg-slate-900/50 relative;
+    @apply p-8 overflow-y-auto flex-1 bg-transparent relative;
 }
 
 .step-container {
@@ -140,27 +143,27 @@
 }
 
 .step-title {
-    @apply text-2xl font-black text-slate-900 dark:text-white;
+    @apply font-mono text-xs uppercase tracking-widest text-white/80 mb-2;
 }
 
 .step-subtitle {
-    @apply text-sm text-slate-500 dark:text-slate-400 mt-2;
+    @apply text-[10px] text-white/40 font-mono uppercase tracking-widest mb-6;
 }
 
 .progressive-footer {
-    @apply p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center gap-4;
+    @apply p-6 bg-[#161719] border-t border-white/5 flex items-center gap-4;
 }
 
 .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-2xl font-bold text-sm shadow-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[140px];
+    @apply bg-[#6938ef] hover:bg-[#5b2ecf] text-white px-8 py-3 rounded-md font-mono text-[10px] uppercase tracking-widest transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[140px];
 }
 
 .btn-secondary {
-    @apply bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 px-8 py-3 rounded-2xl font-bold text-sm transition-all active:scale-95;
+    @apply bg-white/5 text-white/60 hover:bg-white/10 hover:text-white px-8 py-3 rounded-md font-mono text-[10px] uppercase tracking-widest transition-colors;
 }
 
 .btn-pay {
-    @apply bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xl;
+    @apply bg-[#6938ef] text-white;
 }
 
 /* Lifecycle Tasks Grid */
@@ -169,11 +172,11 @@
 }
 
 .task-row {
-    @apply flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm transition-all hover:border-blue-500/30;
+    @apply flex items-center justify-between bg-[#161719] p-4 rounded-lg border border-white/5 transition-all hover:border-white/10;
 }
 
 .task-name {
-    @apply text-sm font-bold text-slate-700 dark:text-slate-200;
+    @apply text-[10px] font-mono uppercase tracking-widest text-white/70;
 }
 
 .task-actions {
@@ -181,23 +184,15 @@
 }
 
 .task-btn {
-    @apply px-4 py-1.5 rounded-xl text-xs font-bold border-2 border-transparent transition-all;
-}
-
-.btn-todo {
-    @apply bg-slate-100 dark:bg-slate-700 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-600;
+    @apply px-4 py-2 rounded-md text-[9px] font-mono uppercase tracking-widest border border-white/5 transition-all bg-[#131415] text-white/40 hover:bg-white/5 hover:text-white;
 }
 
 .btn-todo.active {
-    @apply bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border-blue-500/50 shadow-sm;
-}
-
-.btn-done {
-    @apply bg-slate-100 dark:bg-slate-700 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-600;
+    @apply bg-[#2fb080]/10 text-[#2fb080] border-[#2fb080]/20;
 }
 
 .btn-done.active {
-    @apply bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border-emerald-500/50 shadow-sm;
+    @apply bg-[#6938ef]/10 text-[#6938ef] border-[#6938ef]/20;
 }
 
 /* Animations */
@@ -206,32 +201,33 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px) scale(0.98); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .spinner-small {
-    @apply w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin;
+    @apply w-4 h-4 border border-white/30 border-t-white rounded-full animate-spin;
 }
 
 /* Ensure map component fills space */
 .map-wrapper {
     min-height: 50vh;
+    @apply border-white/5 rounded-lg;
 }
 
-/* Base form fields (retained for layout) */
+/* Base form fields */
 .form-group-list {
-    @apply space-y-4;
+    @apply space-y-6;
 }
 
 .form-group label {
-    @apply block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1;
+    @apply block text-[9px] font-mono uppercase tracking-[0.2em] text-white/40 mb-2 ml-1;
 }
 
 .form-control {
-    @apply w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 font-medium text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 transition-all;
+    @apply w-full bg-[#131415] border border-white/5 rounded-md px-4 py-3 font-mono text-xs text-white/80 focus:ring-1 focus:ring-[#6938ef]/50 transition-all appearance-none placeholder-white/20;
 }
 
 .date-grid {
-    @apply grid grid-cols-2 gap-4;
+    @apply grid grid-cols-2 gap-6;
 }

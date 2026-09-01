@@ -231,9 +231,9 @@ export class ProjectsComponent implements OnInit {
     const start = project.startDate ? new Date(project.startDate) : null;
     const end = project.endDate ? new Date(project.endDate) : null;
 
-    if (start && now < start) return 'bg-blue-100 text-blue-800';
-    if (end && now > end) return 'bg-green-100 text-green-800';
-    return 'bg-orange-100 text-orange-800';
+    if (start && now < start) return 'text-[#6938ef] border-[#6938ef]/20';
+    if (end && now > end) return 'text-[#2fb080] border-[#2fb080]/20';
+    return 'text-orange-400 border-orange-400/20';
   }
 
   getStatus(project: Project): string {

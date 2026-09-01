@@ -6,33 +6,35 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-5 border border-gray-100 dark:border-slate-700 border-l-4 transition-all hover:shadow-md cursor-pointer" 
-         [ngClass]="getBorderClass()"
+    <div class="bg-[#131415] rounded-xl p-8 border border-white/5 hover:border-white/10 transition-all cursor-pointer flex flex-col justify-between" 
          (click)="onCardClick()">
-      <div class="flex justify-between items-start">
+      <div class="flex justify-between items-start mb-6">
         <div>
-          <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ title }}</p>
-          <div class="mt-1 flex items-baseline gap-1">
-            <span class="text-2xl font-bold text-gray-900 dark:text-white">{{ value }}</span>
-            <span *ngIf="unit" class="text-sm text-gray-600 dark:text-gray-300">{{ unit }}</span>
-          </div>
+          <p class="font-mono text-[9px] text-white/40 uppercase tracking-[0.2em]">{{ title }}</p>
         </div>
-        <div *ngIf="icon" class="text-gray-400 dark:text-gray-500">
+        <div *ngIf="icon" class="text-white/20">
           <i [class]="icon"></i>
         </div>
       </div>
       
-      <div *ngIf="trend !== undefined" class="mt-3 flex items-center text-xs">
-        <span [ngClass]="trend > 0 ? 'text-red-500' : 'text-green-500'" class="font-bold flex items-center">
-          <span *ngIf="trend > 0">↑</span>
-          <span *ngIf="trend < 0">↓</span>
-          {{ Math.abs(trend) }}
-        </span>
-        <span class="ml-1 text-gray-500 dark:text-gray-400">{{ trendLabel }}</span>
-      </div>
-      
-      <div *ngIf="subtext" class="mt-3 text-xs text-gray-500 dark:text-gray-400">
-        {{ subtext }}
+      <div>
+        <div class="flex items-baseline gap-1">
+          <span class="font-mono text-4xl font-normal text-white/90">{{ value }}</span>
+          <span *ngIf="unit" class="text-xs text-white/30 ml-2 font-mono">{{ unit }}</span>
+        </div>
+        
+        <div *ngIf="trend !== undefined" class="mt-4 flex items-center text-[9px] font-mono uppercase tracking-[0.2em]">
+          <span [ngClass]="trend > 0 ? 'text-red-400' : 'text-[#2fb080]'" class="flex items-center">
+            <span *ngIf="trend > 0" class="mr-1">&uarr;</span>
+            <span *ngIf="trend < 0" class="mr-1">&darr;</span>
+            {{ Math.abs(trend) }}
+          </span>
+          <span class="ml-2 text-white/30">{{ trendLabel }}</span>
+        </div>
+        
+        <div *ngIf="subtext" class="mt-3 text-[9px] font-mono uppercase tracking-[0.2em] text-white/30">
+          {{ subtext }}
+        </div>
       </div>
     </div>
   `,
@@ -52,14 +54,6 @@ export class KPICardComponent {
 
   Math = Math;
 
-  getBorderClass() {
-    switch (this.status) {
-      case 'success': return 'border-green-500';
-      case 'warning': return 'border-yellow-500';
-      case 'danger': return 'border-red-500';
-      default: return 'border-blue-500';
-    }
-  }
 
   onCardClick() {
     this.cardClick.emit();

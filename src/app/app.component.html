@@ -1,44 +1,47 @@
-<div class="flex h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden">
-    <!-- Sidebar (Only visible when logged in) -->
-    <app-sidebar *ngIf="authService.currentUser$ | async" [class.hidden]="!sidebarOpen" class="lg:block"
+<div class="flex h-screen bg-[#0d0e11] text-white/80 overflow-hidden font-sans">
+    <!-- Sidebar -->
+    <app-sidebar *ngIf="authService.currentUser$ | async" [class.hidden]="!sidebarOpen" class="lg:block border-r border-white/5"
         [class.lg:w-64]="true" [class.fixed]="true" [class.lg:relative]="true" [class.z-50]="true"></app-sidebar>
 
-    <!-- Overlay for mobile (Only visible when logged in) -->
+    <!-- Overlay for mobile -->
     <div *ngIf="(authService.currentUser$ | async) && sidebarOpen" (click)="toggleSidebar()"
-        class="fixed inset-0 bg-black bg-opacity-50 lg:hidden z-40">
+        class="fixed inset-0 bg-[#0d0e11]/80 backdrop-blur-sm lg:hidden z-40">
     </div>
 
     <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-        <!-- Top Header with Hamburger Menu (Only visible when logged in) -->
-        <header *ngIf="authService.currentUser$ | async" class="bg-white dark:bg-slate-800 shadow-sm z-30 border-b border-gray-100 dark:border-slate-700">
+    <div class="flex-1 flex flex-col overflow-hidden relative">
+        <!-- Top Header -->
+        <header *ngIf="authService.currentUser$ | async" class="bg-[#131415]/80 backdrop-blur-md z-30 border-b border-white/5 relative">
             <div class="flex items-center justify-between p-4">
                 <button (click)="toggleSidebar()"
-                    class="lg:hidden p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    class="lg:hidden p-2 rounded-md text-white/50 hover:bg-white/5 hover:text-white transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                 </button>
-                <div class="flex-1 lg:ml-0 ml-4">
-                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">QuarkBau Management System</h1>
+                <div class="flex-1 lg:ml-0 ml-4 flex items-center gap-3">
+                    <h1 class="font-mono text-[11px] uppercase tracking-widest text-white/40">QuarkBau / Management System</h1>
+                    <span class="px-2 py-0.5 rounded bg-[#2fb080]/10 border border-[#2fb080]/20 text-[#2fb080] font-mono text-[9px] uppercase tracking-widest hidden sm:block">Online</span>
                 </div>
 
                 <button (click)="logout()"
-                    class="ml-4 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 border border-red-200">
-                    <span>🚪</span>
-                    <span class="hidden sm:inline">Logout</span>
+                    class="ml-4 px-3 py-1.5 bg-transparent hover:bg-white/5 text-white/50 hover:text-white rounded-lg text-[10px] font-mono uppercase tracking-widest transition-colors flex items-center gap-2 border border-white/5">
+                    <span class="hidden sm:inline">Logout &rarr;</span>
                 </button>
             </div>
         </header>
 
         <!-- Page Content -->
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 dark:bg-slate-900 flex flex-col">
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-transparent flex flex-col relative z-10">
             <div class="flex-grow">
                 <router-outlet></router-outlet>
             </div>
             <app-footer></app-footer>
         </main>
+        
+        <!-- Optional global background decoration -->
+        <div class="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_top,rgba(47,176,128,0.03)_0%,transparent_50%)]"></div>
     </div>
     <app-toast></app-toast>
 </div>

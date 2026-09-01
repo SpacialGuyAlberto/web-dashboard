@@ -1,54 +1,54 @@
 .dashboard-container {
-    @apply min-h-screen bg-gray-100 dark:bg-gray-900 p-6 font-sans;
+    @apply min-h-screen bg-[#0a0a0c] p-6 lg:p-12 font-sans text-white/80;
 }
 
 .dashboard-header {
-    @apply flex justify-between items-center mb-6;
+    @apply flex justify-between items-end mb-12 border-b border-white/5 pb-8;
 }
 
 .header-title-group h1 {
-    @apply text-2xl font-bold text-gray-800 dark:text-white tracking-tight;
+    @apply font-display text-5xl tracking-normal text-white/90 font-normal leading-none;
 }
 
 .header-subtitle {
-    @apply text-sm text-gray-500 dark:text-gray-400;
+    @apply text-sm text-white/40 mt-3 font-sans;
 }
 
 .header-actions {
     @apply flex gap-4 items-center;
 }
 
+/* Dropdown */
 .project-selector-wrapper {
     @apply relative min-w-[200px];
 }
-
 .project-selector-label {
-    @apply block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-1;
+    @apply block text-[9px] font-mono uppercase text-white/40 mb-2 ml-1 tracking-[0.2em];
 }
 
 .project-selector {
-    @apply w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all shadow-sm appearance-none;
+    @apply w-full bg-[#131415] border border-white/5 rounded-md px-4 py-2.5 text-xs text-white/80 focus:ring-1 focus:ring-[#2fb080]/50 transition-all appearance-none font-mono tracking-wide;
 }
-
 .selector-icon {
-    @apply absolute right-3 bottom-2.5 pointer-events-none text-gray-400;
+    @apply absolute right-4 bottom-2.5 pointer-events-none text-white/30 text-[10px];
 }
 
 .time-filter-group {
     @apply flex gap-2 self-end;
 }
 
+/* Time btn */
 .time-btn {
-    @apply px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors;
+    @apply px-4 py-2.5 bg-[#131415] border border-white/5 rounded-md text-[9px] font-mono uppercase tracking-widest hover:bg-[#1a1b1e] hover:border-white/10 transition-colors text-white/50 hover:text-white;
 }
 
 /* Project Summary Section */
 .project-summary-grid {
-    @apply mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6;
+    @apply mb-12 grid grid-cols-1 lg:grid-cols-3 gap-8;
 }
 
 .project-overview-card {
-    @apply lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white relative;
+    @apply lg:col-span-2 p-10 bg-[#161719] rounded-xl border border-white/5 text-white relative;
 }
 
 .project-overview-content {
@@ -56,35 +56,35 @@
 }
 
 .badge-active {
-    @apply bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 text-[10px] font-bold px-2.5 py-1 rounded text-xs tracking-widest;
+    @apply bg-[#2fb080]/10 text-[#2fb080] border border-[#2fb080]/20 px-2.5 py-1 rounded text-[9px] font-mono uppercase tracking-[0.2em];
 }
 
 .project-title {
-    @apply text-3xl font-bold mt-3 text-gray-900 dark:text-white;
+    @apply font-display text-5xl font-normal mt-6 text-white leading-tight;
 }
 
 .progress-label {
-    @apply text-gray-500 dark:text-gray-400 text-xs uppercase font-semibold tracking-widest;
+    @apply text-white/30 text-[9px] uppercase font-mono tracking-[0.2em];
 }
 
 .progress-value {
-    @apply text-4xl font-bold text-blue-600 dark:text-blue-400 mt-1;
+    @apply font-mono text-4xl font-normal text-white mt-2;
 }
 
 .project-description {
-    @apply text-gray-600 dark:text-gray-300 max-w-2xl text-sm leading-relaxed mb-6;
+    @apply text-white/40 max-w-2xl text-sm leading-relaxed mb-10 mt-6 font-sans;
 }
 
 .project-stats-border {
-    @apply flex gap-8 border-t border-gray-100 dark:border-slate-700 pt-6;
+    @apply flex gap-12 border-t border-white/5 pt-8;
 }
 
 .stat-item-label {
-    @apply text-gray-500 dark:text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-1;
+    @apply text-white/30 text-[9px] uppercase font-mono tracking-[0.2em] mb-2;
 }
 
 .stat-item-value {
-    @apply text-xl font-semibold text-gray-900 dark:text-white;
+    @apply text-xl font-mono text-white/90;
 }
 
 .decorative-circle-1 {
@@ -97,128 +97,132 @@
 
 /* Health Card */
 .health-status-card {
-    @apply bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-slate-700 flex flex-col justify-between;
+    @apply p-10 flex flex-col justify-between bg-[#161719] rounded-xl border border-white/5 text-white relative;
 }
 
 .health-label {
-    @apply text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-4;
+    @apply text-white/30 text-[9px] font-mono uppercase tracking-[0.2em] mb-8;
 }
 
 .health-metric-group {
-    @apply space-y-4;
+    @apply space-y-8;
 }
 
 .health-metric-row {
-    @apply flex justify-between items-center;
+    @apply flex justify-between items-end;
 }
 
 .health-metric-name {
-    @apply text-sm font-medium text-gray-700 dark:text-gray-300;
+    @apply text-xs font-mono uppercase tracking-widest text-white/50;
 }
 
 .health-metric-percent {
-    @apply font-bold text-sm;
+    @apply font-mono text-sm text-white/80;
 }
 
 .progress-bar-bg {
-    @apply w-full bg-gray-100 dark:bg-slate-700 h-2 rounded-full;
+    @apply w-full bg-[#131415] border border-white/5 h-1 rounded-full mt-3 overflow-hidden;
 }
 
 .progress-bar-fill {
-    @apply h-2 rounded-full;
+    @apply h-1 rounded-full;
 }
 
 .manage-btn-container {
-    @apply pt-6 border-t border-gray-100 dark:border-slate-700 mt-6;
+    @apply pt-8 border-t border-white/5 mt-10;
 }
 
 .manage-btn {
-    @apply w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm;
+    @apply w-full py-3 bg-[#131415] border border-white/5 hover:bg-white/5 text-white/50 hover:text-white rounded-md text-[9px] font-mono uppercase tracking-widest transition-colors;
 }
 
 /* KPI Grid */
 .kpi-section-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6;
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12;
 }
 
 /* Main Grid */
 .main-layout-grid {
-    @apply grid grid-cols-12 gap-4 mb-6;
+    @apply grid grid-cols-12 gap-8 mb-12;
 }
 
 .map-view-container {
-    @apply col-span-12 lg:col-span-8 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden relative;
+    @apply col-span-12 lg:col-span-8 p-1 bg-[#131415] rounded-xl border border-white/5 overflow-hidden relative;
 }
 
 .map-legend {
-    @apply absolute bottom-4 right-4 z-[1000] bg-white/90 dark:bg-gray-900/90 backdrop-blur px-3 py-1 rounded shadow text-xs font-bold border border-gray-200 dark:border-gray-700;
+    @apply absolute bottom-6 right-6 z-[1000] bg-[#1a1b1e]/90 backdrop-blur px-5 py-3 rounded-lg text-[9px] font-mono uppercase tracking-widest border border-white/5 text-white/40 flex items-center gap-5;
 }
 
 .sidebar-container {
-    @apply col-span-12 lg:col-span-4 flex flex-col gap-4;
+    @apply col-span-12 lg:col-span-4 flex flex-col gap-8;
 }
 
 /* Risk Panel */
 .risk-panel-card {
-    @apply flex-1 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden flex flex-col;
+    @apply flex-1 bg-[#161719] rounded-xl border border-white/5 overflow-hidden flex flex-col text-white;
 }
 
 .panel-header {
-    @apply p-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50;
+    @apply p-6 border-b border-white/5 bg-transparent;
 }
 
 .panel-title {
-    @apply font-bold text-gray-800 dark:text-white flex justify-between items-center;
+    @apply font-mono text-[9px] uppercase tracking-[0.2em] text-white/40 flex justify-between items-center;
 }
 
 .risk-count-badge {
-    @apply bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full;
+    @apply bg-transparent text-white/50 font-mono text-[10px];
 }
 
 .panel-content-scroll {
-    @apply flex-1 overflow-y-auto p-2 space-y-2;
+    @apply flex-1 overflow-y-auto p-6 space-y-4 bg-transparent;
 }
 
 .risk-item {
-    @apply p-3 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer;
+    @apply p-5 bg-[#131415] border border-white/5 rounded-lg hover:border-white/10 transition-colors cursor-pointer;
 }
 
 .risk-item-header {
-    @apply flex justify-between items-start;
+    @apply flex justify-between items-start mb-3;
 }
 
 .risk-item-title {
-    @apply font-bold text-sm text-gray-800 dark:text-gray-200;
+    @apply font-mono text-[10px] text-white/80 uppercase tracking-wider;
 }
 
 .risk-delay-value {
-    @apply text-xs font-bold text-red-600;
+    @apply text-[9px] font-mono text-red-400 bg-red-400/10 px-2 py-1 rounded border border-red-400/20 tracking-wider;
 }
 
 .risk-cause {
-    @apply text-xs text-gray-600 dark:text-gray-400 mt-1 truncate;
+    @apply text-xs text-white/30 font-sans mt-1 truncate;
 }
 
 .empty-state {
-    @apply text-center py-8 text-gray-400 text-sm;
+    @apply text-center py-10 text-white/20 text-[9px] font-mono uppercase tracking-[0.2em];
 }
 
 /* Action Center */
 .action-center-wrapper {
-    @apply flex-1 overflow-hidden;
+    @apply flex-1 overflow-hidden bg-[#161719] rounded-xl border border-white/5;
 }
 
 /* Table Section */
 .table-section-container {
-    @apply bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden;
+    @apply bg-[#161719] rounded-xl border border-white/5 overflow-hidden text-white;
 }
 
 .table-header-group {
-    @apply p-4 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50;
+    @apply p-8 border-b border-white/5 flex justify-between items-center bg-transparent;
+}
+
+.table-header-group h3 {
+    @apply font-display text-3xl font-normal text-white/90;
 }
 
 .table-view-all {
-    @apply text-blue-600 text-sm font-medium hover:underline;
+    @apply text-white/40 text-[9px] font-mono uppercase tracking-widest hover:text-white transition-colors;
 }
 
 .table-responsive-wrapper {
@@ -226,29 +230,29 @@
 }
 
 .data-table {
-    @apply w-full text-sm text-left text-gray-500 dark:text-gray-400;
+    @apply w-full text-sm text-left text-white/60 bg-transparent;
 }
 
 .data-table thead {
-    @apply text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400;
+    @apply text-[9px] font-mono uppercase tracking-widest text-white/30 bg-[#131415];
 }
 
 .data-table th {
-    @apply px-6 py-3;
+    @apply px-8 py-5 border-b border-white/5;
 }
 
 .data-table-row {
-    @apply bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600;
+    @apply border-b border-white/5 hover:bg-white/[0.02] transition-colors;
 }
 
 .data-table-cell {
-    @apply px-6 py-4;
+    @apply px-8 py-5 font-sans text-xs;
 }
 
 .cell-primary {
-    @apply font-medium text-gray-900 dark:text-white whitespace-nowrap;
+    @apply font-mono text-sm text-white/90 whitespace-nowrap;
 }
 
 .table-action-link {
-    @apply font-medium text-blue-600 dark:text-blue-500 hover:underline;
+    @apply font-mono text-[9px] uppercase tracking-widest text-white/40 hover:text-white transition-colors;
 }
