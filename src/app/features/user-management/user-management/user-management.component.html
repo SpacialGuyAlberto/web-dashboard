@@ -24,15 +24,15 @@
             </button>
             <button (click)="filterRole = 'FIELD_WORKER'" class="filter-btn"
                 [class.filter-btn-active-workers]="filterRole === 'FIELD_WORKER'">
-                <span class="status-dot bg-emerald-500"></span>Workers
+                Workers
             </button>
             <button (click)="filterRole = 'PROJECT_MANAGER'" class="filter-btn"
                 [class.filter-btn-active-managers]="filterRole === 'PROJECT_MANAGER'">
-                <span class="status-dot bg-purple-500"></span>Managers
+                Managers
             </button>
             <button (click)="filterRole = 'ADMIN'" class="filter-btn"
                 [class.filter-btn-active-admins]="filterRole === 'ADMIN'">
-                <span class="status-dot bg-gray-600"></span>Admins
+                Admins
             </button>
         </div>
     </div>

@@ -1,5 +1,5 @@
 .progress-container {
-    @apply min-h-screen bg-gray-50 dark:bg-gray-900 p-6 font-sans;
+    @apply min-h-screen bg-[#0a0a0c] p-6 lg:p-12 font-sans;
 }
 
 .content-wrapper {
@@ -8,27 +8,27 @@
 
 /* Header Section */
 .page-header {
-    @apply mb-8 flex justify-between items-center;
+    @apply mb-12 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/5 pb-8;
 }
 
 .header-title {
-    @apply text-3xl font-bold text-gray-900 dark:text-white tracking-tight;
+    @apply font-display text-5xl font-normal text-white/90 tracking-tight leading-none;
 }
 
 .header-subtitle {
-    @apply text-gray-500 dark:text-gray-400 mt-2;
+    @apply text-white/40 mt-4 font-sans text-sm;
 }
 
 .filter-toolbar {
-    @apply flex gap-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700;
+    @apply flex gap-4 mt-6 md:mt-0;
 }
 
 .filter-group-label {
-    @apply block text-xs text-gray-500 dark:text-gray-400 mb-1;
+    @apply block text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-2;
 }
 
 .filter-input {
-    @apply border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-2 py-1 text-sm;
+    @apply bg-[#131415] border border-white/5 rounded-md px-3 py-2 font-mono text-xs text-white/80 focus:ring-1 focus:ring-[#6938ef]/50 focus:border-[#6938ef]/50 transition-all outline-none;
 }
 
 /* Status Indicators */
@@ -37,20 +37,24 @@
 }
 
 .spinner {
-    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600;
+    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-[#6938ef];
 }
 
 .error-banner {
-    @apply bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-center text-red-600 dark:text-red-400;
+    @apply bg-red-400/10 border border-red-400/20 rounded-md p-4 text-center text-red-400 font-mono text-[10px] uppercase tracking-widest;
 }
 
 /* Layout Sections */
 .sections-stack {
-    @apply space-y-8;
+    @apply space-y-12;
 }
 
 .section-title {
-    @apply text-xl font-bold text-gray-800 dark:text-white mb-4;
+    @apply text-[10px] font-mono uppercase tracking-[0.2em] text-[#6938ef] mb-6 flex items-center gap-4;
+}
+.section-title::after {
+    content: "";
+    @apply h-[1px] flex-1 bg-white/5;
 }
 
 /* Overall Progress Card */
@@ -59,51 +63,51 @@
 }
 
 .stat-card-elevated {
-    @apply bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700;
+    @apply bg-[#131415] rounded-xl p-6 border border-white/5 transition-all hover:border-white/10 flex flex-col;
 }
 
 .stat-label-muted {
-    @apply text-sm font-medium text-gray-500 dark:text-gray-400;
+    @apply text-[9px] font-mono uppercase text-white/40 tracking-[0.2em] mb-2;
 }
 
 .stat-display-main {
-    @apply flex items-end gap-2 mt-2;
+    @apply flex items-end gap-3 mt-2;
 }
 
 .stat-value-xl {
-    @apply text-3xl font-bold text-gray-900 dark:text-white;
+    @apply font-mono text-4xl text-white/90;
 }
 
 .stat-subtext-sm {
-    @apply text-sm text-gray-500 mb-1;
+    @apply font-mono text-[10px] text-white/30 uppercase tracking-widest mb-1.5;
 }
 
 .progress-track-bg {
-    @apply w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-3;
+    @apply w-full bg-[#161719] rounded-none h-1 mt-6 overflow-hidden border border-white/5;
 }
 
 .progress-filler-blue {
-    @apply bg-blue-600 h-2 rounded-full;
+    @apply bg-[#6938ef] h-1;
 }
 
 .target-comparison-text {
-    @apply text-sm mb-1;
+    @apply font-mono text-[9px] uppercase tracking-widest mb-1.5;
 }
 
 .text-status-good {
-    @apply text-green-500;
+    @apply text-[#2fb080];
 }
 
 .text-status-bad {
-    @apply text-red-500;
+    @apply text-amber-400;
 }
 
 .stat-description-xs {
-    @apply text-xs text-gray-500 mt-1;
+    @apply font-mono text-[9px] text-white/30 uppercase tracking-widest mt-2;
 }
 
 .forecast-value {
-    @apply text-3xl font-bold text-blue-600 dark:text-blue-400 mt-2;
+    @apply font-mono text-4xl text-[#6938ef] mt-2;
 }
 
 /* Productivity Leaderboard */
@@ -112,161 +116,161 @@
 }
 
 .leaderboard-card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden;
+    @apply bg-[#131415] rounded-xl border border-white/5 overflow-hidden flex flex-col;
 }
 
 .card-header-accent {
-    @apply p-4 border-b border-gray-100 dark:border-gray-700;
+    @apply p-4 border-b border-white/5;
 }
 
 .bg-top-performer {
-    @apply bg-green-50 dark:bg-green-900/20;
+    @apply bg-[#2fb080]/10;
 }
 
 .bg-needs-attention {
-    @apply bg-red-50 dark:bg-red-900/20;
+    @apply bg-amber-400/10;
 }
 
 .header-label-top {
-    @apply font-bold text-green-800 dark:text-green-400;
+    @apply font-mono text-[10px] uppercase tracking-[0.2em] text-[#2fb080];
 }
 
 .header-label-problem {
-    @apply font-bold text-red-800 dark:text-red-400;
+    @apply font-mono text-[10px] uppercase tracking-[0.2em] text-amber-400;
 }
 
 .card-body-p4 {
-    @apply p-4;
+    @apply p-0 flex-1;
 }
 
 .list-item-ranking {
-    @apply flex items-center justify-between py-3 border-b last:border-0 border-gray-100 dark:border-gray-700;
+    @apply flex items-center justify-between py-4 px-6 border-b last:border-0 border-white/5 hover:bg-white/5 transition-colors;
 }
 
 .rank-badge-wrapper {
-    @apply flex items-center gap-3;
+    @apply flex items-center gap-4;
 }
 
 .rank-number-dot {
-    @apply w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold;
+    @apply w-6 h-6 flex items-center justify-center rounded text-[9px] font-mono border;
 }
 
 .bg-rank-green {
-    @apply bg-green-100 text-green-700;
+    @apply bg-[#2fb080]/10 text-[#2fb080] border-[#2fb080]/20;
 }
 
 .bg-rank-red {
-    @apply bg-red-100 text-red-700;
+    @apply bg-amber-400/10 text-amber-400 border-amber-400/20;
 }
 
 .crew-name-main {
-    @apply font-medium text-gray-900 dark:text-white;
+    @apply font-mono text-xs text-white/80 uppercase tracking-wider;
 }
 
 .rank-score-value {
-    @apply font-bold text-gray-700 dark:text-gray-300;
+    @apply font-mono text-[10px] text-white/60 tracking-widest;
 }
 
 /* Efficiency Stats */
 .efficiency-metrics-box {
-    @apply space-y-6;
+    @apply space-y-6 flex-1 flex flex-col justify-center;
 }
 
 /* Area Performance Table */
 .table-card-full {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden;
+    @apply bg-[#131415] rounded-xl border border-white/5 overflow-hidden;
 }
 
 .data-table-simple {
-    @apply min-w-full divide-y divide-gray-200 dark:divide-gray-700;
+    @apply min-w-full divide-y divide-white/5 text-left;
 }
 
 .thead-gray {
-    @apply bg-gray-50 dark:bg-gray-700;
+    @apply bg-[#161719];
 }
 
 .table-th-sm {
-    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider;
+    @apply px-6 py-4 font-mono text-[9px] uppercase tracking-[0.2em] text-white/40;
 }
 
 .tbody-main-divide {
-    @apply bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700;
+    @apply divide-y divide-white/5;
 }
 
 .table-td-nowrap {
-    @apply px-6 py-4 whitespace-nowrap;
+    @apply px-6 py-5 whitespace-nowrap;
 }
 
 .soil-badge {
-    @apply px-2 py-1 text-xs font-bold rounded;
+    @apply px-2 py-1 text-[9px] font-mono uppercase tracking-widest rounded border border-white/10 bg-white/5 text-white/60;
 }
 
 .traffic-impact-bar {
-    @apply bg-orange-500 h-2 rounded-full;
+    @apply bg-amber-400 h-1;
 }
 
 .status-tag-sm {
-    @apply px-2 py-1 text-xs font-bold rounded;
+    @apply px-2 py-0.5 text-[9px] font-mono uppercase tracking-widest rounded border;
 }
 
 .bg-on-track {
-    @apply bg-green-100 text-green-800;
+    @apply bg-transparent text-[#2fb080] border-[#2fb080]/20;
 }
 
 .bg-delayed {
-    @apply bg-red-100 text-red-800;
+    @apply bg-transparent text-amber-400 border-amber-400/20;
 }
 
 /* Historical Trends & Quality */
 .two-column-grid {
-    @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-8;
 }
 
 .trends-chart-list {
-    @apply space-y-3;
+    @apply space-y-4;
 }
 
 .chart-row {
-    @apply flex items-center gap-4;
+    @apply flex items-center gap-6;
 }
 
 .chart-row-label {
-    @apply w-24 text-sm text-gray-500 dark:text-gray-400;
+    @apply w-16 font-mono text-[9px] text-white/40 uppercase tracking-widest;
 }
 
 .chart-bar-container {
-    @apply flex-1 bg-gray-100 dark:bg-gray-700 rounded-full h-4 overflow-hidden;
+    @apply flex-1 bg-[#161719] border border-white/5 h-2 overflow-hidden;
 }
 
 .chart-bar-blue {
-    @apply bg-blue-600 h-full rounded-full;
+    @apply bg-[#6938ef] h-full;
 }
 
 .chart-row-value {
-    @apply w-16 text-sm font-bold text-gray-700 dark:text-gray-300 text-right;
+    @apply w-16 font-mono text-[10px] text-white/80 text-right;
 }
 
 /* Quality Cards */
 .quality-grid-compact {
-    @apply grid grid-cols-2 gap-4;
+    @apply grid grid-cols-2 gap-6;
 }
 
 .quality-stat-card {
-    @apply bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700;
+    @apply bg-[#131415] rounded-xl p-6 border border-white/5 transition-all hover:border-white/10;
 }
 
 .text-defect {
-    @apply text-red-600;
+    @apply text-red-400;
 }
 
 .text-quality {
-    @apply text-green-600;
+    @apply text-[#2fb080];
 }
 
 .text-safety {
-    @apply text-blue-600;
+    @apply text-blue-400;
 }
 
 .text-rework {
-    @apply text-orange-600;
+    @apply text-amber-400;
 }

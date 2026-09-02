@@ -80,15 +80,15 @@ export class UserManagementComponent implements OnInit {
     getRoleBadgeClass(role: string): string {
         switch (role) {
             case 'ADMIN':
-                return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600';
+                return 'bg-white/10 text-white border-white/20';
             case 'PROJECT_MANAGER':
-                return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800';
+                return 'bg-[#6938ef]/10 text-[#6938ef] border-[#6938ef]/20';
             case 'FIELD_WORKER':
-                return 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800';
+                return 'bg-[#2fb080]/10 text-[#2fb080] border-[#2fb080]/20';
             case 'SUBCONTRACTOR':
-                return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800';
+                return 'bg-amber-400/10 text-amber-400 border-amber-400/20';
             default:
-                return 'bg-slate-100 text-slate-800 border-slate-200';
+                return 'bg-white/5 text-white/60 border-white/10';
         }
     }
 }

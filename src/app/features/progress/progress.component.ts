@@ -65,10 +65,10 @@ export class ProgressComponent implements OnInit {
     // Helper to get color for soil type
     getSoilColor(type: string): string {
         switch (type) {
-            case 'ROCKY': return 'bg-red-100 text-red-800';
-            case 'SANDY': return 'bg-yellow-100 text-yellow-800';
-            case 'CLAY': return 'bg-orange-100 text-orange-800';
-            default: return 'bg-gray-100 text-gray-800';
+            case 'ROCKY': return 'text-red-400 border-red-400/20';
+            case 'SANDY': return 'text-yellow-400 border-yellow-400/20';
+            case 'CLAY': return 'text-orange-400 border-orange-400/20';
+            default: return 'text-white/60 border-white/10';
         }
     }
 }

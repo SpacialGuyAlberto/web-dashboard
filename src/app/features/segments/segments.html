@@ -108,8 +108,8 @@
         } @empty {
           <div class="empty-state-card group">
             <div class="empty-state-icon">
-              <svg class="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              <svg class="mx-auto h-12 w-12 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                       d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
                 </path>
               </svg>
@@ -176,10 +176,10 @@
             }
           </div>
         } @else {
-          <div class="flex flex-col items-center justify-center py-24 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[3rem]">
+          <div class="empty-state-card group py-24 border border-dashed border-white/5 rounded-xl text-center bg-[#131415]/50 flex flex-col items-center justify-center">
             <span class="text-6xl mb-6 opacity-20">📦</span>
-            <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">No Materials Allocated</h3>
-            <p class="text-slate-500 dark:text-slate-400 font-medium">This project currently has no materials assigned.</p>
+            <h3 class="font-display text-3xl font-normal text-white/80 mb-2">No Materials Allocated</h3>
+            <p class="font-mono text-[9px] uppercase tracking-widest text-white/40">This project currently has no materials assigned.</p>
           </div>
         }
       </div>
@@ -189,8 +189,8 @@
   @if (showCreateModal) {
     <div class="modal-overlay">
       <div class="modal-container-large">
-        <div class="modal-header">
-          <h2>{{ isEditing ? 'Edit Segment' : 'New Segment' }}</h2>
+        <div class="modal-header p-6 border-b border-white/5 flex flex-col items-center relative bg-[#161719]">
+          <h2 class="font-display text-3xl font-normal text-white mt-2">{{ isEditing ? 'Edit Segment' : 'New Segment' }}</h2>
         </div>
 
         <div class="modal-content-scroll">
@@ -234,7 +234,7 @@
                       </button>
                     }
                   </div>
-                  <p class="text-xs text-gray-500 mt-1">Current State: {{ getStateText(newSegment.currentState) }}</p>
+                  <p class="text-[9px] font-mono text-white/40 mt-1 uppercase tracking-widest">Current State: {{ getStateText(newSegment.currentState) }}</p>
                 </div>
               } @else {
                 <div class="form-group">
@@ -385,12 +385,12 @@
       <div class="modal-container-medium">
         <div class="modal-header-with-close">
           <div>
-            <span class="text-[10px] font-black uppercase text-accent tracking-[0.2em] mb-1 block">Quick Look</span>
-            <h2 class="text-3xl font-black text-slate-900 dark:text-white">{{ selectedSegment.streetName }}</h2>
+            <span class="text-[9px] font-mono uppercase text-[#6938ef] tracking-[0.2em] mb-2 block">Quick Look</span>
+            <h2 class="font-display text-4xl font-normal text-white/90">{{ selectedSegment.streetName }}</h2>
           </div>
-          <button (click)="closeDetailsModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+          <button (click)="closeDetailsModal()" class="text-white/30 hover:text-white transition-colors">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
         </div>

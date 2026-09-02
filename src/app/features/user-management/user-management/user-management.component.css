@@ -15,25 +15,25 @@
 }
 
 .management-container {
-    @apply space-y-6;
+    @apply space-y-6 bg-[#0a0a0c] p-6 lg:p-12 min-h-screen;
 }
 
 /* Header Section */
 .page-header {
-    @apply flex flex-col md:flex-row md:items-center justify-between gap-4;
+    @apply mb-12 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/5 pb-8 gap-4;
 }
 
 .header-title {
-    @apply text-2xl font-bold text-gray-800 dark:text-white;
+    @apply font-display text-5xl font-normal text-white/90 tracking-tight leading-none;
 }
 
 .header-subtitle {
-    @apply text-gray-600 dark:text-gray-400 mt-1;
+    @apply text-white/40 mt-4 font-sans text-sm;
 }
 
 /* Filters & Toolbar Section */
 .toolbar-container {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 flex flex-col sm:flex-row gap-4 border border-gray-100 dark:border-gray-700;
+    @apply bg-[#131415] rounded-xl p-4 flex flex-col sm:flex-row gap-4 border border-white/5;
 }
 
 .search-wrapper {
@@ -41,11 +41,11 @@
 }
 
 .search-input {
-    @apply w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all;
+    @apply w-full pl-10 pr-4 py-2 rounded-md bg-[#161719] border border-white/5 font-mono text-xs text-white/80 focus:outline-none focus:ring-1 focus:ring-[#6938ef]/50 transition-all placeholder-white/30;
 }
 
 .search-icon {
-    @apply w-5 h-5 text-gray-400 absolute left-3 top-2.5;
+    @apply w-5 h-5 text-white/30 absolute left-3 top-2.5;
 }
 
 .filter-pills {
@@ -53,32 +53,28 @@
 }
 
 .filter-btn {
-    @apply px-3 py-1.5 rounded-full text-sm font-medium border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap flex items-center;
+    @apply px-4 py-2 rounded-md text-[9px] font-mono tracking-widest uppercase border border-white/5 hover:bg-white/5 transition-colors whitespace-nowrap flex items-center text-white/40;
 }
 
 .filter-btn-active-all {
-    @apply bg-blue-100 text-blue-700;
+    @apply bg-white/10 text-white border-white/20;
 }
 
 .filter-btn-active-workers {
-    @apply bg-emerald-100 text-emerald-700;
+    @apply bg-[#2fb080]/10 text-[#2fb080] border-[#2fb080]/20;
 }
 
 .filter-btn-active-managers {
-    @apply bg-purple-100 text-purple-700;
+    @apply bg-[#6938ef]/10 text-[#6938ef] border-[#6938ef]/20;
 }
 
 .filter-btn-active-admins {
-    @apply bg-gray-100 text-gray-700;
-}
-
-.status-dot {
-    @apply w-2 h-2 rounded-full mr-2;
+    @apply bg-amber-400/10 text-amber-400 border-amber-400/20;
 }
 
 /* Table Section */
 .table-card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden;
+    @apply bg-[#131415] rounded-xl border border-white/5 overflow-hidden;
 }
 
 .table-wrapper {
@@ -90,19 +86,19 @@
 }
 
 .thead-light {
-    @apply bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700;
+    @apply bg-[#161719] border-b border-white/5;
 }
 
 .table-th {
-    @apply px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider;
+    @apply px-6 py-4 font-mono text-[9px] uppercase tracking-[0.2em] text-white/40;
 }
 
 .tbody-main {
-    @apply divide-y divide-gray-100 dark:divide-gray-700;
+    @apply divide-y divide-white/5;
 }
 
 .table-tr {
-    @apply hover:bg-blue-50/50 dark:hover:bg-gray-700/30 transition-colors;
+    @apply hover:bg-white/[0.02] transition-colors;
 }
 
 .table-td {
@@ -115,7 +111,7 @@
 }
 
 .avatar-initials {
-    @apply h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm shadow-md;
+    @apply h-10 w-10 rounded border border-white/10 bg-[#161719] flex items-center justify-center text-white/60 font-mono text-sm;
 }
 
 .user-info {
@@ -123,15 +119,15 @@
 }
 
 .user-name-link {
-    @apply text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer block;
+    @apply font-mono text-xs text-white/90 uppercase tracking-wider hover:text-[#6938ef] cursor-pointer block;
 }
 
 .user-email {
-    @apply text-sm text-gray-500 dark:text-gray-400;
+    @apply font-mono text-[10px] text-white/40 tracking-widest mt-1;
 }
 
 .subcontractor-badge {
-    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 mt-1;
+    @apply inline-flex items-center px-2 py-0.5 rounded border border-amber-400/20 text-[9px] font-mono tracking-widest bg-amber-400/10 text-amber-400 mt-2 uppercase;
 }
 
 /* Role & Info Cell */
@@ -140,31 +136,31 @@
 }
 
 .role-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border shadow-sm;
+    @apply inline-flex items-center px-2 py-0.5 rounded border text-[9px] font-mono tracking-widest uppercase;
 }
 
 .info-item {
-    @apply flex items-center text-xs;
+    @apply flex items-center font-mono text-[9px] tracking-widest uppercase mt-1;
 }
 
 .info-item-crew {
-    @apply text-gray-600 dark:text-gray-400;
+    @apply text-white/60;
 }
 
 .info-item-location {
-    @apply text-blue-600 dark:text-blue-400;
+    @apply text-[#6938ef];
 }
 
 .info-item-activity {
-    @apply text-gray-500 dark:text-gray-500 italic;
+    @apply text-white/40;
 }
 
 .status-badge-active {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400;
+    @apply inline-flex items-center px-2 py-0.5 rounded border border-[#2fb080]/20 text-[9px] font-mono tracking-widest bg-[#2fb080]/10 text-[#2fb080] uppercase;
 }
 
 .status-indicator-dot {
-    @apply w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5;
+    @apply w-1.5 h-1.5 rounded-full bg-[#2fb080] mr-2 animate-pulse;
 }
 
 /* Actions Cell */
@@ -177,26 +173,26 @@
 }
 
 .btn-icon-action {
-    @apply p-1 text-gray-400 transition-colors;
+    @apply p-1 text-white/30 transition-colors hover:text-white hover:bg-white/5 rounded;
 }
 
 .btn-edit:hover {
-    @apply text-blue-500;
+    @apply text-white;
 }
 
 .btn-deactivate:hover {
-    @apply text-red-500;
+    @apply text-red-400 hover:bg-red-400/10;
 }
 
 /* Empty State */
 .empty-state-container {
-    @apply px-6 py-12 text-center text-gray-500 dark:text-gray-400;
+    @apply px-6 py-24 text-center flex flex-col items-center justify-center;
 }
 
 .empty-state-icon {
-    @apply mx-auto h-12 w-12 text-gray-300;
+    @apply mx-auto h-12 w-12 text-white/10 mb-4;
 }
 
 .empty-state-text {
-    @apply mt-2 text-sm font-medium;
+    @apply font-mono text-[9px] uppercase tracking-widest text-white/40;
 }

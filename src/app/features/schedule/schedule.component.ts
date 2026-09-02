@@ -205,11 +205,11 @@ export class ScheduleComponent implements OnInit {
     // Get status color
     getStatusColor(status: string): string {
         switch (status) {
-            case 'SCHEDULED': return 'bg-blue-100 text-blue-800';
-            case 'IN_PROGRESS': return 'bg-yellow-100 text-yellow-800';
-            case 'COMPLETED': return 'bg-green-100 text-green-800';
-            case 'CANCELLED': return 'bg-red-100 text-red-800';
-            default: return 'bg-gray-100 text-gray-800';
+            case 'SCHEDULED': return 'border-l-2 border-l-[#6938ef] bg-[#161719] text-white/90 border-y-white/5 border-r-white/5 border-y border-r';
+            case 'IN_PROGRESS': return 'border-l-2 border-l-amber-400 bg-[#161719] text-white/90 border-y-white/5 border-r-white/5 border-y border-r';
+            case 'COMPLETED': return 'border-l-2 border-l-[#2fb080] bg-[#161719] text-white/90 border-y-white/5 border-r-white/5 border-y border-r';
+            case 'CANCELLED': return 'border-l-2 border-l-red-400 bg-[#161719] text-white/90 border-y-white/5 border-r-white/5 border-y border-r';
+            default: return 'border-l-2 border-l-white/20 bg-[#161719] text-white/90 border-y-white/5 border-r-white/5 border-y border-r';
         }
     }
 

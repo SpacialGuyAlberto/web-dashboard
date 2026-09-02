@@ -12,29 +12,29 @@
 
     .form-input,
     .form-select {
-        @apply w-full bg-slate-50 dark:bg-slate-800/50 border border-transparent rounded-2xl px-5 py-4 font-bold text-slate-800 dark:text-slate-200 transition-all hover:bg-slate-100 dark:hover:bg-slate-800/80;
+        @apply w-full bg-[#131415] border border-white/5 rounded-md px-4 py-3 font-mono text-xs text-white/80 focus:ring-1 focus:ring-[#6938ef]/50 transition-all placeholder-white/20;
     }
 
     .form-input:focus,
     .form-select:focus {
-        @apply ring-2 ring-blue-500/50 outline-none bg-white dark:bg-slate-800 border-blue-500/30;
+        @apply ring-1 ring-[#6938ef]/50 border-[#6938ef]/50 outline-none bg-[#161719];
     }
 
     .form-input-readonly {
-        @apply bg-slate-100/50 dark:bg-slate-800/30 text-slate-500 dark:text-slate-400 cursor-default border-slate-200 dark:border-slate-800;
+        @apply bg-[#131415] text-white/40 cursor-default border border-white/5;
     }
 
     /* Shared Tab Styles */
     .tab-nav {
-        @apply flex bg-slate-200/50 dark:bg-slate-800/50 p-1 rounded-2xl w-fit backdrop-blur-md;
+        @apply flex gap-2 w-fit;
     }
 
     .tab-btn {
-        @apply px-6 py-2.5 rounded-xl font-bold text-sm transition-all text-slate-500 hover:text-slate-700 dark:hover:text-slate-300;
+        @apply px-4 py-2 rounded-md font-mono text-[9px] uppercase tracking-widest transition-all bg-transparent text-white/40 hover:text-white hover:bg-white/5 border border-transparent;
     }
 
     .tab-btn-active {
-        @apply bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400;
+        @apply bg-white/10 text-white border-white/10;
     }
 
     /* Details Grid */
@@ -43,45 +43,45 @@
     }
 
     .details-box {
-        @apply bg-slate-50 dark:bg-slate-800/30 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 transition-all hover:border-blue-500/20;
+        @apply bg-[#131415] p-6 rounded-xl border border-white/5 transition-all hover:border-white/10 flex flex-col;
     }
 
     .details-box-label {
-        @apply text-[10px] font-black uppercase text-slate-400 mb-2 tracking-wider;
+        @apply text-[9px] font-mono uppercase text-white/40 mb-2 tracking-[0.2em];
     }
 
     .details-box-value {
-        @apply text-lg font-bold text-slate-800 dark:text-slate-100;
+        @apply text-sm font-mono text-white/90;
     }
 
     /* Modal Standard Styles */
     .modal-overlay {
-        @apply fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-[100] p-4;
+        @apply fixed inset-0 bg-[#0a0a0c]/80 backdrop-blur-md flex items-center justify-center z-[100] p-4;
     }
 
     .modal-container-medium {
-        @apply bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800;
+        @apply bg-[#131415] rounded-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10;
     }
 
     .modal-header-with-close {
-        @apply p-10 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900;
+        @apply p-8 border-b border-white/5 flex justify-between items-start bg-[#161719];
     }
 
     .modal-footer {
-        @apply p-8 bg-slate-50 dark:bg-slate-900/50 flex justify-end gap-4;
+        @apply p-6 bg-[#161719] border-t border-white/5 flex items-center gap-4 justify-end;
     }
 
     .modal-content-scroll {
-        @apply p-10 overflow-y-auto flex-1;
+        @apply p-8 overflow-y-auto flex-1 bg-transparent;
     }
 
     /* Component specific but shared patterns */
     .btn-save {
-        @apply bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-10 py-4 rounded-2xl font-black text-xs tracking-widest shadow-xl hover:opacity-90 active:scale-95 transition-all;
+        @apply bg-[#6938ef] text-white px-8 py-3 rounded-md font-mono text-[10px] uppercase tracking-widest hover:bg-[#5b2ecf] transition-all;
     }
 
     .btn-action-outline {
-        @apply border-2 border-slate-100 dark:border-slate-800 py-3 rounded-2xl font-bold text-xs hover:border-blue-400/40 transition-all text-slate-500 active:scale-95;
+        @apply bg-transparent border border-white/5 py-3 px-8 rounded-md font-mono text-[10px] uppercase tracking-widest hover:border-white/10 hover:bg-white/5 transition-all text-white/60 hover:text-white;
     }
 
     /* Severity Indicators */
