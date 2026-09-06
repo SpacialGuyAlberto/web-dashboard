@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-4">
     <!-- Clean Header Actions (Inspired by PlanningScreen.kt TopAppBar) -->
-    <div *ngIf="!viewOnly"
-        class="flex items-center justify-between bg-[#131415] p-3 rounded-xl border border-white/5 shadow-none">
+    <!-- Clean Header Actions (Inspired by PlanningScreen.kt TopAppBar) -->
+    <div class="flex items-center justify-between bg-[#131415] p-3 rounded-xl border border-white/5 shadow-none">
         <div class="flex items-center gap-4">
             <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-[#6938ef] animate-pulse"></span>
@@ -19,7 +19,7 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div *ngIf="!viewOnly" class="flex items-center gap-2">
             <!-- Mode Toggle (Planning vs Evidence) -->
             <div class="flex bg-[#0a0a0c] p-1 rounded-md gap-1">
                 <button (click)="setStrokeColor('#6938ef')" [class.bg-white]="strokeColor === '#6938ef'"
@@ -58,11 +58,9 @@
     </div>
 
     <!-- Main View Matrix -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-[500px] lg:h-[600px]">
-
+    <div [class]="viewOnly ? 'flex w-full min-h-[500px] lg:h-[600px]' : 'grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-[500px] lg:h-[600px]'">
         <!-- Left Pane: 3D Visualization (STREET VIEW) -->
-        <div
-            class="relative rounded-xl border border-white/10 overflow-hidden shadow-none bg-black group h-[350px] lg:h-full">
+        <div *ngIf="!viewOnly" class="relative rounded-xl border border-white/10 overflow-hidden shadow-none bg-black group h-[350px] lg:h-full">
             <div #streetViewDiv class="w-full h-full opacity-90"></div>
 
             <!-- Floating Status Header (Mobile Context) -->
@@ -97,10 +95,10 @@
         </div>
 
         <!-- Right Pane: 2D GIS Map -->
-        <div class="relative rounded-xl border border-white/10 overflow-hidden shadow-none h-[350px] lg:h-full">
-            <google-map height="100%" width="100%" [center]="center" [zoom]="zoom" [options]="mapOptions"
+        <div [class]="viewOnly ? 'relative rounded-xl border border-white/10 overflow-hidden shadow-none w-full h-[500px] lg:h-full' : 'relative rounded-xl border border-white/10 overflow-hidden shadow-none h-[350px] lg:h-full'">
+            <google-map height="100%" width="100%" [options]="mapOptions"
                 [mapTypeId]="mapTypeId" (mapTypeIdChange)="onMapTypeChange()" (mapClick)="onMapClick($event)"
-                (mapMousemove)="onMouseMove($event)" class="block w-full h-full">
+                (mapMousemove)="onMouseMove($event)" (centerChanged)="onCenterChanged()" class="block w-full h-full">
 
                 <!-- Mask Polygon for Project Area -->
                 <map-polygon *ngIf="getMaskPaths().length > 0"

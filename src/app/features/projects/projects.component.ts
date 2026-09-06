@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +16,7 @@ import { GeometryPoint } from '@features/segments/segment.model';
 })
 // Updated component with API integration
 export class ProjectsComponent implements OnInit {
+  @ViewChild(SegmentCreationMapComponent) referenceMap!: SegmentCreationMapComponent;
   projects: Project[] = [];
   loading = true;
   error: string | null = null;
@@ -54,6 +55,16 @@ export class ProjectsComponent implements OnInit {
   showCreateModal = false;
   isEditing = false;
   currentProjectId: number | null = null;
+  isFullscreen = false;
+  mapCenter: google.maps.LatLngLiteral = { lat: 52.4746, lng: 13.4475 };
+
+  onMapCenterChanged(center: google.maps.LatLngLiteral) {
+    this.mapCenter = center;
+  }
+
+  toggleFullscreen() {
+    this.isFullscreen = !this.isFullscreen;
+  }
 
   newProject: Project = {
     name: '',
@@ -108,13 +119,6 @@ export class ProjectsComponent implements OnInit {
     }
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-    }
-  }
-
   openCreateModal() {
     this.isEditing = false;
     this.currentProjectId = null;
@@ -134,6 +138,7 @@ export class ProjectsComponent implements OnInit {
         geometry: project.geometry || []
     }; // Copy data
     this.selectedFile = null;
+    this.resetOverlay();
     this.currentStep = 1;
     this.showCreateModal = true;
   }
@@ -144,7 +149,132 @@ export class ProjectsComponent implements OnInit {
     this.isEditing = false;
     this.currentProjectId = null;
     this.selectedFile = null;
+    this.resetOverlay();
     this.currentStep = 1;
+  }
+
+  // Overlay state
+  planOverlayUrl: string | null = null;
+  planOpacity = 0.7;
+  planScale = 1.0;
+  planRotation = 0;
+  planX = 0;
+  planY = 0;
+  
+  isDraggingOverlay = false;
+  private dragStartX = 0;
+  private dragStartY = 0;
+  private initialPlanX = 0;
+  private initialPlanY = 0;
+
+  getTransform(): string {
+      return `translate(${this.planX}px, ${this.planY}px) scale(${this.planScale}) rotate(${this.planRotation}deg)`;
+  }
+
+  // Simulated AI Vector Comparison Score
+  get matchScore(): number {
+      // Deterministic function based on transforms to simulate real-time alignment analysis
+      const normalizedX = Math.abs(this.planX % 200) / 200;
+      const normalizedY = Math.abs(this.planY % 200) / 200;
+      
+      // Let's create a sweet spot for rotation around 0, 90, 180...
+      const rotMod = Math.abs(this.planRotation % 90);
+      const normalizedRot = rotMod > 45 ? (90 - rotMod) / 45 : rotMod / 45; 
+      
+      // Base score 50. Closer to 0 mod 200 on X/Y gives higher score. Closer to orthogonal rotation gives higher score.
+      let score = 50 + ((1 - normalizedX) * 20) + ((1 - normalizedY) * 20) + ((1 - normalizedRot) * 9.9);
+      
+      // Penalize absurd scales
+      if (this.planScale > 2.0) {
+          score -= (this.planScale - 2.0) * 30;
+      }
+      
+      return Math.max(0, Math.min(99.9, score));
+  }
+
+  get matchColor(): string {
+      const score = this.matchScore;
+      if (score < 75) return '#ef4444'; // Red (Poor match)
+      if (score < 88) return '#eab308'; // Yellow (Partial match)
+      return '#2fb080'; // Green (Good match)
+  }
+
+  resetOverlay() {
+      this.planOverlayUrl = null;
+      this.planOpacity = 0.7;
+      this.planScale = 1.0;
+      this.planRotation = 0;
+      this.planX = 0;
+      this.planY = 0;
+  }
+
+  onDragOver(event: DragEvent) {
+      event.preventDefault();
+      event.stopPropagation();
+      // Optionally add a class for drag over styling
+  }
+
+  onDrop(event: DragEvent) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
+          this.handleFile(event.dataTransfer.files[0]);
+      }
+  }
+
+  onFileSelected(event: any) {
+      const file = event.target.files[0];
+      if (file) {
+          this.handleFile(file);
+      }
+  }
+
+  private handleFile(file: File) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+          this.planOverlayUrl = e.target.result;
+          this.autoAlignPlan();
+      };
+      reader.readAsDataURL(file);
+  }
+
+  autoAlignPlan() {
+      // Simulate automatic geometric compatibility adjustment
+      this.planScale = 1.15;
+      this.planRotation = 0; // Keeping it straight, or maybe adjust if needed
+      this.planX = 0;
+      this.planY = 0;
+      
+      // Let's add a slight rotation or scale to make it feel "calculated"
+      // In a real scenario, this would compare image edges with map streets
+      setTimeout(() => {
+          this.planScale = 1.25;
+          this.planRotation = -2;
+          this.planX = 15;
+          this.planY = -10;
+      }, 500); // Small delay for visual effect
+  }
+
+  onOverlayDragStart(event: MouseEvent) {
+      event.preventDefault(); // Prevent default image dragging
+      this.isDraggingOverlay = true;
+      this.dragStartX = event.clientX;
+      this.dragStartY = event.clientY;
+      this.initialPlanX = this.planX;
+      this.initialPlanY = this.planY;
+  }
+
+  onOverlayDrag(event: MouseEvent) {
+      if (!this.isDraggingOverlay) return;
+      const dx = event.clientX - this.dragStartX;
+      const dy = event.clientY - this.dragStartY;
+      this.planX = this.initialPlanX + dx;
+      this.planY = this.initialPlanY + dy;
+  }
+
+  onOverlayDragEnd() {
+      this.isDraggingOverlay = false;
   }
 
   saveProject() {
@@ -204,7 +334,25 @@ export class ProjectsComponent implements OnInit {
 
   private handleFileUploadAndClose(projectId: number) {
     if (this.selectedFile) {
-        this.planningService.processPlanauskunft(projectId, this.selectedFile).subscribe({
+        let currentLat = this.mapCenter.lat;
+        let currentLng = this.mapCenter.lng;
+        
+        if (this.referenceMap) {
+            const center = this.referenceMap.getCurrentCenter();
+            currentLat = center.lat;
+            currentLng = center.lng;
+        }
+
+        this.planningService.processPlanauskunft(
+            projectId, 
+            this.selectedFile,
+            this.planScale,
+            this.planRotation,
+            this.planX,
+            this.planY,
+            currentLat, 
+            currentLng  
+        ).subscribe({
             next: (segments) => {
                 console.log('Planauskunft processed, segments generated:', segments);
                 this.closeCreateModal();

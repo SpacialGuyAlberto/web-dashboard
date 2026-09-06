@@ -61,9 +61,24 @@ export class PlanningService {
         return this.http.put<Project>(`${this.apiUrl}/projects/${id}`, project);
     }
 
-    processPlanauskunft(projectId: number, file: File): Observable<any> {
+    processPlanauskunft(
+        projectId: number, 
+        file: File, 
+        scale: number, 
+        rotation: number, 
+        x: number, 
+        y: number, 
+        centerLat: number, 
+        centerLng: number
+    ): Observable<any> {
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('scale', scale.toString());
+        formData.append('rotation', rotation.toString());
+        formData.append('x', x.toString());
+        formData.append('y', y.toString());
+        formData.append('centerLat', centerLat.toString());
+        formData.append('centerLng', centerLng.toString());
         return this.http.post(`${this.apiUrl}/projects/${projectId}/planauskunft/process`, formData);
     }
 

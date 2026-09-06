@@ -79,8 +79,8 @@
     </div>
 
     <!-- Create/Edit Project Progressive Modal -->
-    <div *ngIf="showCreateModal" class="modal-overlay">
-        <div class="modal-container apple-pay-modal">
+    <div *ngIf="showCreateModal" class="modal-overlay" [class.fullscreen]="isFullscreen">
+        <div class="modal-container apple-pay-modal" [class.fullscreen]="isFullscreen">
             <!-- Modal Header -->
             <div class="modal-header">
                 <button (click)="closeCreateModal()" class="btn-close">
@@ -152,37 +152,127 @@
                     </div>
                 </div>
 
-                <!-- STEP 3: Geometry (Map) -->
-                <div *ngIf="currentStep === 3" class="step-container animate-fade-in h-full flex flex-col">
-                    <h3 class="step-title">Project Area</h3>
-                    <p class="step-subtitle">Draw a closed polygon (A->B->C->A) defining the project area.</p>
+                <!-- STEP 3: Project Location -->
+                <div *ngIf="currentStep === 3" class="step-container animate-fade-in h-full flex flex-col relative">
+                    <h3 class="step-title">Project Location</h3>
+                    <p class="step-subtitle">Search for the project address and center the map on the work site.</p>
                     
-                    <div class="map-wrapper mt-2 flex-1 min-h-[400px] relative">
+                    <div class="map-wrapper mt-2 flex-1 min-h-[400px] relative overflow-hidden bg-black rounded-xl border border-white/10">
                         <app-segment-creation-map 
-                            (coordinatesChanged)="onCoordinatesChanged($event)"
+                            [startLat]="mapCenter.lat"
+                            [startLng]="mapCenter.lng"
+                            [viewOnly]="true"
+                            (centerChanged)="onMapCenterChanged($event)"
                             class="absolute inset-0 w-full h-full">
                         </app-segment-creation-map>
+                        <div class="absolute bottom-4 left-0 right-0 flex justify-center pointer-events-none">
+                            <div class="bg-black/80 backdrop-blur-md px-6 py-3 rounded-full text-white/80 text-xs font-mono border border-white/10 shadow-xl flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-[#6938ef] animate-pulse"></div>
+                                CENTER MAP ON PROJECT LOCATION
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- STEP 4: Smart Segment Recognition -->
-                <div *ngIf="currentStep === 4" class="step-container animate-fade-in">
+                <!-- STEP 4: Smart Segment Recognition (Interactive Overlay) -->
+                <div *ngIf="currentStep === 4" class="step-container animate-fade-in h-full flex flex-col relative"
+                     (dragover)="onDragOver($event)" (drop)="onDrop($event)"
+                     (mousemove)="onOverlayDrag($event)" (mouseup)="onOverlayDragEnd()" (mouseleave)="onOverlayDragEnd()">
                     <h3 class="step-title">Smart Segment Recognition</h3>
-                    <p class="step-subtitle">Upload your "Planauskunft" (PDF, PNG, JPG, DWG, GeoJSON) to automatically generate segments.</p>
+                    <p class="step-subtitle">Drag your "Planauskunft" onto the map and align it.</p>
                     
-                    <div class="file-upload-wrapper mt-4 border border-dashed border-white/20 rounded-xl p-10 text-center bg-[#131415] hover:bg-white/5 transition-colors">
-                        <svg class="mx-auto h-10 w-10 text-white/30 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                        </svg>
-                        <p class="text-[10px] text-white/40 mb-6 font-mono uppercase tracking-widest">Drag and drop your file here, or click to browse.</p>
-                        <input type="file" (change)="onFileSelected($event)" class="hidden" id="file-upload" accept=".pdf,.png,.jpg,.jpeg,.dwg,.dxf,.geojson" />
-                        <label for="file-upload" class="cursor-pointer bg-white/5 border border-white/10 rounded-md py-2.5 px-6 inline-flex items-center text-[9px] font-mono uppercase tracking-widest text-white/80 hover:bg-white/10 transition-colors">
-                            Select File
-                        </label>
+                    <div class="map-wrapper mt-2 flex-1 min-h-[400px] relative overflow-hidden bg-black rounded-xl">
+                        
+                        <!-- The Reference Map -->
+                        <app-segment-creation-map 
+                            [startLat]="mapCenter.lat"
+                            [startLng]="mapCenter.lng"
+                            [viewOnly]="true"
+                            (centerChanged)="onMapCenterChanged($event)"
+                            class="absolute inset-0 w-full h-full">
+                        </app-segment-creation-map>
 
-                        <div *ngIf="selectedFile" class="mt-6 p-4 bg-[#6938ef]/10 text-[#6938ef] border border-[#6938ef]/20 rounded-md text-[10px] font-mono tracking-widest flex items-center justify-center uppercase">
-                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            {{ selectedFile.name }}
+                        <!-- Draggable Overlay Image -->
+                        <div *ngIf="planOverlayUrl" class="absolute inset-0 top-[76px] z-10 pointer-events-none flex items-center justify-center">
+                            <img [src]="planOverlayUrl" 
+                                 class="draggable-blueprint cursor-move pointer-events-auto"
+                                 [style.transform]="getTransform()"
+                                 [style.opacity]="planOpacity"
+                                 (mousedown)="onOverlayDragStart($event)"
+                                 alt="Planauskunft Overlay">
+                        </div>
+
+                        <!-- Empty State Dropzone -->
+                        <div *ngIf="!planOverlayUrl" class="absolute inset-0 top-[76px] z-20 flex items-center justify-center bg-[#131415]/70 backdrop-blur-sm">
+                            <div class="border-2 border-dashed border-[#6938ef]/50 rounded-2xl p-12 text-center bg-[#131415]/90 max-w-md w-full hover:bg-white/5 transition-colors">
+                                <svg class="mx-auto h-12 w-12 text-[#6938ef] mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                                <p class="text-xs text-white/70 mb-2 font-mono uppercase tracking-widest">Drop blueprint here</p>
+                                <p class="text-[9px] text-white/40 mb-6 font-mono uppercase tracking-widest">PDF, PNG, JPG, GeoJSON</p>
+                                <input type="file" (change)="onFileSelected($event)" class="hidden" id="file-upload" accept=".pdf,.png,.jpg,.jpeg,.dwg,.dxf,.geojson" />
+                                <label for="file-upload" class="cursor-pointer bg-[#6938ef] text-white rounded-md py-3 px-8 inline-flex items-center text-[10px] font-mono uppercase tracking-widest hover:bg-[#5b2ecf] transition-all shadow-[0_0_15px_rgba(105,56,239,0.4)]">
+                                    Browse Files
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Horizon Connectivity Style Control Panel -->
+                        <div *ngIf="planOverlayUrl" class="overlay-controls-panel absolute right-4 top-4 z-30 flex flex-col gap-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[9px] font-mono uppercase tracking-[0.2em] text-[#6938ef] font-bold">Overlay Tools</span>
+                                <button (click)="resetOverlay()" class="text-white/40 hover:text-white transition-colors" title="Reset Image">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+                            
+                            <!-- AI Vector Analysis Score -->
+                            <div class="mb-2 p-3 bg-black/40 rounded-lg border border-white/5">
+                                <div class="flex justify-between items-center text-[8px] font-mono uppercase tracking-widest text-white/50 mb-1.5">
+                                    <span>Vector Alignment</span>
+                                    <span [style.color]="matchColor">{{ matchScore | number:'1.1-1' }}%</span>
+                                </div>
+                                <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                    <div class="h-full rounded-full transition-all duration-300" [style.width.%]="matchScore" [style.backgroundColor]="matchColor"></div>
+                                </div>
+                            </div>
+
+                            <!-- Opacity Slider -->
+                            <div class="flex flex-col gap-2">
+                                <div class="flex justify-between items-center text-[9px] font-mono text-white/60">
+                                    <span>Opacity</span>
+                                    <span class="text-white">{{ (planOpacity * 100) | number:'1.0-0' }}%</span>
+                                </div>
+                                <input type="range" min="0.1" max="1" step="0.05" [(ngModel)]="planOpacity" class="modern-slider">
+                            </div>
+
+                            <!-- Scale Slider -->
+                            <div class="flex flex-col gap-2">
+                                <div class="flex justify-between items-center text-[9px] font-mono text-white/60">
+                                    <span>Scale</span>
+                                    <span class="text-white">{{ planScale | number:'1.1-2' }}x</span>
+                                </div>
+                                <input type="range" min="0.01" max="5" step="0.01" [(ngModel)]="planScale" class="modern-slider">
+                            </div>
+
+                            <!-- Rotation Slider -->
+                            <div class="flex flex-col gap-2">
+                                <div class="flex justify-between items-center text-[9px] font-mono text-white/60">
+                                    <span>Rotation</span>
+                                    <span class="text-white">{{ planRotation }}°</span>
+                                </div>
+                                <input type="range" min="-180" max="180" step="1" [(ngModel)]="planRotation" class="modern-slider">
+                            </div>
+                            
+                            <div class="text-[9px] text-white/30 font-mono text-center mt-2">
+                                Drag image to position
+                            </div>
+                            
+                            <button (click)="toggleFullscreen()" class="mt-2 btn-secondary py-2 w-full text-center flex items-center justify-center gap-2">
+                                <svg *ngIf="!isFullscreen" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                                <svg *ngIf="isFullscreen" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h4v4m0-4l-5 5m11-5h4v4m0-4l5 5M4 10h4V6m0 4l-5-5m11 5h4V6m0 4l5-5"></path></svg>
+                                {{ isFullscreen ? 'EXIT FULLSCREEN' : 'FULLSCREEN MAP' }}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -194,12 +284,14 @@
                     Back
                 </button>
                 <div class="flex-1"></div>
-                <button *ngIf="currentStep < 4" (click)="nextStep()" class="btn-primary" [disabled]="(currentStep === 1 && !newProject.name) || loading">
-                    Continue &rarr;
+                <button *ngIf="currentStep < 4" (click)="nextStep()" class="btn-primary"
+                        [disabled]="currentStep === 1 && !newProject.name">
+                    CONTINUE &rarr;
                 </button>
-                <button *ngIf="currentStep === 4" (click)="saveProject()" class="btn-primary btn-pay" [disabled]="!newProject.name || loading">
-                    <span *ngIf="!loading">{{ isEditing ? 'Save Changes' : 'Create Project' }}</span>
-                    <span *ngIf="loading" class="spinner-small"></span>
+                <button *ngIf="currentStep === 4" (click)="saveProject()" class="btn-primary btn-pay"
+                        [disabled]="loading || !newProject.name">
+                    <span *ngIf="!loading">CREATE PROJECT</span>
+                    <div *ngIf="loading" class="spinner-small"></div>
                 </button>
             </div>
         </div>

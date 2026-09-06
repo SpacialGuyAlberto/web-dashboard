@@ -50,6 +50,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
     @Input() projectGeometry: {lat: number, lng: number}[] | null = null;
 
     @Output() coordinatesChanged = new EventEmitter<SegmentCoordinates>();
+    @Output() centerChanged = new EventEmitter<google.maps.LatLngLiteral>();
 
     @ViewChild('searchInput', { static: false }) searchInputElement!: ElementRef;
     private autocomplete: google.maps.places.Autocomplete | null = null;
@@ -83,6 +84,24 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
     zoom = 17;
     mapTypeId = google.maps.MapTypeId.ROADMAP;
 
+    getCurrentCenter(): google.maps.LatLngLiteral {
+        if (this.map && this.map.googleMap) {
+            const c = this.map.googleMap.getCenter();
+            if (c) return { lat: c.lat(), lng: c.lng() };
+        }
+        return this.center;
+    }
+
+    onCenterChanged() {
+        if (this.map && this.map.googleMap) {
+            const c = this.map.googleMap.getCenter();
+            if (c) {
+                this.center = { lat: c.lat(), lng: c.lng() };
+                this.centerChanged.emit(this.center);
+            }
+        }
+    }
+
     mapOptions: google.maps.MapOptions = {
         disableDefaultUI: false,
         zoomControl: true,
@@ -90,7 +109,8 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         disableDoubleClickZoom: true,
         maxZoom: 20,
         minZoom: 8,
-        gestureHandling: 'greedy'
+        gestureHandling: 'greedy',
+        draggable: true
     };
 
     startPos: google.maps.LatLngLiteral | null = null;
@@ -164,8 +184,16 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         if ((this.isEditing || this.viewOnly) && this.startLat && this.endLat) {
             this.updateMapFromInputs();
         }
-        this.streetViewPos = { lat: this.startLat, lng: this.startLng } ;
-        this.center = { lat: this.startLat, lng: this.startLng };
+        
+        // Provide a fallback center (Berlin) if startLat is not provided
+        this.center = { lat: this.startLat || 52.5200, lng: this.startLng || 13.4050 };
+        this.streetViewPos = { ...this.center };
+        
+        this.mapOptions = {
+            ...this.mapOptions,
+            center: this.center,
+            zoom: this.zoom
+        };
     }
 
     ngAfterViewInit(): void {
@@ -215,6 +243,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
                 const pos = { lat, lng };
 
                 this.center = pos;
+                this.centerChanged.emit(this.center);
                 this.zoom = 18; // Zoom in for precision
 
                 if (this.map && this.map.googleMap) {
