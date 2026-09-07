@@ -1,5 +1,5 @@
 .crews-page-container {
-    @apply min-h-screen bg-gray-50 dark:bg-gray-900 p-6;
+    @apply min-h-screen bg-[#0a0a0c] p-6 lg:p-12 font-sans;
 }
 
 .crews-page-wrapper {
@@ -7,15 +7,15 @@
 }
 
 .page-header {
-    @apply mb-8;
+    @apply mb-12 flex flex-col justify-start items-start border-b border-white/5 pb-8;
 }
 
 .page-header h1 {
-    @apply text-3xl font-bold text-gray-900 dark:text-white;
+    @apply font-display text-5xl font-normal text-white/90 tracking-tight leading-none;
 }
 
 .page-header p {
-    @apply text-gray-600 dark:text-gray-400 mt-2;
+    @apply text-white/40 mt-4 font-sans text-sm;
 }
 
 .crews-grid {
@@ -23,51 +23,51 @@
 }
 
 .crew-card {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200 dark:border-gray-700;
+    @apply bg-[#131415] rounded-xl border border-white/5 overflow-hidden p-6 transition-all hover:border-white/10 flex flex-col;
 }
 
 .crew-card-header {
-    @apply flex justify-between items-start mb-4;
+    @apply flex justify-between items-start mb-6;
 }
 
 .crew-title {
-    @apply text-xl font-semibold text-gray-900 dark:text-white;
+    @apply font-mono text-lg text-white/90 uppercase tracking-wider mb-1;
 }
 
 .crew-subtitle {
-    @apply text-sm text-gray-500 dark:text-gray-400 mt-1;
+    @apply font-mono text-[9px] text-white/40 uppercase tracking-[0.2em];
 }
 
 .crew-status-badge {
-    @apply px-3 py-1 rounded-full text-xs font-medium;
+    @apply px-2 py-0.5 text-[9px] font-mono uppercase tracking-widest rounded border bg-transparent;
 }
 
 .crew-card-details {
-    @apply space-y-3 mb-4;
+    @apply space-y-4 mb-6 flex-1;
 }
 
 .crew-detail-row {
-    @apply flex items-center gap-2 text-sm;
+    @apply flex items-center justify-between border-b border-white/5 pb-2 last:border-0 last:pb-0;
 }
 
 .detail-label {
-    @apply text-gray-500 dark:text-gray-400;
+    @apply text-[9px] font-mono uppercase text-white/40 tracking-[0.2em];
 }
 
 .detail-value {
-    @apply font-medium text-gray-900 dark:text-white;
+    @apply font-mono text-[10px] text-white/80 tracking-widest text-right;
 }
 
 .crew-actions {
-    @apply mt-6 flex gap-2;
+    @apply mt-auto flex gap-3 pt-4 border-t border-white/5;
 }
 
 .btn-view-details {
-    @apply flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium;
+    @apply flex-1 bg-[#161719] text-white/80 px-4 py-2.5 rounded border border-white/10 hover:bg-white/5 transition-colors text-[10px] font-mono uppercase tracking-widest;
 }
 
 .btn-edit-crew {
-    @apply px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300;
+    @apply px-4 py-2.5 bg-transparent border border-white/5 rounded hover:border-[#6938ef]/50 hover:text-[#6938ef] transition-colors text-[10px] font-mono uppercase tracking-widest text-white/40;
 }
 
 .btn-add-crew-wrapper {
@@ -75,32 +75,32 @@
 }
 
 .btn-add-crew {
-    @apply bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md;
+    @apply bg-[#6938ef] text-white px-6 py-3 rounded text-[10px] font-mono uppercase tracking-widest hover:bg-[#5b2bd9] transition-colors shadow-md;
 }
 
 /* Modal */
 .modal-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+    @apply fixed inset-0 bg-[#0a0a0c]/80 flex items-center justify-center z-50 backdrop-blur-sm p-4;
 }
 
 .modal-container {
-    @apply bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full shadow-xl;
+    @apply bg-[#131415] border border-white/10 rounded-xl p-8 max-w-md w-full shadow-2xl;
 }
 
 .modal-container-wide {
-    @apply bg-white dark:bg-gray-800 rounded-lg p-8 max-w-2xl w-full shadow-xl max-h-[90vh] overflow-y-auto;
+    @apply bg-[#131415] border border-white/10 rounded-xl p-8 max-w-3xl w-full shadow-2xl max-h-[90vh] overflow-y-auto;
 }
 
 .modal-header {
-    @apply flex justify-between items-center mb-6;
+    @apply flex justify-between items-center mb-8 border-b border-white/5 pb-4;
 }
 
 .modal-header h2 {
-    @apply text-2xl font-bold text-gray-900 dark:text-white;
+    @apply font-display text-2xl font-normal text-white/90;
 }
 
 .btn-close-icon {
-    @apply text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white;
+    @apply text-white/40 hover:text-white transition-colors text-2xl leading-none;
 }
 
 .modal-body {
@@ -112,55 +112,80 @@
 }
 
 .form-label {
-    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+    @apply block text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-2;
 }
 
 .form-control,
 .form-select {
-    @apply w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+    @apply w-full bg-[#0a0a0c] border border-white/5 rounded-md px-3 py-2 font-mono text-xs text-white/80 focus:ring-1 focus:ring-[#6938ef]/50 focus:border-[#6938ef]/50 transition-all outline-none;
 }
 
 .modal-footer {
-    @apply mt-8 flex justify-end gap-3;
+    @apply mt-8 flex justify-end gap-3 pt-4 border-t border-white/5;
 }
 
 .btn-modal-cancel {
-    @apply px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium;
+    @apply px-4 py-2 border border-white/10 rounded bg-[#161719] hover:bg-white/5 text-[10px] font-mono uppercase tracking-widest text-white/60 transition-colors;
 }
 
 .btn-modal-save {
-    @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50;
+    @apply px-4 py-2 bg-[#6938ef] text-white rounded text-[10px] font-mono uppercase tracking-widest hover:bg-[#5b2bd9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 /* Details Section */
 .details-grid {
-    @apply grid grid-cols-2 gap-6;
+    @apply grid grid-cols-2 md:grid-cols-4 gap-6;
 }
 
 .details-box {
-    @apply bg-gray-50 dark:bg-gray-700 p-4 rounded-lg;
+    @apply bg-[#0a0a0c] border border-white/5 p-4 rounded-lg flex flex-col justify-center;
 }
 
 .details-label {
-    @apply text-sm text-gray-500 dark:text-gray-400 mb-1;
+    @apply text-[9px] font-mono uppercase text-white/40 tracking-[0.2em] mb-2;
 }
 
 .details-value-large {
-    @apply text-lg font-semibold text-gray-900 dark:text-white;
+    @apply font-mono text-lg text-white/90 uppercase tracking-widest;
 }
 
 .details-value-medium {
-    @apply text-lg font-medium text-gray-900 dark:text-white;
+    @apply font-mono text-sm text-white/80 uppercase tracking-widest;
 }
 
 .assignment-section {
-    @apply mt-6;
+    @apply mt-8 border-t border-white/5 pt-6;
 }
 
 .section-title {
-    @apply text-lg font-semibold text-gray-900 dark:text-white mb-3;
+    @apply text-[10px] font-mono uppercase tracking-[0.2em] text-[#6938ef] mb-6 flex items-center gap-4;
+}
+.section-title::after {
+    content: "";
+    @apply h-[1px] flex-1 bg-white/5;
 }
 
 .btn-modal-close-wide {
-    @apply px-6 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-900 dark:hover:bg-gray-600 font-medium transition-colors;
+    @apply px-6 py-2 border border-white/10 rounded bg-[#161719] hover:bg-white/5 text-[10px] font-mono uppercase tracking-widest text-white/60 transition-colors;
+}
+
+/* Worker Cards */
+.workers-grid {
+    @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4;
+}
+
+.worker-card {
+    @apply bg-[#0a0a0c] border border-white/5 rounded-lg p-3 text-center transition-all hover:border-[#6938ef]/50 hover:bg-[#161719];
+}
+
+.worker-photo {
+    @apply w-16 h-16 mx-auto rounded-full object-cover mb-3 border-2 border-white/10 shadow-lg;
+}
+
+.worker-name {
+    @apply font-mono text-[10px] text-white/90 uppercase tracking-widest truncate;
+}
+
+.worker-role {
+    @apply font-mono text-[8px] text-[#2fb080] uppercase tracking-[0.2em] mt-1;
 }

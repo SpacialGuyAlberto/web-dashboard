@@ -53,58 +53,46 @@ export class WorkLogComponent implements OnInit {
     }
 
     loadCrews() {
-        this.fieldService.getCrews().subscribe({
-            next: (data) => this.crews = data,
-            error: (err) => console.error('Error loading crews:', err)
-        });
+        // Mock crews
+        this.crews = [
+            { id: 1, name: 'Alpha Crew', members: 4, currentProject: 'Berlin', location: 'Berlin', status: 'Active' },
+            { id: 2, name: 'Beta Crew', members: 3, currentProject: 'Munich', location: 'Munich', status: 'Active' },
+            { id: 3, name: 'Gamma Crew', members: 5, currentProject: 'Hamburg', location: 'Hamburg', status: 'Active' }
+        ] as any[];
     }
 
     loadSegments() {
-        // Load segments for dropdown
-        this.segmentService.getProjectSegments(1).subscribe(data => {
-            this.segments = data;
-        }); // Mocking project ID 1 for now or fetch all
+        // Mock segments
+        this.segments = [
+            { id: 1, streetName: 'Berlin Sector 4', status: 'IN_PROGRESS' },
+            { id: 2, streetName: 'Munich Central', status: 'PLANNED' }
+        ] as any[];
     }
 
     loadWorkLogs() {
         this.loading = true;
         this.error = '';
 
-        if (this.filterSegmentId) {
-            this.billingService.getWorkLogsBySegment(this.filterSegmentId).subscribe({
-                next: (data) => {
-                    this.workLogs = data;
-                    this.loading = false;
-                },
-                error: (err) => {
-                    this.error = 'Failed to load work logs';
-                    this.loading = false;
-                }
-            });
-        } else if (this.filterCrewId) {
-            this.billingService.getWorkLogsByCrew(this.filterCrewId).subscribe({
-                next: (data) => {
-                    this.workLogs = data;
-                    this.loading = false;
-                },
-                error: (err) => {
-                    this.error = 'Failed to load work logs';
-                    this.loading = false;
-                }
-            });
-        } else {
-            // Load all if no filter
-            this.billingService.getAllWorkLogs().subscribe({
-                next: (data) => {
-                    this.workLogs = data;
-                    this.loading = false;
-                },
-                error: (err) => {
-                    this.error = 'Failed to load work logs';
-                    this.loading = false;
-                }
-            });
-        }
+        // Mock work logs
+        setTimeout(() => {
+            const allLogs: WorkLogDTO[] = [
+                { id: 1, segmentId: 1, segmentName: 'Berlin Sector 4', crewId: 1, crewName: 'Alpha Crew', date: '2026-09-07', metersCompleted: 120, hoursWorked: 8, notes: 'Normal soil conditions', crossingsCompleted: 1, reworkMeters: 0, subcontractorId: 1, subcontractorName: 'FiberTech' },
+                { id: 2, segmentId: 1, segmentName: 'Berlin Sector 4', crewId: 2, crewName: 'Beta Crew', date: '2026-09-06', metersCompleted: 85, hoursWorked: 6, notes: 'Heavy rain in the afternoon', crossingsCompleted: 0, reworkMeters: 5, subcontractorId: 1, subcontractorName: 'FiberTech' },
+                { id: 3, segmentId: 2, segmentName: 'Munich Central', crewId: 3, crewName: 'Gamma Crew', date: '2026-09-05', metersCompleted: 210, hoursWorked: 10, notes: 'Fast progress on asphalt', crossingsCompleted: 2, reworkMeters: 0, subcontractorId: 2, subcontractorName: 'AlphaBuild' },
+                { id: 4, segmentId: 1, segmentName: 'Berlin Sector 4', crewId: 1, crewName: 'Alpha Crew', date: '2026-09-04', metersCompleted: 95, hoursWorked: 8, notes: 'Found underground cables, delayed', crossingsCompleted: 0, reworkMeters: 0, subcontractorId: 1, subcontractorName: 'FiberTech' },
+                { id: 5, segmentId: 2, segmentName: 'Munich Central', crewId: 2, crewName: 'Beta Crew', date: '2026-09-03', metersCompleted: 150, hoursWorked: 8, notes: 'Completed crossing #2', crossingsCompleted: 1, reworkMeters: 0, subcontractorId: 1, subcontractorName: 'FiberTech' }
+            ];
+
+            if (this.filterSegmentId) {
+                this.workLogs = allLogs.filter(log => log.segmentId === this.filterSegmentId);
+            } else if (this.filterCrewId) {
+                this.workLogs = allLogs.filter(log => log.crewId === this.filterCrewId);
+            } else {
+                this.workLogs = allLogs;
+            }
+            
+            this.loading = false;
+        }, 300);
     }
 
     openCreateModal() {

@@ -119,4 +119,37 @@ export class SubcontractorsComponent implements OnInit {
             });
         }
     }
+
+    // --- Details Modal ---
+    showDetailsModal = false;
+    selectedSubcontractor: any = null;
+    mockContracts: any[] = [];
+    mockProjects: any[] = [];
+    totalHours: number = 0;
+
+    openSubcontractorDetails(sub: Subcontractor) {
+        this.selectedSubcontractor = sub;
+        
+        // Generate mock data for the detailed view
+        this.totalHours = Math.floor(Math.random() * 5000) + 1200; // Mock total hours
+        
+        this.mockContracts = [
+            { id: 'CTR-2026-001', name: 'Master Services Agreement 2026', value: '€250,000', status: 'Active', expiryDate: '2026-12-31' },
+            { id: 'CTR-2025-089', name: 'Berlin Fiber Drop Q4', value: '€75,000', status: 'Completed', expiryDate: '2025-12-01' }
+        ];
+
+        this.mockProjects = [
+            { name: 'Berlin Sector 4 Expansion', role: 'Main Fiber Installer', progress: 65 },
+            { name: 'Munich Central Upgrade', role: 'Trenching Support', progress: 30 }
+        ];
+
+        this.showDetailsModal = true;
+    }
+
+    closeSubcontractorDetails() {
+        this.showDetailsModal = false;
+        this.selectedSubcontractor = null;
+        this.mockContracts = [];
+        this.mockProjects = [];
+    }
 }

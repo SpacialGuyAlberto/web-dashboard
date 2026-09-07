@@ -3,7 +3,7 @@
         <!-- Header -->
         <div class="page-header">
             <h1>Field Crews</h1>
-            <p>Manage field deployment teams</p>
+            <p>Manage field deployment teams and their assignments</p>
         </div>
 
         <!-- Crews Grid -->
@@ -23,15 +23,15 @@
                 <!-- Crew Details -->
                 <div class="crew-card-details">
                     <div class="crew-detail-row">
-                        <span class="detail-label">👥 Members:</span>
+                        <span class="detail-label">Members</span>
                         <span class="detail-value">{{ crew.members }}</span>
                     </div>
                     <div class="crew-detail-row">
-                        <span class="detail-label">📍 Location:</span>
+                        <span class="detail-label">Location</span>
                         <span class="detail-value">{{ crew.location }}</span>
                     </div>
                     <div class="crew-detail-row">
-                        <span class="detail-label">🔨 Project:</span>
+                        <span class="detail-label">Project</span>
                         <span class="detail-value">{{ crew.currentProject }}</span>
                     </div>
                 </div>
@@ -59,8 +59,12 @@
     <!-- Create/Edit Crew Modal -->
     <div *ngIf="showCreateModal" class="modal-overlay">
         <div class="modal-container">
-            <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{{ isEditing ? 'Edit Crew' : 'New Field
-                Crew' }}</h2>
+            <div class="modal-header">
+                <h2>{{ isEditing ? 'Edit Crew' : 'New Field Crew' }}</h2>
+                <button (click)="closeCreateModal()" class="btn-close-icon">
+                    <span>&times;</span>
+                </button>
+            </div>
 
             <div class="modal-body">
                 <div class="form-group">
@@ -116,9 +120,9 @@
     <div *ngIf="showDetailsModal && selectedCrew" class="modal-overlay">
         <div class="modal-container-wide">
             <div class="modal-header">
-                <h2>Crew Details</h2>
+                <h2>Crew Overview</h2>
                 <button (click)="closeDetailsModal()" class="btn-close-icon">
-                    <span class="text-2xl">&times;</span>
+                    <span>&times;</span>
                 </button>
             </div>
 
@@ -134,12 +138,12 @@
                         <p class="details-value-medium">{{ selectedCrew.leader }}</p>
                     </div>
                     <div class="details-box">
-                        <p class="details-label">Members</p>
-                        <p class="details-value-medium">{{ selectedCrew.members }} people</p>
+                        <p class="details-label">Total Members</p>
+                        <p class="details-value-medium">{{ selectedCrew.members }} People</p>
                     </div>
-                    <div class="details-box">
+                    <div class="details-box items-start justify-center">
                         <p class="details-label">Status</p>
-                        <span [class]="getStatusColor(selectedCrew.status)" class="crew-status-badge inline-block mt-1">
+                        <span [class]="getStatusColor(selectedCrew.status)" class="crew-status-badge mt-1">
                             {{ getStatusText(selectedCrew.status) }}
                         </span>
                     </div>
@@ -159,11 +163,85 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Workers -->
+                <div class="assignment-section">
+                    <h3 class="section-title">Team Members</h3>
+                    <div class="workers-grid">
+                        <div class="worker-card cursor-pointer" *ngFor="let worker of mockWorkers" (click)="openWorkerDetails(worker)">
+                            <img [src]="worker.photoUrl" [alt]="worker.name" class="worker-photo">
+                            <h4 class="worker-name" [title]="worker.name">{{ worker.name }}</h4>
+                            <p class="worker-role">{{ worker.role }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="modal-footer">
                 <button (click)="closeDetailsModal()" class="btn-modal-close-wide">
-                    Close
+                    Close Details
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Worker Details Modal -->
+    <div *ngIf="showWorkerModal && selectedWorker" class="modal-overlay" style="z-index: 60;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>Worker Profile</h2>
+                <button (click)="closeWorkerDetails()" class="btn-close-icon">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body space-y-6">
+                <!-- Profile Header -->
+                <div class="flex items-center gap-6">
+                    <img [src]="selectedWorker.photoUrl" [alt]="selectedWorker.name" class="w-24 h-24 rounded-full border-2 border-white/10 shadow-xl object-cover">
+                    <div>
+                        <h3 class="font-display text-2xl text-white/90">{{ selectedWorker.name }}</h3>
+                        <p class="font-mono text-[10px] text-[#2fb080] uppercase tracking-[0.2em] mt-1">{{ selectedWorker.role }}</p>
+                        <span class="inline-block mt-3 px-2 py-0.5 text-[9px] font-mono uppercase tracking-widest rounded border" 
+                            [ngClass]="selectedWorker.status === 'Working' ? 'text-[#2fb080] border-[#2fb080]/30' : 'text-amber-400 border-amber-400/30'">
+                            {{ selectedWorker.status }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Current Assignment -->
+                <div class="border-t border-white/5 pt-4">
+                    <h4 class="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-3">Current Assignment</h4>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="font-mono text-[10px] text-white/40 tracking-widest">Project:</span>
+                            <span class="font-mono text-[10px] text-white/80">{{ selectedWorker.currentProject }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-mono text-[10px] text-white/40 tracking-widest">Location:</span>
+                            <span class="font-mono text-[10px] text-white/80">{{ selectedWorker.location }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-mono text-[10px] text-white/40 tracking-widest">Hours this week:</span>
+                            <span class="font-mono text-[10px] text-white/80">{{ selectedWorker.hoursLogged }} hrs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Past Projects -->
+                <div class="border-t border-white/5 pt-4">
+                    <h4 class="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-3">Past Projects</h4>
+                    <ul class="space-y-2">
+                        <li *ngFor="let project of selectedWorker.pastProjects" class="font-mono text-[10px] text-white/60 tracking-widest flex items-center gap-2">
+                            <span class="text-white/20">■</span> {{ project }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button (click)="closeWorkerDetails()" class="btn-modal-cancel w-full text-center justify-center flex">
+                    Back to Crew Details
                 </button>
             </div>
         </div>

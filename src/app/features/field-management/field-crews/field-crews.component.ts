@@ -32,10 +32,10 @@ export class FieldCrewsComponent {
 
   getStatusColor(status: string): string {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'idle': return 'bg-yellow-100 text-yellow-800';
-      case 'off-duty': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'active': return 'text-[#2fb080] border-[#2fb080]/30';
+      case 'idle': return 'text-amber-400 border-amber-400/30';
+      case 'off-duty': return 'text-white/40 border-white/10';
+      default: return 'text-white/40 border-white/10';
     }
   }
 
@@ -118,8 +118,29 @@ export class FieldCrewsComponent {
   // Details modal
   showDetailsModal = false;
   selectedCrew: FieldCrew | null = null;
+  mockWorkers: any[] = [];
+  
+  // Worker modal
+  showWorkerModal = false;
+  selectedWorker: any = null;
 
   openDetailsModal(crew: FieldCrew) {
+    // Generate mock workers based on number of members
+    this.mockWorkers = Array.from({ length: crew.members || 4 }).map((_, i) => ({
+      name: `Worker ${i + 1}`,
+      role: i === 0 ? 'Foreman' : 'Technician',
+      photoUrl: `https://i.pravatar.cc/150?u=crew_${crew.id}_worker_${i}`,
+      currentProject: crew.currentProject,
+      location: crew.location,
+      status: i % 3 === 0 ? 'On Break' : 'Working',
+      pastProjects: [
+        'Berlin Sector 4 Expansion',
+        'Munich Central Fiber Drop',
+        'Hamburg Node Maintenance'
+      ],
+      hoursLogged: Math.floor(Math.random() * 20) + 30
+    }));
+
     // Fetch fresh crew details from backend
     this.fieldService.getCrewById(crew.id).subscribe({
       next: (freshCrew) => {
@@ -144,5 +165,16 @@ export class FieldCrewsComponent {
   closeDetailsModal() {
     this.showDetailsModal = false;
     this.selectedCrew = null;
+    this.mockWorkers = [];
+  }
+
+  openWorkerDetails(worker: any) {
+    this.selectedWorker = worker;
+    this.showWorkerModal = true;
+  }
+
+  closeWorkerDetails() {
+    this.showWorkerModal = false;
+    this.selectedWorker = null;
   }
 }

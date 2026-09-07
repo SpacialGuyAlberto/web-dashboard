@@ -27,11 +27,18 @@
                         <option *ngFor="let crew of crews" [ngValue]="crew.id">{{ crew.name }}</option>
                     </select>
                 </div>
-                <div class="filter-actions">
-                    <button (click)="applyFilters()" class="btn-filter-apply">
+                <div>
+                    <label class="filter-label">Segment</label>
+                    <select [(ngModel)]="filterSegmentId" class="filter-select">
+                        <option [ngValue]="null">All Segments</option>
+                        <option *ngFor="let segment of segments" [ngValue]="segment.id">{{ segment.streetName }}</option>
+                    </select>
+                </div>
+                <div class="filter-actions h-[36px]">
+                    <button (click)="applyFilters()" class="btn-filter-apply h-full">
                         Apply
                     </button>
-                    <button (click)="clearFilters()" class="btn-filter-clear">
+                    <button (click)="clearFilters()" class="btn-filter-clear h-full">
                         Clear
                     </button>
                 </div>
@@ -54,17 +61,17 @@
                         <th class="table-th">Crew</th>
                         <th class="table-th">Meters</th>
                         <th class="table-th">Hours</th>
-                        <th class="table-th">Actions</th>
+                        <th class="table-th text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="tbody-main">
                     <tr *ngFor="let log of workLogs" class="table-row-hover">
                         <td class="table-td">{{ log.date }}</td>
                         <td class="table-td">{{ log.segmentName }}</td>
-                        <td class="table-td">{{ log.crewName }}</td>
-                        <td class="table-td">{{ log.metersCompleted }}m</td>
+                        <td class="table-td text-white/40">{{ log.crewName }}</td>
+                        <td class="table-td text-[#6938ef]">{{ log.metersCompleted }}m</td>
                         <td class="table-td">{{ log.hoursWorked }}h</td>
-                        <td class="table-td link-action">View</td>
+                        <td class="table-td link-action text-right">View Log</td>
                     </tr>
                 </tbody>
             </table>
@@ -104,6 +111,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">Log Work</h2>
+                <button (click)="closeModal()" class="text-white/40 hover:text-white transition-colors text-2xl leading-none">&times;</button>
             </div>
 
             <div class="modal-body">
@@ -169,7 +177,7 @@
 
                     <div class="form-field">
                         <label class="field-label">Notes</label>
-                        <textarea [(ngModel)]="newWorkLog.notes" rows="3" class="form-textarea"></textarea>
+                        <textarea [(ngModel)]="newWorkLog.notes" rows="3" class="form-textarea" placeholder="Add any details..."></textarea>
                     </div>
                 </div>
             </div>
@@ -178,7 +186,7 @@
                 <button (click)="closeModal()" class="btn-secondary">
                     Cancel
                 </button>
-                <button (click)="saveWorkLog()" class="btn-save" [disabled]="!newWorkLog.crewId">
+                <button (click)="saveWorkLog()" class="btn-save" [disabled]="!newWorkLog.crewId || !newWorkLog.segmentId">
                     Save Log
                 </button>
             </div>
