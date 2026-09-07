@@ -1,5 +1,5 @@
 .workflows-container {
-    @apply min-h-screen bg-gray-50 dark:bg-gray-900 p-6;
+    @apply min-h-screen bg-[#0a0a0c] p-6 lg:p-12 font-sans;
 }
 
 .max-container {
@@ -8,64 +8,64 @@
 
 /* Header Section */
 .page-header {
-    @apply mb-8;
+    @apply mb-12 flex flex-col justify-start items-start border-b border-white/5 pb-8;
 }
 
 .header-title {
-    @apply text-3xl font-bold text-gray-900 dark:text-white;
+    @apply font-display text-5xl font-normal text-white/90 tracking-tight leading-none;
 }
 
 .header-subtitle {
-    @apply text-gray-600 dark:text-gray-400 mt-2;
+    @apply text-white/40 mt-4 font-sans text-sm;
 }
 
 /* Table Section */
 .table-wrapper {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700;
+    @apply bg-[#131415] rounded-xl border border-white/5 overflow-hidden;
 }
 
 .data-table {
-    @apply min-w-full divide-y divide-gray-200 dark:divide-gray-700;
+    @apply min-w-full divide-y divide-white/5 text-left;
 }
 
 .thead-light {
-    @apply bg-gray-50 dark:bg-gray-700;
+    @apply bg-[#161719];
 }
 
 .table-th {
-    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider;
+    @apply px-6 py-4 font-mono text-[9px] uppercase tracking-[0.2em] text-white/40;
 }
 
 .tbody-main {
-    @apply bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700;
+    @apply divide-y divide-white/5;
 }
 
 .table-row-hover {
-    @apply hover:bg-gray-50 dark:hover:bg-gray-700;
+    @apply hover:bg-white/5 transition-colors;
 }
 
 .table-td {
-    @apply px-6 py-4 whitespace-nowrap;
+    @apply px-6 py-5 whitespace-nowrap;
 }
 
 .projectName-cell {
-    @apply text-sm font-medium text-gray-900 dark:text-white;
+    @apply font-mono text-xs text-white/80 uppercase tracking-wider;
 }
 
 .currentStep-cell {
-    @apply text-sm text-gray-900 dark:text-white;
+    @apply font-mono text-[10px] text-[#6938ef] uppercase tracking-widest;
 }
 
 .assignedTo-cell {
-    @apply text-sm text-gray-500 dark:text-gray-400;
+    @apply font-mono text-[10px] text-white/60 tracking-widest;
 }
 
 .status-badge {
-    @apply px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full;
+    @apply px-2 py-0.5 text-[9px] font-mono uppercase tracking-widest rounded border;
 }
 
 .dueDate-cell {
-    @apply text-sm text-gray-500 dark:text-gray-400;
+    @apply font-mono text-[10px] text-white/60 tracking-widest;
 }
 
 .actions-cell {
@@ -73,11 +73,11 @@
 }
 
 .btn-view {
-    @apply text-blue-600 hover:text-blue-900 mr-4;
+    @apply font-mono text-[10px] uppercase tracking-widest text-white/40 hover:text-white transition-colors mr-4;
 }
 
 .btn-edit-action {
-    @apply text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white;
+    @apply font-mono text-[10px] uppercase tracking-widest text-[#6938ef] hover:text-[#8b5cf6] transition-colors bg-transparent border-none cursor-pointer;
 }
 
 /* Footer Actions */
@@ -86,20 +86,20 @@
 }
 
 .btn-primary-lg {
-    @apply bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md;
+    @apply bg-[#6938ef] text-white px-6 py-3 rounded text-[10px] font-mono uppercase tracking-widest hover:bg-[#5b2bd9] transition-colors shadow-md;
 }
 
 /* Modal Section */
 .modal-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+    @apply fixed inset-0 bg-[#0a0a0c]/80 flex items-center justify-center z-50 backdrop-blur-sm;
 }
 
 .modal-content {
-    @apply bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full shadow-xl;
+    @apply bg-[#131415] border border-white/10 rounded-xl p-8 max-w-md w-full shadow-2xl;
 }
 
 .modal-title {
-    @apply text-2xl font-bold mb-6 text-gray-900 dark:text-white;
+    @apply font-display text-2xl font-normal text-white/90 mb-6;
 }
 
 .form-stack {
@@ -111,12 +111,12 @@
 }
 
 .field-label {
-    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+    @apply block text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-2;
 }
 
 .form-input,
 .form-select {
-    @apply w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+    @apply w-full bg-[#0a0a0c] border border-white/5 rounded-md px-3 py-2 font-mono text-xs text-white/80 focus:ring-1 focus:ring-[#6938ef]/50 focus:border-[#6938ef]/50 transition-all outline-none;
 }
 
 .modal-footer {
@@ -124,9 +124,9 @@
 }
 
 .btn-secondary {
-    @apply px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium;
+    @apply px-4 py-2 border border-white/10 rounded bg-[#161719] hover:bg-white/5 text-[10px] font-mono uppercase tracking-widest text-white/60 transition-colors;
 }
 
 .btn-save {
-    @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50;
+    @apply px-4 py-2 bg-[#6938ef] text-white rounded text-[10px] font-mono uppercase tracking-widest hover:bg-[#5b2bd9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
 }

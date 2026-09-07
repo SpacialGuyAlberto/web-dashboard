@@ -11,8 +11,8 @@
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col overflow-hidden relative">
         <!-- Top Header -->
-        <header *ngIf="authService.currentUser$ | async" class="bg-[#131415]/80 backdrop-blur-md z-30 border-b border-white/5 relative">
-            <div class="flex items-center justify-between p-4">
+        <header *ngIf="authService.currentUser$ | async" class="bg-[#131415]/80 backdrop-blur-md z-30 border-b border-white/5 relative h-[80px] flex items-center">
+            <div class="flex items-center justify-between w-full px-4 lg:px-6">
                 <button (click)="toggleSidebar()"
                     class="lg:hidden p-2 rounded-md text-white/50 hover:bg-white/5 hover:text-white transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GoogleMapsModule, GoogleMap, MapGroundOverlay } from '@angular/google-maps';
@@ -27,7 +27,87 @@ export class GisViewerComponent implements AfterViewInit {
     center: google.maps.LatLngLiteral = { lat: 52.5200, lng: 13.4050 };
     zoom = 14;
     mapOptions: google.maps.MapOptions = {
-        mapTypeId: google.maps.MapTypeId.ROADMAP
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        styles: [
+            { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+            { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+            { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+            {
+              featureType: "administrative.locality",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#d59563" }],
+            },
+            {
+              featureType: "poi",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#d59563" }],
+            },
+            {
+              featureType: "poi.park",
+              elementType: "geometry",
+              stylers: [{ color: "#263c3f" }],
+            },
+            {
+              featureType: "poi.park",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#6b9a76" }],
+            },
+            {
+              featureType: "road",
+              elementType: "geometry",
+              stylers: [{ color: "#38414e" }],
+            },
+            {
+              featureType: "road",
+              elementType: "geometry.stroke",
+              stylers: [{ color: "#212a37" }],
+            },
+            {
+              featureType: "road",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#9ca5b3" }],
+            },
+            {
+              featureType: "road.highway",
+              elementType: "geometry",
+              stylers: [{ color: "#746855" }],
+            },
+            {
+              featureType: "road.highway",
+              elementType: "geometry.stroke",
+              stylers: [{ color: "#1f2835" }],
+            },
+            {
+              featureType: "road.highway",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#f3d19c" }],
+            },
+            {
+              featureType: "transit",
+              elementType: "geometry",
+              stylers: [{ color: "#2f3948" }],
+            },
+            {
+              featureType: "transit.station",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#d59563" }],
+            },
+            {
+              featureType: "water",
+              elementType: "geometry",
+              stylers: [{ color: "#17263c" }],
+            },
+            {
+              featureType: "water",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#515c6d" }],
+            },
+            {
+              featureType: "water",
+              elementType: "labels.text.stroke",
+              stylers: [{ color: "#17263c" }],
+            },
+          ]
     };
 
     // Digital Plan Room State
@@ -44,10 +124,13 @@ export class GisViewerComponent implements AfterViewInit {
         clickable: false
     };
 
-    constructor(private infrastructureService: InfrastructureService) { }
+    constructor(private infrastructureService: InfrastructureService, private cdr: ChangeDetectorRef) { }
 
     ngAfterViewInit(): void {
-        this.isLoading = false;
+        setTimeout(() => {
+            this.isLoading = false;
+            this.cdr.detectChanges();
+        }, 500);
     }
 
     togglePlanOverlay(show: boolean) {
