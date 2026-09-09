@@ -1,0 +1,155 @@
+<div class="pop-dashboard-container h-full w-full bg-[#0a0a0c] overflow-y-auto overflow-x-hidden p-8 flex flex-col gap-8 custom-scrollbar relative">
+  <!-- Ambient background -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden opacity-50">
+    <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-[#6938ef]/10 blur-[120px] rounded-full"></div>
+    <div class="absolute top-[40%] -right-[10%] w-[40%] h-[60%] bg-[#2fb080]/10 blur-[150px] rounded-full"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="flex items-start justify-between relative z-10 shrink-0">
+    <div class="flex flex-col gap-2">
+      <button (click)="goBack()" class="btn-back text-white/40 flex items-center gap-2 text-[9px] font-mono uppercase tracking-[0.2em] transition-all mb-2 hover:text-white bg-transparent border-none cursor-pointer p-0">
+        ← Back to Cluster Map
+      </button>
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-[#6938ef]/20 border border-[#6938ef]/30 flex items-center justify-center text-[#6938ef]">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L22 7l-10 5L2 7l10-5zm0 15l-10-5v5l10 5 10-5v-5l-10 5zm0-5l-10-5v5l10 5 10-5v-5l-10 5z"/></svg>
+        </div>
+        <div>
+          <h1 class="font-display text-4xl font-normal text-white/90 tracking-tight leading-none">{{ popData.name }}</h1>
+          <p class="font-mono text-xs text-white/40 uppercase tracking-widest mt-2">Point of Presence (POP) ID: {{ popData.id }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex flex-col items-end gap-3">
+      <span class="px-3 py-1.5 rounded-md text-[10px] font-mono uppercase tracking-widest border" [ngClass]="{
+        'bg-[#2fb080]/10 text-[#2fb080] border-[#2fb080]/20': popData.status === 'ACTIVE',
+        'bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/20': popData.status === 'ERROR'
+      }">
+        {{ popData.status }}
+      </span>
+      <span class="text-[10px] font-mono text-white/30 uppercase tracking-widest">Last Maintenance: {{ popData.lastMaintenance | date:'mediumDate' }}</span>
+    </div>
+  </div>
+
+  <!-- KPI Grid -->
+  <div class="grid grid-cols-3 gap-6 relative z-10 shrink-0">
+    <!-- Capacity Card -->
+    <div class="glass-panel backdrop-blur-xl bg-black/40 border border-white/10 rounded-2xl p-6 relative overflow-hidden group hover:border-white/20 transition-all duration-300">
+      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>
+      </div>
+      <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] text-white/50 mb-4">Total Capacity</h3>
+      <div class="flex items-baseline gap-2 mb-2">
+        <span class="text-3xl font-mono text-white">{{ popData.capacity.used | number }}</span>
+        <span class="text-sm font-mono text-white/40">/ {{ popData.capacity.total | number }}</span>
+      </div>
+      <p class="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-4">{{ popData.capacity.unit }} used</p>
+      
+      <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-[#6938ef] to-[#2fb080]" [style.width.%]="(popData.capacity.used / popData.capacity.total) * 100"></div>
+      </div>
+    </div>
+
+    <!-- Hardware/Env Card -->
+    <div class="glass-panel backdrop-blur-xl bg-black/40 border border-white/10 rounded-2xl p-6 relative overflow-hidden group hover:border-white/20 transition-all duration-300">
+      <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] text-white/50 mb-4">Hardware & Environment</h3>
+      <div class="grid grid-cols-2 gap-4 mt-2">
+        <div class="flex flex-col gap-1">
+          <span class="text-xl font-mono text-white">{{ popData.hardware.racks }}</span>
+          <span class="text-[9px] font-mono text-white/40 uppercase tracking-widest">Active Racks</span>
+        </div>
+        <div class="flex flex-col gap-1">
+          <span class="text-xl font-mono text-white">{{ popData.hardware.activeSwitches }}</span>
+          <span class="text-[9px] font-mono text-white/40 uppercase tracking-widest">L3 Switches</span>
+        </div>
+        <div class="flex flex-col gap-1 col-span-2 mt-2">
+          <span class="text-xl font-mono text-[#fbbf24]">{{ popData.hardware.temp }}</span>
+          <span class="text-[9px] font-mono text-white/40 uppercase tracking-widest">Ambient Temp (Nominal)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bandwidth Card -->
+    <div class="glass-panel backdrop-blur-xl bg-black/40 border border-white/10 rounded-2xl p-6 relative overflow-hidden group hover:border-white/20 transition-all duration-300">
+      <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] text-white/50 mb-4">Uplink Telemetry</h3>
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex flex-col">
+          <span class="text-lg font-mono text-[#2fb080] flex items-center gap-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            {{ popData.bandwidth.up }}
+          </span>
+          <span class="text-[9px] font-mono text-white/30 uppercase tracking-widest mt-1">TX Peak</span>
+        </div>
+        <div class="flex flex-col items-end">
+          <span class="text-lg font-mono text-[#6938ef] flex items-center gap-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+            {{ popData.bandwidth.down }}
+          </span>
+          <span class="text-[9px] font-mono text-white/30 uppercase tracking-widest mt-1">RX Peak</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full border-2 border-[#2fb080]/30 flex items-center justify-center relative">
+           <svg class="absolute inset-0 w-full h-full -rotate-90 text-[#2fb080]" viewBox="0 0 36 36">
+             <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="42, 100" />
+           </svg>
+           <span class="text-[10px] font-mono text-white">{{ popData.bandwidth.usage }}</span>
+        </div>
+        <span class="text-[9px] font-mono text-white/40 uppercase tracking-widest leading-tight">Average<br>Utilization</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connected DPs Table -->
+  <div class="flex-1 flex flex-col glass-panel backdrop-blur-xl bg-black/40 border border-white/10 rounded-2xl overflow-hidden relative z-10 min-h-[300px]">
+    <div class="p-6 border-b border-white/5 flex items-center justify-between shrink-0">
+      <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] text-white/50">Connected Netzverteiler (DPs)</h3>
+      <span class="text-[9px] bg-white/10 text-white/50 px-2 py-0.5 rounded-full font-mono uppercase tracking-widest">Total: {{ popData.connectedDPs.length }}</span>
+    </div>
+    
+    <div class="flex-1 overflow-auto">
+      <table class="w-full text-left border-collapse">
+        <thead class="sticky top-0 bg-[#0a0a0c]/95 backdrop-blur-sm z-10">
+          <tr>
+            <th class="py-3 px-6 text-[9px] font-mono uppercase tracking-widest text-white/40 font-normal">DP Node</th>
+            <th class="py-3 px-6 text-[9px] font-mono uppercase tracking-widest text-white/40 font-normal">Status</th>
+            <th class="py-3 px-6 text-[9px] font-mono uppercase tracking-widest text-white/40 font-normal">Active Connections</th>
+            <th class="py-3 px-6 text-[9px] font-mono uppercase tracking-widest text-white/40 font-normal text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="font-mono text-[11px] text-white/80">
+          @for (dp of popData.connectedDPs; track dp.id) {
+            <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group cursor-pointer">
+              <td class="py-4 px-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 rounded-full" [style.backgroundColor]="dp.status === 'ACTIVE' ? '#2fb080' : '#ffffff40'"></div>
+                  <div class="flex flex-col">
+                    <span class="text-white group-hover:text-[#2fb080] transition-colors">{{ dp.name }}</span>
+                    <span class="text-[9px] text-white/30 uppercase mt-0.5">{{ dp.id }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="py-4 px-6">
+                <span class="px-1.5 py-0.5 rounded text-[8px] uppercase tracking-widest border" [ngClass]="{
+                  'bg-[#2fb080]/10 text-[#2fb080] border-[#2fb080]/20': dp.status === 'ACTIVE',
+                  'bg-white/5 text-white/40 border-white/10': dp.status === 'PLANNED'
+                }">{{ dp.status }}</span>
+              </td>
+              <td class="py-4 px-6">
+                <span class="text-white/70">{{ dp.connections }}</span>
+                <span class="text-white/30 ml-1 text-[9px]">ONUs</span>
+              </td>
+              <td class="py-4 px-6 text-right">
+                <button class="text-[9px] uppercase tracking-widest text-white/40 hover:text-white border border-white/10 hover:border-white/30 bg-transparent px-3 py-1.5 rounded transition-all cursor-pointer">
+                  View DP
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

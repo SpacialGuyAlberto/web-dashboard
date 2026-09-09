@@ -26,6 +26,8 @@ export const routes: Routes = [
             { path: 'projects', component: ProjectsComponent },
             { path: 'project-details', loadComponent: () => import('./features/projects/project-details/project-details.component').then(m => m.ProjectDetailsComponent) },
             { path: 'project-details/clusters/:clusterId/areas', loadComponent: () => import('./features/clusters/cluster-area-dashboard/cluster-area-dashboard.component').then(m => m.ClusterAreaDashboardComponent) },
+            { path: 'project-details/clusters/:clusterId/pop/:popId', loadComponent: () => import('./features/clusters/nodes/pop-dashboard/pop-dashboard').then(m => m.PopDashboard) },
+            { path: 'project-details/clusters/:clusterId/dp/:dpId', loadComponent: () => import('./features/clusters/nodes/dp-dashboard/dp-dashboard').then(m => m.DpDashboard) },
             { path: 'segments', component: SegmentsComponent },
             { path: 'subcontractors', component: SubcontractorsComponent },
             { path: 'schedule', component: ScheduleComponent },

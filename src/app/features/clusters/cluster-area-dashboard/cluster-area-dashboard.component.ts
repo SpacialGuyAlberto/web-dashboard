@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ViewChild, HostListener, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser, CommonModule, KeyValuePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GoogleMapsModule, GoogleMap } from '@angular/google-maps';
 
@@ -72,6 +72,13 @@ export class ClusterAreaDashboardComponent implements OnInit {
   viewMode: 'map-focused' | 'split' | 'data-focused' = 'map-focused';
   panelPosition: 'left' | 'right' | 'bottom' = 'left';
 
+  // Resizing state
+  isResizing = false;
+  panelWidth = 450;
+  panelHeight = 350;
+  minPanelWidth = 300;
+  minPanelHeight = 200;
+
   // Accordion state
   expandedGroup: string = 'POP';
 
@@ -84,27 +91,6 @@ export class ClusterAreaDashboardComponent implements OnInit {
     };
   }
 
-  get contentPanelClasses() {
-    const base = 'glass-panel flex flex-col transition-all duration-500 ease-in-out backdrop-blur-2xl bg-[#0a0a0c]/90 border-white/10 shadow-2xl z-10 ';
-    
-    if (this.viewMode === 'map-focused') {
-      if (this.panelPosition === 'left') return base + 'absolute left-0 top-0 bottom-0 w-[400px] border-r';
-      if (this.panelPosition === 'right') return base + 'absolute right-0 top-0 bottom-0 w-[400px] border-l';
-      if (this.panelPosition === 'bottom') return base + 'absolute left-0 right-0 bottom-0 h-[350px] border-t';
-    }
-    
-    if (this.viewMode === 'split') {
-      if (this.panelPosition === 'bottom') return base + 'flex-1 h-auto w-full relative border-t';
-      return base + 'flex-1 w-auto relative ' + (this.panelPosition === 'left' ? 'border-r' : 'border-l');
-    }
-
-    if (this.viewMode === 'data-focused') {
-      return base + 'flex-1 w-full h-full relative';
-    }
-
-    return base;
-  }
-
   projections = {
     totalBudget: 450000,
     spent: 125000,
@@ -115,7 +101,8 @@ export class ClusterAreaDashboardComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit() {
@@ -156,12 +143,50 @@ export class ClusterAreaDashboardComponent implements OnInit {
 
   setViewMode(mode: 'map-focused' | 'split' | 'data-focused') {
     this.viewMode = mode;
+    
+    if (isPlatformBrowser(this.platformId)) {
+      if (mode === 'map-focused') {
+        this.panelWidth = 450;
+        this.panelHeight = 350;
+      } else if (mode === 'split') {
+        this.panelWidth = window.innerWidth * 0.45;
+        this.panelHeight = window.innerHeight * 0.5;
+      }
+    }
+    
     this.triggerMapResize();
   }
 
   setPanelPosition(pos: 'left' | 'right' | 'bottom') {
     this.panelPosition = pos;
     this.triggerMapResize();
+  }
+
+  onResizeStart(event: MouseEvent) {
+    if (this.viewMode === 'data-focused') return;
+    this.isResizing = true;
+    event.preventDefault(); // Prevent text selection
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent) {
+    if (!this.isResizing || !isPlatformBrowser(this.platformId)) return;
+
+    if (this.panelPosition === 'left') {
+      this.panelWidth = Math.max(this.minPanelWidth, event.clientX);
+    } else if (this.panelPosition === 'right') {
+      this.panelWidth = Math.max(this.minPanelWidth, window.innerWidth - event.clientX);
+    } else if (this.panelPosition === 'bottom') {
+      this.panelHeight = Math.max(this.minPanelHeight, window.innerHeight - event.clientY);
+    }
+  }
+
+  @HostListener('document:mouseup')
+  onMouseUp() {
+    if (this.isResizing) {
+      this.isResizing = false;
+      this.triggerMapResize();
+    }
   }
 
   toggleGroup(groupName: string) {
@@ -237,6 +262,19 @@ export class ClusterAreaDashboardComponent implements OnInit {
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  onNodeClick(element: any) {
+    if (element.type === 'POP') {
+      this.router.navigate(['/project-details/clusters', this.clusterId, 'pop', element.id], {
+        queryParams: { projectId: this.projectId, projectName: this.projectName }
+      });
+    } else if (element.type === 'DP') {
+      this.router.navigate(['/project-details/clusters', this.clusterId, 'dp', element.id], {
+        queryParams: { projectId: this.projectId, projectName: this.projectName }
+      });
+    }
+    // You could add logic here for ACOMETIDA and HEUP later
   }
 
   goBack() {

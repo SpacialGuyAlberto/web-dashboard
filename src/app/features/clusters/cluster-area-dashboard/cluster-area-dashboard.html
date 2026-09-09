@@ -28,8 +28,36 @@
     </google-map>
   </div>
 
+  <!-- Resizer (only visible if not data-focused) -->
+  <div class="resizer flex items-center justify-center relative" *ngIf="viewMode !== 'data-focused'"
+       (mousedown)="onResizeStart($event)"
+       [ngClass]="{
+         'cursor-col-resize w-2 -mx-1 hover:bg-white/5 transition-colors z-20': panelPosition === 'left' || panelPosition === 'right',
+         'cursor-row-resize h-2 -my-1 hover:bg-white/5 transition-colors z-20': panelPosition === 'bottom'
+       }">
+     <div class="absolute flex items-center justify-center bg-[#131415] border border-white/10 rounded-full shadow-lg"
+          [ngClass]="{
+            'top-1/2 -translate-y-1/2 -left-3 w-6 h-10': panelPosition === 'right',
+            'top-1/2 -translate-y-1/2 -right-3 w-6 h-10': panelPosition === 'left',
+            'left-1/2 -translate-x-1/2 -top-3 w-10 h-6': panelPosition === 'bottom'
+          }">
+        <svg *ngIf="panelPosition !== 'bottom'" width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" class="text-white/50"><path d="M8 9l-4 3 4 3m8-6l4 3-4 3"/></svg>
+        <svg *ngIf="panelPosition === 'bottom'" width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" class="text-white/50"><path d="M9 8l3-4 3 4m-6 8l3 4 3 4"/></svg>
+     </div>
+  </div>
+
   <!-- Content Panel -->
-  <div [class]="contentPanelClasses">
+  <div class="glass-panel flex flex-col z-10 backdrop-blur-2xl bg-[#0a0a0c]/90 border-white/10 shadow-2xl"
+       [class.transition-all]="!isResizing"
+       [class.duration-500]="!isResizing"
+       [ngClass]="{
+         'flex-1 w-full h-full relative': viewMode === 'data-focused',
+         'border-r': panelPosition === 'left' && viewMode !== 'data-focused',
+         'border-l': panelPosition === 'right' && viewMode !== 'data-focused',
+         'border-t': panelPosition === 'bottom' && viewMode !== 'data-focused'
+       }"
+       [style.width.px]="viewMode !== 'data-focused' && panelPosition !== 'bottom' ? panelWidth : null"
+       [style.height.px]="viewMode !== 'data-focused' && panelPosition === 'bottom' ? panelHeight : null">
     
     <!-- Header -->
     <div class="content-header p-6 border-b border-white/5 shrink-0 flex flex-col gap-5">
@@ -186,7 +214,7 @@
               <div class="flex flex-col p-3 pt-0 border-t border-white/5 bg-black/20" *ngIf="expandedGroup === group.key">
                 <div class="flex flex-col gap-2 mt-3">
                   @for (element of group.value; track element.id) {
-                    <div class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/5">
+                    <div (click)="onNodeClick(element)" class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/5">
                       <div class="flex flex-col flex-1 overflow-hidden">
                         <h4 class="text-[11px] font-mono text-white/80 truncate mb-0.5">{{ element.name }}</h4>
                         <span class="text-[9px] font-mono text-white/30 tracking-widest uppercase">ID: {{ element.id }}</span>
@@ -243,7 +271,7 @@
                   <!-- Accordion Items -->
                   @if (expandedGroup === group.key) {
                     @for (element of group.value; track element.id) {
-                      <tr class="hover:bg-white/5 transition-colors border-b border-white/5 last:border-b-0 cursor-pointer group/row">
+                      <tr (click)="onNodeClick(element)" class="hover:bg-white/5 transition-colors border-b border-white/5 last:border-b-0 cursor-pointer group/row">
                         <td class="py-3 px-4 pl-8">
                           <div class="flex items-center gap-3">
                             <div class="flex flex-col">
