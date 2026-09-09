@@ -1,0 +1,55 @@
+:host {
+  display: block;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+/* Map mode collapsing (only applies to map-focused mode) */
+.sidebar-closed {
+  transform: translateX(-100%);
+}
+
+/* Scrollbar styling for the expanded tables */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Toggle Buttons */
+.view-toggles .toggle-btn {
+  @apply p-1.5 rounded text-white/40 hover:text-white transition-all cursor-pointer;
+}
+.view-toggles .active-toggle {
+  @apply bg-white/10 text-white shadow-sm;
+}
+
+/* Original Sidebar Toggle Arrow */
+.sidebar-toggle-btn {
+  @apply absolute top-1/2 -right-10 w-10 h-16 bg-[#0a0a0c]/80 backdrop-blur-2xl border border-white/5 border-l-0 rounded-r-xl flex items-center justify-center text-white/50 hover:text-white cursor-pointer transition-colors z-20 shadow-xl;
+  transform: translateY(-50%);
+}
+
+/* Animations */
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

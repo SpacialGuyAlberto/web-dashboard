@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -29,18 +29,15 @@ import { GoogleMapsModule } from '@angular/google-maps';
 export class SegmentsComponent implements OnInit {
   @ViewChild(SegmentCreationMapComponent) mapComponent!: SegmentCreationMapComponent;
 
-  projectId!: number;
-  projectName: string = '';
+  @Input() projectId!: number;
+  @Input() projectName: string = '';
+
   segments: Segment[] = [];
   crews: Crew[] = [];
   loading = false;
   error: string | null = null;
   
   projectGeometry: {lat: number, lng: number}[] | null = null;
-
-  // Tabs
-  activeTab: 'segments' | 'materials' = 'segments';
-  projectMaterials: Material[] = [];
 
   showCreateModal = false;
   showDetailsModal = false;
@@ -92,14 +89,10 @@ export class SegmentsComponent implements OnInit {
   ngOnInit() {
     this.loadCrews();
     this.loadCustomFieldDefinitions();
-    this.route.queryParams.subscribe(params => {
-      this.projectId = +params['projectId'];
-      this.projectName = params['projectName'] || 'Project';
-      if (this.projectId) {
-        this.loadProjectDetails();
-        this.loadSegments();
-      }
-    });
+    if (this.projectId) {
+      this.loadProjectDetails();
+      this.loadSegments();
+    }
   }
 
   loadProjectDetails() {
@@ -140,32 +133,7 @@ export class SegmentsComponent implements OnInit {
     });
   }
 
-  loadProjectMaterials() {
-    this.inventoryService.getAllMaterials().subscribe({
-      next: (materials) => {
-        // Filter materials that have allocation for this project
-        // Note: In a real backend, we'd have a specific endpoint like /api/projects/{id}/materials
-        this.projectMaterials = materials.filter(m =>
-          m.projectAllocations && m.projectAllocations.some(a => a.projectId == this.projectId.toString())
-        );
 
-        // Mocking some data if empty for demo purposes (since we just added the feature)
-        if (this.projectMaterials.length === 0) {
-          this.projectMaterials = materials.slice(0, 3).map(m => ({
-            ...m,
-            projectAllocations: [{ projectId: this.projectId.toString(), projectName: this.projectName, quantityAllocated: Math.floor(Math.random() * 500) + 50 }]
-          }));
-        }
-      }
-    });
-  }
-
-  switchTab(tab: 'segments' | 'materials') {
-    this.activeTab = tab;
-    if (tab === 'materials') {
-      this.loadProjectMaterials();
-    }
-  }
 
   openCreateModal() {
     this.isEditing = false;
@@ -351,7 +319,5 @@ export class SegmentsComponent implements OnInit {
     return segment.volume ? 'CERTIFIED' : 'PENDING';
   }
 
-  goBack() {
-    this.router.navigate(['/projects']);
-  }
+
 }

@@ -15,11 +15,16 @@ import { ToastComponent } from '@core/notifications/toast/toast.component';
 })
 export class App {
   sidebarOpen = false;
+  sidebarCollapsed = false;
 
   constructor(public authService: AuthService) { }
 
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  onSidebarCollapse(collapsed: boolean) {
+    this.sidebarCollapsed = collapsed;
   }
 
   logout() {

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
@@ -22,6 +22,9 @@ interface NavigationItem {
 })
 export class SidebarComponent implements OnInit {
     @Output() themeToggled = new EventEmitter<void>();
+    @Input() isCollapsed = false;
+    @Output() collapsedChange = new EventEmitter<boolean>();
+    
     isDarkMode = true;
     currentUser: User | null = null;
 
@@ -117,11 +120,19 @@ export class SidebarComponent implements OnInit {
     }
 
     toggleGroup(group: NavigationItem) {
+        if (this.isCollapsed) {
+            this.toggleCollapse();
+        }
         if (group.children) {
             group.isOpen = !group.isOpen;
         } else if (group.route) {
             this.router.navigate([group.route]);
         }
+    }
+
+    toggleCollapse() {
+        this.isCollapsed = !this.isCollapsed;
+        this.collapsedChange.emit(this.isCollapsed);
     }
 
     checkActiveGroup(url: string) {

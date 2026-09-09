@@ -46,9 +46,9 @@
 
                 <!-- Actions -->
                 <div class="project-actions">
-                    <button [routerLink]="['/segments']"
+                    <button [routerLink]="['/project-details']"
                         [queryParams]="{projectId: project.id, projectName: project.name}" class="btn-view">
-                        View Segments
+                        View Details
                     </button>
                     <button (click)="openEditModal(project)" class="btn-edit">
                         Edit
@@ -99,7 +99,7 @@
                 <div *ngIf="currentStep === 1" class="step-container animate-fade-in">
                     <h3 class="step-title">Project Details</h3>
                     <p class="step-subtitle">Enter the basic information for this deployment.</p>
-                    
+
                     <div class="form-group-list mt-2">
                         <div class="form-group">
                             <label>Project Name</label>
@@ -130,18 +130,18 @@
                 <div *ngIf="currentStep === 2" class="step-container animate-fade-in">
                     <h3 class="step-title">Lifecycle Tasks</h3>
                     <p class="step-subtitle">Select the tasks required for this project and their current status.</p>
-                    
+
                     <div class="task-grid mt-2">
                         <div *ngFor="let task of workTypes" class="task-row">
                             <div class="task-name">{{ task }}</div>
                             <div class="task-actions">
-                                <button 
+                                <button
                                     (click)="toggleLifecycle(task, 'todo')"
                                     [class.active]="isWorkTypeSelected(task, 'todo')"
                                     class="task-btn btn-todo">
                                     To Do
                                 </button>
-                                <button 
+                                <button
                                     (click)="toggleLifecycle(task, 'done')"
                                     [class.active]="isWorkTypeSelected(task, 'done')"
                                     class="task-btn btn-done">
@@ -156,9 +156,9 @@
                 <div *ngIf="currentStep === 3" class="step-container animate-fade-in h-full flex flex-col relative">
                     <h3 class="step-title">Project Location</h3>
                     <p class="step-subtitle">Search for the project address and center the map on the work site.</p>
-                    
+
                     <div class="map-wrapper mt-2 flex-1 min-h-[400px] relative overflow-hidden bg-black rounded-xl border border-white/10">
-                        <app-segment-creation-map 
+                        <app-segment-creation-map
                             [startLat]="mapCenter.lat"
                             [startLng]="mapCenter.lng"
                             [viewOnly]="true"
@@ -180,11 +180,11 @@
                      (mousemove)="onOverlayDrag($event)" (mouseup)="onOverlayDragEnd()" (mouseleave)="onOverlayDragEnd()">
                     <h3 class="step-title">Smart Segment Recognition</h3>
                     <p class="step-subtitle">Drag your "Planauskunft" onto the map and align it.</p>
-                    
+
                     <div class="map-wrapper mt-2 flex-1 min-h-[400px] relative overflow-hidden bg-black rounded-xl">
-                        
+
                         <!-- The Reference Map -->
-                        <app-segment-creation-map 
+                        <app-segment-creation-map
                             [startLat]="mapCenter.lat"
                             [startLng]="mapCenter.lng"
                             [viewOnly]="true"
@@ -194,7 +194,7 @@
 
                         <!-- Draggable Overlay Image -->
                         <div *ngIf="planOverlayUrl" class="absolute inset-0 top-[76px] z-10 pointer-events-none flex items-center justify-center">
-                            <img [src]="planOverlayUrl" 
+                            <img [src]="planOverlayUrl"
                                  class="draggable-blueprint cursor-move pointer-events-auto"
                                  [style.transform]="getTransform()"
                                  [style.opacity]="planOpacity"
@@ -225,7 +225,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 </button>
                             </div>
-                            
+
                             <!-- AI Vector Analysis Score -->
                             <div class="mb-2 p-3 bg-black/40 rounded-lg border border-white/5">
                                 <div class="flex justify-between items-center text-[8px] font-mono uppercase tracking-widest text-white/50 mb-1.5">
@@ -263,11 +263,11 @@
                                 </div>
                                 <input type="range" min="-180" max="180" step="1" [(ngModel)]="planRotation" class="modern-slider">
                             </div>
-                            
+
                             <div class="text-[9px] text-white/30 font-mono text-center mt-2">
                                 Drag image to position
                             </div>
-                            
+
                             <button (click)="toggleFullscreen()" class="mt-2 btn-secondary py-2 w-full text-center flex items-center justify-center gap-2">
                                 <svg *ngIf="!isFullscreen" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
                                 <svg *ngIf="isFullscreen" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h4v4m0-4l-5 5m11-5h4v4m0-4l5 5M4 10h4V6m0 4l-5-5m11 5h4V6m0 4l5-5"></path></svg>

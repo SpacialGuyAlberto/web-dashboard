@@ -127,10 +127,35 @@ export class GisViewerComponent implements AfterViewInit {
     constructor(private infrastructureService: InfrastructureService, private cdr: ChangeDetectorRef) { }
 
     ngAfterViewInit(): void {
+        this.requestUserLocation();
         setTimeout(() => {
             this.isLoading = false;
             this.cdr.detectChanges();
         }, 500);
+    }
+
+    private requestUserLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    this.center = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    };
+                    if (this.map) {
+                        this.map.panTo(this.center);
+                        this.map.zoom = 15;
+                    }
+                    this.cdr.detectChanges();
+                },
+                (error) => {
+                    console.warn('Error al obtener la ubicación:', error);
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            console.warn('Geolocalización no soportada por el navegador.');
+        }
     }
 
     togglePlanOverlay(show: boolean) {

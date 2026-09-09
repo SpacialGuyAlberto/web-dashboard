@@ -1,7 +1,8 @@
 <div class="flex h-screen bg-[#0d0e11] text-white/80 overflow-hidden font-sans">
     <!-- Sidebar -->
-    <app-sidebar *ngIf="authService.currentUser$ | async" [class.hidden]="!sidebarOpen" class="lg:block border-r border-white/5"
-        [class.lg:w-64]="true" [class.fixed]="true" [class.lg:relative]="true" [class.z-50]="true"></app-sidebar>
+    <app-sidebar *ngIf="authService.currentUser$ | async" [class.hidden]="!sidebarOpen" class="lg:block border-r border-white/5 transition-all duration-300 relative"
+        [class.lg:w-64]="!sidebarCollapsed" [class.lg:w-4]="sidebarCollapsed" [class.fixed]="true" [class.lg:relative]="true" [class.z-50]="true"
+        (collapsedChange)="onSidebarCollapse($event)" [isCollapsed]="sidebarCollapsed"></app-sidebar>
 
     <!-- Overlay for mobile -->
     <div *ngIf="(authService.currentUser$ | async) && sidebarOpen" (click)="toggleSidebar()"

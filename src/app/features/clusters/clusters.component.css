@@ -1,0 +1,107 @@
+:host {
+    --glass-bg: #131415;
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --accent-color: #6938ef;
+}
+
+.btn-new-cluster {
+    @apply bg-[#6938ef] text-white px-6 py-3 rounded-md hover:bg-[#5b2ecf] transition-colors font-mono text-[10px] uppercase tracking-widest shadow-none flex items-center;
+}
+
+.clusters-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8;
+}
+
+.cluster-card {
+    @apply bg-[#131415] rounded-xl p-8 border border-white/5 transition-all hover:border-white/10 flex flex-col relative overflow-hidden;
+}
+
+.card-edge-glow {
+    @apply hidden; /* Can add glow effect later if needed */
+}
+
+.cluster-card-header {
+    @apply flex justify-between items-start mb-6;
+}
+
+.title-row {
+    @apply flex items-center gap-3 mb-1;
+}
+
+.title-row h3 {
+    @apply font-mono text-sm uppercase tracking-widest text-white/90;
+}
+
+.location-icon {
+    @apply text-white/30 text-lg;
+}
+
+.city-area-tag {
+    @apply text-[9px] uppercase font-mono tracking-widest text-white/40 py-1 px-2 border border-white/5 rounded bg-white/5;
+}
+
+.status-stack {
+    @apply flex flex-col items-end gap-2;
+}
+
+.status-badge {
+    @apply text-[9px] font-mono tracking-widest uppercase px-2 py-0.5 rounded border bg-transparent;
+}
+
+.id-badge {
+    @apply text-[8px] font-mono tracking-widest uppercase px-2 py-0.5 rounded border border-[#6938ef]/30 bg-[#6938ef]/10 text-[#6938ef];
+}
+
+.cluster-info-grid {
+    @apply grid grid-cols-2 gap-6 mb-8 pt-6 border-t border-white/5;
+}
+
+.info-item {
+    @apply flex flex-col;
+}
+
+.info-label {
+    @apply text-[9px] font-mono uppercase tracking-[0.2em] text-white/30 mb-2;
+}
+
+.info-value {
+    @apply font-mono text-xl text-white/80;
+}
+
+.card-footer-actions {
+    @apply mt-auto pt-6 border-t border-white/5;
+}
+
+.btn-action-outline {
+    @apply bg-white/5 border border-white/5 text-white/70 py-2.5 rounded-md font-mono text-[9px] uppercase tracking-widest hover:bg-white/10 hover:text-white transition-all text-center flex justify-center items-center;
+}
+
+/* Modal styles borrowed from shared/segment styles */
+.modal-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 md:p-8;
+}
+
+.modal-container-medium {
+    @apply bg-[#131415] rounded-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10 shadow-2xl;
+}
+
+.modal-content-scroll {
+    @apply overflow-y-auto overflow-x-hidden p-6;
+}
+
+/* Empty State */
+.empty-state-card {
+    @apply flex flex-col items-center justify-center py-24 bg-[#131415]/50 border border-white/5 border-dashed rounded-xl col-span-full text-center transition-all duration-300 hover:border-white/10 hover:bg-[#131415] cursor-pointer;
+}
+
+.empty-state-icon {
+    @apply text-white/20 mb-6;
+}
+
+.empty-state-card h3 {
+    @apply font-display text-3xl font-normal text-white/80 mb-2;
+}
+
+.empty-state-card p {
+    @apply text-white/40 font-mono text-xs uppercase tracking-widest;
+}

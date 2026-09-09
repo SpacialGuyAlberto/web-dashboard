@@ -1,0 +1,286 @@
+<div class="dashboard-container flex relative h-full w-full bg-[#0a0a0c] overflow-hidden"
+     [ngClass]="{
+       'flex-row': panelPosition === 'left',
+       'flex-row-reverse': panelPosition === 'right',
+       'flex-col-reverse': panelPosition === 'bottom'
+     }">
+  
+  <!-- Map Area -->
+  <div class="map-area transition-all duration-500 ease-in-out relative overflow-hidden"
+       [ngClass]="{
+         'flex-1': viewMode === 'map-focused' || viewMode === 'split',
+         'absolute bottom-6 right-6 w-80 h-48 rounded-2xl shadow-2xl border-2 border-[#131415] z-50 pointer-events-auto': viewMode === 'data-focused'
+       }">
+    <google-map 
+      height="100%" 
+      width="100%" 
+      [center]="center" 
+      [zoom]="zoom" 
+      [options]="mapOptions">
+      
+      @for (element of elements; track element.id) {
+        <map-marker
+          [position]="{ lat: element.lat, lng: element.lng }"
+          [options]="{ icon: getIconForType(element.type) }"
+          [title]="element.name">
+        </map-marker>
+      }
+    </google-map>
+  </div>
+
+  <!-- Content Panel -->
+  <div [class]="contentPanelClasses">
+    
+    <!-- Header -->
+    <div class="content-header p-6 border-b border-white/5 shrink-0 flex flex-col gap-5">
+      <div class="flex items-start justify-between">
+        <div>
+          <button (click)="goBack()" class="btn-back text-white/40 flex items-center gap-2 text-[9px] font-mono uppercase tracking-[0.2em] transition-all mb-4 hover:text-white bg-transparent border-none cursor-pointer p-0">
+            ← Back to Project
+          </button>
+          <h2 class="font-display text-3xl font-normal text-white/90 tracking-tight leading-none mb-2">Cluster Areas</h2>
+          <p class="font-mono text-[10px] text-white/40 uppercase tracking-widest">Manage POPs, DPs, Acometidas & HEÜPs</p>
+        </div>
+      </div>
+      
+      <!-- Layout Mode & Panel Position Toggles -->
+      <div class="flex items-center justify-between bg-black/20 p-1.5 rounded-xl border border-white/5">
+        
+        <!-- Panel Position Toggles -->
+        <div class="flex gap-1">
+          <button (click)="setPanelPosition('left')" [class.bg-white_10]="panelPosition === 'left'" [class.text-white]="panelPosition === 'left'" class="text-white/40 hover:text-white transition-all cursor-pointer p-1.5 rounded bg-transparent border-none flex items-center gap-1">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
+            <span class="text-[9px] font-mono uppercase tracking-widest hidden sm:inline">Left</span>
+          </button>
+          <button (click)="setPanelPosition('bottom')" [class.bg-white_10]="panelPosition === 'bottom'" [class.text-white]="panelPosition === 'bottom'" class="text-white/40 hover:text-white transition-all cursor-pointer p-1.5 rounded bg-transparent border-none flex items-center gap-1">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h8" /></svg>
+            <span class="text-[9px] font-mono uppercase tracking-widest hidden sm:inline">Bottom</span>
+          </button>
+          <button (click)="setPanelPosition('right')" [class.bg-white_10]="panelPosition === 'right'" [class.text-white]="panelPosition === 'right'" class="text-white/40 hover:text-white transition-all cursor-pointer p-1.5 rounded bg-transparent border-none flex items-center gap-1">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M12 12h8m-8 6h16" /></svg>
+            <span class="text-[9px] font-mono uppercase tracking-widest hidden sm:inline">Right</span>
+          </button>
+        </div>
+
+        <div class="w-px h-4 bg-white/10 mx-2"></div>
+
+        <!-- View Mode Toggles -->
+        <div class="flex gap-1">
+          <button (click)="setViewMode('map-focused')" [class.bg-white_10]="viewMode === 'map-focused'" [class.text-white]="viewMode === 'map-focused'" class="text-white/40 hover:text-white transition-all cursor-pointer p-1.5 rounded bg-transparent border-none flex items-center gap-1">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+            <span class="text-[9px] font-mono uppercase tracking-widest hidden sm:inline">Map</span>
+          </button>
+          <button (click)="setViewMode('split')" [class.bg-white_10]="viewMode === 'split'" [class.text-white]="viewMode === 'split'" class="text-white/40 hover:text-white transition-all cursor-pointer p-1.5 rounded bg-transparent border-none flex items-center gap-1">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            <span class="text-[9px] font-mono uppercase tracking-widest hidden sm:inline">Split</span>
+          </button>
+          <button (click)="setViewMode('data-focused')" [class.bg-white_10]="viewMode === 'data-focused'" [class.text-white]="viewMode === 'data-focused'" class="text-white/40 hover:text-white transition-all cursor-pointer p-1.5 rounded bg-transparent border-none flex items-center gap-1">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+            <span class="text-[9px] font-mono uppercase tracking-widest hidden sm:inline">Data</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto overflow-x-hidden p-6 flex flex-col gap-6 custom-scrollbar">
+      
+      <!-- Stats Grid -->
+      <div class="sidebar-stats-grid grid gap-4 shrink-0" [ngClass]="viewMode === 'map-focused' && panelPosition !== 'bottom' ? 'grid-cols-2' : 'grid-cols-4'">
+        <div class="stat-card flex items-center gap-4 bg-[#131415] border border-white/5 p-4 rounded-xl">
+          <div class="stat-icon w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-[#6938ef]/10 text-[#6938ef] border border-[#6938ef]/30">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L22 7l-10 5L2 7l10-5zm0 15l-10-5v5l10 5 10-5v-5l-10 5zm0-5l-10-5v5l10 5 10-5v-5l-10 5z"/></svg>
+          </div>
+          <div class="stat-info flex flex-col">
+            <span class="text-[9px] font-mono uppercase tracking-widest text-white/40">POPs</span>
+            <span class="text-lg font-mono text-white/90 leading-none mt-1">{{ stats.pop }}</span>
+          </div>
+        </div>
+        <div class="stat-card flex items-center gap-4 bg-[#131415] border border-white/5 p-4 rounded-xl">
+          <div class="stat-icon w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-[#2fb080]/10 text-[#2fb080] border border-[#2fb080]/30">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2 2h8v2H8V8zm0 4h8v2H8v-2z"/></svg>
+          </div>
+          <div class="stat-info flex flex-col">
+            <span class="text-[9px] font-mono uppercase tracking-widest text-white/40">Netzverteiler</span>
+            <span class="text-lg font-mono text-white/90 leading-none mt-1">{{ stats.dp }}</span>
+          </div>
+        </div>
+        <div class="stat-card flex items-center gap-4 bg-[#131415] border border-white/5 p-4 rounded-xl">
+          <div class="stat-icon w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-[#fbbf24]/10 text-[#fbbf24] border border-[#fbbf24]/30">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          </div>
+          <div class="stat-info flex flex-col">
+            <span class="text-[9px] font-mono uppercase tracking-widest text-white/40">Acometidas</span>
+            <span class="text-lg font-mono text-white/90 leading-none mt-1">{{ stats.acometida }}</span>
+          </div>
+        </div>
+        <div class="stat-card flex items-center gap-4 bg-[#131415] border border-white/5 p-4 rounded-xl">
+          <div class="stat-icon w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/30">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          </div>
+          <div class="stat-info flex flex-col">
+            <span class="text-[9px] font-mono uppercase tracking-widest text-white/40">HEÜPs</span>
+            <span class="text-lg font-mono text-white/90 leading-none mt-1">{{ stats.heup }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projections (Visible in Split or Data mode) -->
+      <div *ngIf="viewMode !== 'map-focused'" class="projections-section animate-fade-in shrink-0">
+        <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] text-white/50 mb-4">Project Overview & Forecasts</h3>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="p-4 bg-white/5 border border-white/10 rounded-xl relative overflow-hidden">
+             <div class="absolute inset-0 bg-gradient-to-br from-[#6938ef]/10 to-transparent"></div>
+             <div class="relative z-10">
+               <span class="block text-[9px] font-mono uppercase text-white/40 mb-1">Total Budget vs Spent</span>
+               <div class="text-xl font-mono text-white">€{{ projections.spent | number }} <span class="text-sm text-white/30">/ €{{ projections.totalBudget | number }}</span></div>
+               <div class="w-full h-1 bg-white/10 rounded-full mt-3 overflow-hidden">
+                 <div class="h-full bg-[#6938ef]" [style.width.%]="(projections.spent / projections.totalBudget) * 100"></div>
+               </div>
+             </div>
+          </div>
+          <div class="p-4 bg-white/5 border border-white/10 rounded-xl relative overflow-hidden">
+             <div class="absolute inset-0 bg-gradient-to-br from-[#2fb080]/10 to-transparent"></div>
+             <div class="relative z-10">
+               <span class="block text-[9px] font-mono uppercase text-white/40 mb-1">Est. Completion</span>
+               <div class="text-xl font-mono text-[#2fb080]">{{ projections.completionDate | date:'MMM dd, yyyy' }}</div>
+               <div class="text-[10px] font-mono text-white/50 mt-2">{{ projections.completionPercentage }}% physical progress</div>
+             </div>
+          </div>
+          <div class="p-4 bg-white/5 border border-white/10 rounded-xl relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#fbbf24]/10 to-transparent"></div>
+            <div class="relative z-10">
+              <span class="block text-[9px] font-mono uppercase text-white/40 mb-1">Upcoming Milestone</span>
+              <div class="text-sm font-mono text-white/90 mt-1 leading-relaxed">{{ projections.upcomingMilestone }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Network Nodes Accordion -->
+      <div class="nodes-section flex-1 flex flex-col min-h-[300px]">
+        <div class="list-header flex justify-between items-center mb-4 shrink-0">
+          <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] text-white/50">Network Nodes Breakdown</h3>
+          <button class="bg-white/5 border border-white/5 text-white/70 py-1 px-3 rounded font-mono text-[9px] uppercase tracking-widest hover:bg-[#6938ef] hover:text-white hover:border-[#6938ef] transition-all cursor-pointer">
+            + Add Node
+          </button>
+        </div>
+        
+        <!-- Narrow Accordion View (Map Focused) -->
+        <div *ngIf="viewMode === 'map-focused'" class="flex flex-col gap-3">
+          @for (group of groupedElements | keyvalue; track group.key) {
+            <div class="group-accordion bg-[#131415] border border-white/5 rounded-xl overflow-hidden transition-all duration-300">
+              <!-- Group Header -->
+              <button class="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors cursor-pointer border-none bg-transparent" (click)="toggleGroup(group.key)">
+                <span class="text-xs font-mono uppercase tracking-widest text-white/90 flex items-center gap-2">
+                  <div class="w-2 h-2 rounded-full" [style.background-color]="group.value.length ? getColorForType(group.value[0].type) : '#fff'"></div>
+                  {{ group.key }}
+                </span>
+                <div class="flex items-center gap-3">
+                  <span class="text-[9px] font-mono bg-white/10 px-2 py-0.5 rounded-full text-white/70">{{ group.value.length }}</span>
+                  <svg [class.rotate-180]="expandedGroup === group.key" class="transition-transform duration-300 text-white/40" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+                </div>
+              </button>
+              
+              <!-- Group Body -->
+              <div class="flex flex-col p-3 pt-0 border-t border-white/5 bg-black/20" *ngIf="expandedGroup === group.key">
+                <div class="flex flex-col gap-2 mt-3">
+                  @for (element of group.value; track element.id) {
+                    <div class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/5">
+                      <div class="flex flex-col flex-1 overflow-hidden">
+                        <h4 class="text-[11px] font-mono text-white/80 truncate mb-0.5">{{ element.name }}</h4>
+                        <span class="text-[9px] font-mono text-white/30 tracking-widest uppercase">ID: {{ element.id }}</span>
+                      </div>
+                      <div class="text-[8px] font-mono uppercase tracking-widest px-1.5 py-0.5 rounded border" [ngClass]="{
+                        'bg-[#2fb080]/10 text-[#2fb080] border-[#2fb080]/20': element.status === 'ACTIVE',
+                        'bg-white/5 text-white/40 border-white/10': element.status === 'PLANNED',
+                        'bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/20': element.status === 'ERROR'
+                      }">
+                        {{ element.status }}
+                      </div>
+                    </div>
+                  }
+                  @if (group.value.length === 0) {
+                    <div class="p-4 text-center text-[10px] font-mono text-white/30 uppercase tracking-widest">No nodes found</div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Rich Data Grid Accordion (Split or Data Focused) -->
+        <div *ngIf="viewMode !== 'map-focused'" class="bg-[#131415] border border-white/10 rounded-xl overflow-hidden flex-1 flex flex-col">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-black/40 border-b border-white/10">
+                  <th class="py-3 px-4 text-[9px] font-mono uppercase tracking-widest text-white/40 font-normal">Node</th>
+                  <th class="py-3 px-4 text-[9px] font-mono uppercase tracking-widest text-white/40 font-normal">Status</th>
+                  <th class="py-3 px-4 text-[9px] font-mono uppercase tracking-widest text-white/40 font-normal">Created By</th>
+                  <th class="py-3 px-4 text-[9px] font-mono uppercase tracking-widest text-white/40 font-normal">Created At</th>
+                  <th class="py-3 px-4 text-[9px] font-mono uppercase tracking-widest text-white/40 font-normal">Forecast</th>
+                  <th class="py-3 px-4 text-[9px] font-mono uppercase tracking-widest text-white/40 font-normal">Contractor</th>
+                  <th class="py-3 px-4 text-[9px] font-mono uppercase tracking-widest text-white/40 font-normal">Budget</th>
+                </tr>
+              </thead>
+              <tbody class="font-mono text-[10px] text-white/80">
+                @for (group of groupedElements | keyvalue; track group.key) {
+                  <!-- Accordion Group Header Row -->
+                  <tr class="bg-[#1a1b1e]/50 border-y border-white/5 hover:bg-white/5 transition-colors cursor-pointer" (click)="toggleGroup(group.key)">
+                    <td colspan="7" class="py-3 px-4">
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono uppercase tracking-widest text-white/90 flex items-center gap-2">
+                          <div class="w-2 h-2 rounded-full" [style.background-color]="group.value.length ? getColorForType(group.value[0].type) : '#fff'"></div>
+                          {{ group.key }}
+                          <span class="text-[9px] bg-white/10 px-2 py-0.5 rounded-full text-white/50 ml-2">{{ group.value.length }}</span>
+                        </span>
+                        <svg [class.rotate-180]="expandedGroup === group.key" class="transition-transform duration-300 text-white/40" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Accordion Items -->
+                  @if (expandedGroup === group.key) {
+                    @for (element of group.value; track element.id) {
+                      <tr class="hover:bg-white/5 transition-colors border-b border-white/5 last:border-b-0 cursor-pointer group/row">
+                        <td class="py-3 px-4 pl-8">
+                          <div class="flex items-center gap-3">
+                            <div class="flex flex-col">
+                              <span class="text-white group-hover/row:text-[#6938ef] transition-colors">{{ element.name }}</span>
+                              <span class="text-[9px] text-white/30 uppercase mt-0.5">{{ element.id }}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="py-3 px-4">
+                          <span class="px-1.5 py-0.5 rounded text-[8px] uppercase tracking-widest border" [ngClass]="{
+                            'bg-[#2fb080]/10 text-[#2fb080] border-[#2fb080]/20': element.status === 'ACTIVE',
+                            'bg-white/5 text-white/40 border-white/10': element.status === 'PLANNED',
+                            'bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/20': element.status === 'ERROR'
+                          }">{{ element.status }}</span>
+                        </td>
+                        <td class="py-3 px-4 text-white/50">{{ element.createdBy || 'Unknown' }}</td>
+                        <td class="py-3 px-4 text-white/50">{{ element.createdAt | date:'shortDate' }}</td>
+                        <td class="py-3 px-4" [ngClass]="{'text-[#2fb080]': element.forecastDate, 'text-white/30': !element.forecastDate}">
+                          {{ (element.forecastDate | date:'shortDate') || 'TBD' }}
+                        </td>
+                        <td class="py-3 px-4 text-white/50">{{ element.contractor || '-' }}</td>
+                        <td class="py-3 px-4 text-white/50">{{ element.budget ? ('€' + (element.budget | number)) : '-' }}</td>
+                      </tr>
+                    }
+                    @if (group.value.length === 0) {
+                      <tr>
+                        <td colspan="7" class="py-6 text-center text-[10px] text-white/30 uppercase tracking-widest">No elements found</td>
+                      </tr>
+                    }
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

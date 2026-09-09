@@ -24,6 +24,8 @@ export const routes: Routes = [
             { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
             { path: 'dashboard', component: DashboardComponent },
             { path: 'projects', component: ProjectsComponent },
+            { path: 'project-details', loadComponent: () => import('./features/projects/project-details/project-details.component').then(m => m.ProjectDetailsComponent) },
+            { path: 'project-details/clusters/:clusterId/areas', loadComponent: () => import('./features/clusters/cluster-area-dashboard/cluster-area-dashboard.component').then(m => m.ClusterAreaDashboardComponent) },
             { path: 'segments', component: SegmentsComponent },
             { path: 'subcontractors', component: SubcontractorsComponent },
             { path: 'schedule', component: ScheduleComponent },

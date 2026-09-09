@@ -1,36 +1,12 @@
 <div class="segments-container">
   <div class="segments-wrapper">
-    <div class="segments-header">
-      <div>
-        <button (click)="goBack()" class="btn-back">
-          ← Back to Projects
-        </button>
-        <h1>{{ projectName }}</h1>
-        <p>Manage fiber optic deployment segments</p>
-      </div>
-      <div class="header-actions">
-        @if (activeTab === 'segments') {
-          <button (click)="openCreateModal()" class="btn-new-segment">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"/>
-            </svg>
-            <span>New Segment</span>
-          </button>
-        }
-      </div>
-    </div>
-
-    <div class="tabs-container">
-      <nav class="tab-nav" aria-label="Tabs">
-        <button (click)="switchTab('segments')" class="tab-btn"
-                [class.tab-btn-active]="activeTab === 'segments'">
-          Segments
-        </button>
-        <button (click)="switchTab('materials')" class="tab-btn"
-                [class.tab-btn-active]="activeTab === 'materials'">
-          Project Materials
-        </button>
-      </nav>
+    <div class="header-actions mb-8 flex justify-end">
+      <button (click)="openCreateModal()" class="btn-new-segment">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"/>
+        </svg>
+        <span>New Segment</span>
+      </button>
     </div>
 
     @if (error) {
@@ -45,7 +21,7 @@
       </div>
     }
 
-    @if (!loading && activeTab === 'segments') {
+    @if (!loading) {
       <div class="segments-grid">
         @for (segment of segments; track segment.id || $index) {
           <div class="segment-card">
@@ -121,70 +97,7 @@
       </div>
     }
 
-    @if (!loading && activeTab === 'materials') {
-      <div>
-        @if (projectMaterials.length > 0) {
-          <div class="materials-grid">
-            @for (material of projectMaterials; track material.id || $index) {
-              <div class="material-card group">
-                <div class="card-edge-glow"></div>
 
-                <div class="material-card-header">
-                  <div class="material-icon-box">
-                    @if (material.name.toLowerCase().includes('cable')) {
-                      <span>🔌</span>
-                    } @else if (material.name.toLowerCase().includes('duct')) {
-                      <span>🕳️</span>
-                    } @else if (material.name.toLowerCase().includes('joint')) {
-                      <span>🔗</span>
-                    } @else {
-                      <span>📦</span>
-                    }
-                  </div>
-                  <span class="material-status-pill status-available">Available</span>
-                </div>
-
-                <div class="material-body">
-                  <h3 class="material-name">{{ material.name }}</h3>
-                  <span class="material-sku-tag">SKU: {{ material.sku }}</span>
-                </div>
-
-                <div class="material-footer">
-                  <div class="material-stats-row">
-                    <div class="flex flex-col">
-                      <span class="stat-label">Allocated</span>
-                      <div class="flex items-baseline">
-                                                <span class="stat-value">
-                                                    {{ material.projectAllocations && material.projectAllocations[0] ?
-                                                  material.projectAllocations[0].quantityAllocated : 0 }}
-                                                </span>
-                        <span class="stat-unit">{{ material.unit }}</span>
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-end">
-                      <span class="stat-label">Stock Level</span>
-                      <span class="text-xs font-bold text-emerald-500">100%</span>
-                    </div>
-                  </div>
-
-                  <div class="supplier-box">
-                    <div class="supplier-avatar">{{ (material.supplier?.name || 'NA').substring(0, 1) }}</div>
-                    <span class="supplier-name">{{ material.supplier?.name || 'Internal Warehouse' }}</span>
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        } @else {
-          <div class="empty-state-card group py-24 border border-dashed border-white/5 rounded-xl text-center bg-[#131415]/50 flex flex-col items-center justify-center">
-            <span class="text-6xl mb-6 opacity-20">📦</span>
-            <h3 class="font-display text-3xl font-normal text-white/80 mb-2">No Materials Allocated</h3>
-            <p class="font-mono text-[9px] uppercase tracking-widest text-white/40">This project currently has no materials assigned.</p>
-          </div>
-        }
-      </div>
-    }
-  </div>
 
   @if (showCreateModal) {
     <div class="modal-overlay">

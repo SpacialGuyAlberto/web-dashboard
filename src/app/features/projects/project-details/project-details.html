@@ -1,0 +1,101 @@
+<div class="project-details-container">
+  <div class="project-details-wrapper">
+    <div class="project-details-header">
+      <div>
+        <button (click)="goBack()" class="btn-back">
+          ← Back to Projects
+        </button>
+        <h1>{{ projectName }}</h1>
+        <p>Manage project areas, fiber optic deployment segments, and materials</p>
+      </div>
+    </div>
+
+    <div class="tabs-container">
+      <button (click)="switchTab('clusters')" class="tab-btn"
+              [class.tab-btn-active]="activeTab === 'clusters'">
+        Clusters
+      </button>
+      <button (click)="switchTab('segments')" class="tab-btn"
+              [class.tab-btn-active]="activeTab === 'segments'">
+        Segments
+      </button>
+      <button (click)="switchTab('materials')" class="tab-btn"
+              [class.tab-btn-active]="activeTab === 'materials'">
+        Project Materials
+      </button>
+    </div>
+
+    @if (activeTab === 'clusters') {
+      <app-clusters [projectId]="projectId" [projectName]="projectName"></app-clusters>
+    }
+
+    @if (activeTab === 'segments') {
+      <app-segments [projectId]="projectId" [projectName]="projectName"></app-segments>
+    }
+
+    @if (activeTab === 'materials') {
+      <div>
+        @if (loadingMaterials) {
+          <div class="flex justify-center p-12">
+            <div class="w-8 h-8 rounded-full border-2 border-[#6938ef] border-t-transparent animate-spin"></div>
+          </div>
+        } @else if (projectMaterials.length > 0) {
+          <div class="materials-grid">
+            @for (material of projectMaterials; track material.id || $index) {
+              <div class="material-card group">
+                <div class="material-card-header">
+                  <div class="material-icon-box">
+                    @if (material.name.toLowerCase().includes('cable')) {
+                      <span>🔌</span>
+                    } @else if (material.name.toLowerCase().includes('duct')) {
+                      <span>🕳️</span>
+                    } @else if (material.name.toLowerCase().includes('joint')) {
+                      <span>🔗</span>
+                    } @else {
+                      <span>📦</span>
+                    }
+                  </div>
+                  <span class="material-status-pill status-available">Available</span>
+                </div>
+
+                <div class="material-body">
+                  <h3 class="material-name">{{ material.name }}</h3>
+                  <span class="material-sku-tag">SKU: {{ material.sku }}</span>
+                </div>
+
+                <div class="material-footer">
+                  <div class="material-stats-row">
+                    <div class="flex flex-col">
+                      <span class="stat-label">Allocated</span>
+                      <div class="flex items-baseline">
+                        <span class="stat-value">
+                          {{ material.projectAllocations && material.projectAllocations[0] ? material.projectAllocations[0].quantityAllocated : 0 }}
+                        </span>
+                        <span class="stat-unit">{{ material.unit }}</span>
+                      </div>
+                    </div>
+                    <div class="flex flex-col items-end">
+                      <span class="stat-label">Stock Level</span>
+                      <span class="text-xs font-bold text-emerald-500">100%</span>
+                    </div>
+                  </div>
+
+                  <div class="supplier-box">
+                    <div class="supplier-avatar">{{ (material.supplier?.name || 'NA').substring(0, 1) }}</div>
+                    <span class="supplier-name">{{ material.supplier?.name || 'Internal Warehouse' }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state-card group">
+            <span class="text-6xl mb-6 opacity-20">📦</span>
+            <h3>No Materials Allocated</h3>
+            <p>This project currently has no materials assigned.</p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

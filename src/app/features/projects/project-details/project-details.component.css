@@ -1,0 +1,131 @@
+:host {
+    --glass-bg: #131415;
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --accent-color: #6938ef;
+}
+
+.project-details-container {
+    @apply min-h-screen bg-[#0a0a0c] p-6 lg:p-12 font-sans;
+}
+
+.project-details-wrapper {
+    @apply max-w-7xl mx-auto;
+}
+
+.project-details-header {
+    @apply mb-12 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/5 pb-8;
+}
+
+.btn-back {
+    @apply text-white/40 flex items-center gap-2 text-[9px] font-mono uppercase tracking-[0.2em] transition-all mb-4 hover:text-white;
+}
+
+.project-details-header h1 {
+    @apply font-display text-5xl font-normal text-white/90 tracking-tight leading-none;
+}
+
+.project-details-header p {
+    @apply text-white/40 mt-4 font-sans text-sm;
+}
+
+.tabs-container {
+    @apply mb-10 flex gap-2;
+}
+
+.tab-btn {
+    @apply bg-transparent text-white/50 border border-transparent px-6 py-2.5 rounded-md font-mono text-[9px] uppercase tracking-widest hover:bg-white/5 hover:text-white transition-all;
+}
+
+.tab-btn-active {
+    @apply bg-white/10 text-white border-white/10;
+}
+
+/* Project Materials Grid */
+.materials-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+}
+
+.material-card {
+    @apply bg-[#161719] border border-white/5 rounded-xl p-6 transition-all hover:border-white/10 relative overflow-hidden flex flex-col;
+}
+
+.material-card-header {
+    @apply flex justify-between items-start mb-6;
+}
+
+.material-icon-box {
+    @apply w-10 h-10 rounded-lg bg-[#131415] border border-white/5 flex items-center justify-center text-white/40;
+}
+
+.material-status-pill {
+    @apply text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded border;
+}
+
+.status-available {
+    @apply bg-transparent text-[#2fb080] border-[#2fb080]/20;
+}
+
+.status-low {
+    @apply bg-transparent text-amber-400 border-amber-400/20;
+}
+
+.material-body {
+    @apply mb-6;
+}
+
+.material-name {
+    @apply text-sm font-mono text-white/90 mb-2 truncate;
+}
+
+.material-sku-tag {
+    @apply text-[9px] font-mono text-white/30 tracking-widest uppercase;
+}
+
+.material-footer {
+    @apply mt-auto pt-4 border-t border-white/5 flex flex-col gap-4;
+}
+
+.material-stats-row {
+    @apply flex justify-between items-center;
+}
+
+.stat-label {
+    @apply text-[9px] font-mono uppercase text-white/40 tracking-[0.2em];
+}
+
+.stat-value {
+    @apply text-sm font-mono text-white/80;
+}
+
+.stat-unit {
+    @apply text-[9px] font-mono text-white/30 ml-1;
+}
+
+.supplier-box {
+    @apply bg-[#131415] p-3 rounded-md border border-white/5 flex items-center gap-3;
+}
+
+.supplier-avatar {
+    @apply w-6 h-6 rounded bg-white/5 text-[9px] flex items-center justify-center font-mono text-white/50 border border-white/10;
+}
+
+.supplier-name {
+    @apply text-[10px] font-mono uppercase tracking-widest text-white/60 truncate;
+}
+
+/* Empty State */
+.empty-state-card {
+    @apply flex flex-col items-center justify-center py-24 bg-[#131415]/50 border border-white/5 border-dashed rounded-xl col-span-full text-center transition-all duration-300 hover:border-white/10 hover:bg-[#131415] cursor-pointer;
+}
+
+.empty-state-icon {
+    @apply text-white/20 mb-6;
+}
+
+.empty-state-card h3 {
+    @apply font-display text-3xl font-normal text-white/80 mb-2;
+}
+
+.empty-state-card p {
+    @apply text-white/40 font-mono text-xs uppercase tracking-widest;
+}
