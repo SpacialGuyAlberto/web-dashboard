@@ -1,249 +1,266 @@
 <div class="crews-page-container">
-    <div class="crews-page-wrapper">
-        <!-- Header -->
-        <div class="page-header">
-            <h1>Field Crews</h1>
-            <p>Manage field deployment teams and their assignments</p>
-        </div>
+  <div class="crews-page-wrapper">
+    <!-- Header -->
+    <div class="page-header">
+      <h1>Field Crews</h1>
+      <p>Manage field deployment teams and their assignments</p>
+    </div>
 
-        <!-- Crews Grid -->
-        <div class="crews-grid">
-            <div *ngFor="let crew of crews" class="crew-card">
-                <!-- Crew Header -->
-                <div class="crew-card-header">
-                    <div>
-                        <h3 class="crew-title">{{ crew.name }}</h3>
-                        <p class="crew-subtitle">Led by {{ crew.leader }}</p>
-                    </div>
-                    <span [class]="getStatusColor(crew.status)" class="crew-status-badge">
-                        {{ getStatusText(crew.status) }}
-                    </span>
-                </div>
-
-                <!-- Crew Details -->
-                <div class="crew-card-details">
-                    <div class="crew-detail-row">
-                        <span class="detail-label">Members</span>
-                        <span class="detail-value">{{ crew.members }}</span>
-                    </div>
-                    <div class="crew-detail-row">
-                        <span class="detail-label">Location</span>
-                        <span class="detail-value">{{ crew.location }}</span>
-                    </div>
-                    <div class="crew-detail-row">
-                        <span class="detail-label">Project</span>
-                        <span class="detail-value">{{ crew.currentProject }}</span>
-                    </div>
-                </div>
-
-                <!-- Actions -->
-                <div class="crew-actions">
-                    <button (click)="openDetailsModal(crew)" class="btn-view-details">
-                        View Details
-                    </button>
-                    <button (click)="openEditModal(crew)" class="btn-edit-crew">
-                        Edit
-                    </button>
-                </div>
+    <!-- Crews Grid -->
+    <div class="crews-grid">
+      @for (crew of crews; track crew) {
+        <div class="crew-card">
+          <!-- Crew Header -->
+          <div class="crew-card-header">
+            <div>
+              <h3 class="crew-title">{{ crew.name }}</h3>
+              <p class="crew-subtitle">Led by {{ crew.leader }}</p>
             </div>
-        </div>
+            <span [class]="getStatusColor(crew.status)" class="crew-status-badge">
+                            {{ getStatusText(crew.status) }}
+                        </span>
+          </div>
 
-        <!-- Add Crew Button -->
-        <div class="btn-add-crew-wrapper">
-            <button (click)="openCreateModal()" class="btn-add-crew">
-                + New Field Crew
+          <!-- Crew Details -->
+          <div class="crew-card-details">
+            <div class="crew-detail-row">
+              <span class="detail-label">Members</span>
+              <span class="detail-value">{{ crew.members }}</span>
+            </div>
+            <div class="crew-detail-row">
+              <span class="detail-label">Location</span>
+              <span class="detail-value">{{ crew.location }}</span>
+            </div>
+            <div class="crew-detail-row">
+              <span class="detail-label">Project</span>
+              <span class="detail-value">{{ crew.currentProject }}</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="crew-actions">
+            <button (click)="openDetailsModal(crew)" class="btn-view-details">
+              View Details
             </button>
+            <button (click)="openEditModal(crew)" class="btn-edit-crew">
+              Edit
+            </button>
+          </div>
         </div>
+      }
     </div>
 
-    <!-- Create/Edit Crew Modal -->
-    <div *ngIf="showCreateModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h2>{{ isEditing ? 'Edit Crew' : 'New Field Crew' }}</h2>
-                <button (click)="closeCreateModal()" class="btn-close-icon">
-                    <span>&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Crew Name</label>
-                    <input [(ngModel)]="newCrew.name" type="text" class="form-control" placeholder="e.g., Alpha Team">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Team Leader</label>
-                    <input [(ngModel)]="newCrew.leader" type="text" class="form-control" placeholder="e.g., John Doe">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Number of Members</label>
-                    <input [(ngModel)]="newCrew.members" type="number" min="1" class="form-control"
-                        placeholder="e.g., 5">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Current Project</label>
-                    <input [(ngModel)]="newCrew.currentProject" type="text" class="form-control"
-                        placeholder="e.g., Berlin Fiber Deployment">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Location</label>
-                    <input [(ngModel)]="newCrew.location" type="text" class="form-control"
-                        placeholder="e.g., Berlin District 2">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select [(ngModel)]="newCrew.status" class="form-select">
-                        <option value="active">Active</option>
-                        <option value="idle">Idle</option>
-                        <option value="off-duty">Off Duty</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button (click)="closeCreateModal()" class="btn-modal-cancel">
-                    Cancel
-                </button>
-                <button (click)="saveCrew()" class="btn-modal-save" [disabled]="!newCrew.name">
-                    {{ isEditing ? 'Save Changes' : 'Create Crew' }}
-                </button>
-            </div>
-        </div>
+    <!-- Add Crew Button -->
+    <div class="btn-add-crew-wrapper">
+      <button (click)="openCreateModal()" class="btn-add-crew">
+        + New Field Crew
+      </button>
     </div>
+  </div>
 
-    <!-- Details Modal -->
-    <div *ngIf="showDetailsModal && selectedCrew" class="modal-overlay">
-        <div class="modal-container-wide">
-            <div class="modal-header">
-                <h2>Crew Overview</h2>
-                <button (click)="closeDetailsModal()" class="btn-close-icon">
-                    <span>&times;</span>
-                </button>
-            </div>
-
-            <div class="space-y-6">
-                <!-- Basic Info -->
-                <div class="details-grid">
-                    <div class="details-box">
-                        <p class="details-label">Crew Name</p>
-                        <p class="details-value-large">{{ selectedCrew.name }}</p>
-                    </div>
-                    <div class="details-box">
-                        <p class="details-label">Team Leader</p>
-                        <p class="details-value-medium">{{ selectedCrew.leader }}</p>
-                    </div>
-                    <div class="details-box">
-                        <p class="details-label">Total Members</p>
-                        <p class="details-value-medium">{{ selectedCrew.members }} People</p>
-                    </div>
-                    <div class="details-box items-start justify-center">
-                        <p class="details-label">Status</p>
-                        <span [class]="getStatusColor(selectedCrew.status)" class="crew-status-badge mt-1">
-                            {{ getStatusText(selectedCrew.status) }}
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Assignment -->
-                <div class="assignment-section">
-                    <h3 class="section-title">Current Assignment</h3>
-                    <div class="details-grid">
-                        <div class="details-box">
-                            <p class="details-label">Project</p>
-                            <p class="details-value-medium">{{ selectedCrew.currentProject }}</p>
-                        </div>
-                        <div class="details-box">
-                            <p class="details-label">Location</p>
-                            <p class="details-value-medium">{{ selectedCrew.location }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Workers -->
-                <div class="assignment-section">
-                    <h3 class="section-title">Team Members</h3>
-                    <div class="workers-grid">
-                        <div class="worker-card cursor-pointer" *ngFor="let worker of mockWorkers" (click)="openWorkerDetails(worker)">
-                            <img [src]="worker.photoUrl" [alt]="worker.name" class="worker-photo">
-                            <h4 class="worker-name" [title]="worker.name">{{ worker.name }}</h4>
-                            <p class="worker-role">{{ worker.role }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button (click)="closeDetailsModal()" class="btn-modal-close-wide">
-                    Close Details
-                </button>
-            </div>
+  <!-- Create/Edit Crew Modal -->
+  @if (showCreateModal) {
+    <div class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>{{ isEditing ? 'Edit Crew' : 'New Field Crew' }}</h2>
+          <button (click)="closeCreateModal()" class="btn-close-icon">
+            <span>&times;</span>
+          </button>
         </div>
-    </div>
 
-    <!-- Worker Details Modal -->
-    <div *ngIf="showWorkerModal && selectedWorker" class="modal-overlay" style="z-index: 60;">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h2>Worker Profile</h2>
-                <button (click)="closeWorkerDetails()" class="btn-close-icon">
-                    <span>&times;</span>
-                </button>
-            </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Crew Name</label>
+            <input [(ngModel)]="newCrew.name" type="text" class="form-control" placeholder="e.g., Alpha Team">
+          </div>
 
-            <div class="modal-body space-y-6">
-                <!-- Profile Header -->
-                <div class="flex items-center gap-6">
-                    <img [src]="selectedWorker.photoUrl" [alt]="selectedWorker.name" class="w-24 h-24 rounded-full border-2 border-white/10 shadow-xl object-cover">
-                    <div>
-                        <h3 class="font-display text-2xl text-white/90">{{ selectedWorker.name }}</h3>
-                        <p class="font-mono text-[10px] text-[#2fb080] uppercase tracking-[0.2em] mt-1">{{ selectedWorker.role }}</p>
-                        <span class="inline-block mt-3 px-2 py-0.5 text-[9px] font-mono uppercase tracking-widest rounded border" 
-                            [ngClass]="selectedWorker.status === 'Working' ? 'text-[#2fb080] border-[#2fb080]/30' : 'text-amber-400 border-amber-400/30'">
-                            {{ selectedWorker.status }}
-                        </span>
-                    </div>
-                </div>
+          <div class="form-group">
+            <label class="form-label">Team Leader</label>
+            <select [(ngModel)]="newCrew.leader" class="form-select">
+              <option value="" disabled selected>Select a team leader</option>
+              @for (worker of mockWorkers; track worker.name) {
+                <option [value]="worker.name">{{ worker.name }} - {{ worker.role }}</option>
+              }
+            </select>
+          </div>
 
-                <!-- Current Assignment -->
-                <div class="border-t border-white/5 pt-4">
-                    <h4 class="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-3">Current Assignment</h4>
-                    <div class="space-y-2">
-                        <div class="flex justify-between">
-                            <span class="font-mono text-[10px] text-white/40 tracking-widest">Project:</span>
-                            <span class="font-mono text-[10px] text-white/80">{{ selectedWorker.currentProject }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-mono text-[10px] text-white/40 tracking-widest">Location:</span>
-                            <span class="font-mono text-[10px] text-white/80">{{ selectedWorker.location }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="font-mono text-[10px] text-white/40 tracking-widest">Hours this week:</span>
-                            <span class="font-mono text-[10px] text-white/80">{{ selectedWorker.hoursLogged }} hrs</span>
-                        </div>
-                    </div>
-                </div>
+          <div class="form-group">
+            <label class="form-label">Number of Members</label>
+            <input [(ngModel)]="newCrew.members" type="number" min="1" class="form-control"
+                   placeholder="e.g., 5">
+          </div>
 
-                <!-- Past Projects -->
-                <div class="border-t border-white/5 pt-4">
-                    <h4 class="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-3">Past Projects</h4>
-                    <ul class="space-y-2">
-                        <li *ngFor="let project of selectedWorker.pastProjects" class="font-mono text-[10px] text-white/60 tracking-widest flex items-center gap-2">
-                            <span class="text-white/20">■</span> {{ project }}
-                        </li>
-                    </ul>
-                </div>
-            </div>
+          <div class="form-group">
+            <label class="form-label">Current Project</label>
+            <input [(ngModel)]="newCrew.currentProject" type="text" class="form-control"
+                   placeholder="e.g., Berlin Fiber Deployment">
+          </div>
 
-            <div class="modal-footer">
-                <button (click)="closeWorkerDetails()" class="btn-modal-cancel w-full text-center justify-center flex">
-                    Back to Crew Details
-                </button>
-            </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input [(ngModel)]="newCrew.location" type="text" class="form-control"
+                   placeholder="e.g., Berlin District 2">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select [(ngModel)]="newCrew.status" class="form-select">
+              <option value="active">Active</option>
+              <option value="idle">Idle</option>
+              <option value="off-duty">Off Duty</option>
+            </select>
+          </div>
         </div>
+
+        <div class="modal-footer">
+          <button (click)="closeCreateModal()" class="btn-modal-cancel">
+            Cancel
+          </button>
+          <button (click)="saveCrew()" class="btn-modal-save" [disabled]="!newCrew.name">
+            {{ isEditing ? 'Save Changes' : 'Create Crew' }}
+          </button>
+        </div>
+      </div>
     </div>
+  }
+
+  <!-- Details Modal -->
+  @if (showDetailsModal && selectedCrew) {
+    <div class="modal-overlay">
+      <div class="modal-container-wide">
+        <div class="modal-header">
+          <h2>Crew Overview</h2>
+          <button (click)="closeDetailsModal()" class="btn-close-icon">
+            <span>&times;</span>
+          </button>
+        </div>
+
+        <div class="space-y-6">
+          <!-- Basic Info -->
+          <div class="details-grid">
+            <div class="details-box">
+              <p class="details-label">Crew Name</p>
+              <p class="details-value-large">{{ selectedCrew.name }}</p>
+            </div>
+            <div class="details-box">
+              <p class="details-label">Team Leader</p>
+              <p class="details-value-medium">{{ selectedCrew.leader }}</p>
+            </div>
+            <div class="details-box">
+              <p class="details-label">Total Members</p>
+              <p class="details-value-medium">{{ selectedCrew.members }} People</p>
+            </div>
+            <div class="details-box items-start justify-center">
+              <p class="details-label">Status</p>
+              <span [class]="getStatusColor(selectedCrew.status)" class="crew-status-badge mt-1">
+                                {{ getStatusText(selectedCrew.status) }}
+                            </span>
+            </div>
+          </div>
+
+          <!-- Assignment -->
+          <div class="assignment-section">
+            <h3 class="section-title">Current Assignment</h3>
+            <div class="details-grid">
+              <div class="details-box">
+                <p class="details-label">Project</p>
+                <p class="details-value-medium">{{ selectedCrew.currentProject }}</p>
+              </div>
+              <div class="details-box">
+                <p class="details-label">Location</p>
+                <p class="details-value-medium">{{ selectedCrew.location }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Workers -->
+          <div class="assignment-section">
+            <h3 class="section-title">Team Members</h3>
+            <div class="workers-grid">
+              @for (worker of mockWorkers; track worker) {
+                <div class="worker-card cursor-pointer" (click)="openWorkerDetails(worker)">
+                  <img [src]="worker.photoUrl" [alt]="worker.name" class="worker-photo">
+                  <h4 class="worker-name" [title]="worker.name">{{ worker.name }}</h4>
+                  <p class="worker-role">{{ worker.role }}</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeDetailsModal()" class="btn-modal-close-wide">
+            Close Details
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Worker Details Modal -->
+  @if (showWorkerModal && selectedWorker) {
+    <div class="modal-overlay" style="z-index: 60;">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>Worker Profile</h2>
+          <button (click)="closeWorkerDetails()" class="btn-close-icon">
+            <span>&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body space-y-6">
+          <!-- Profile Header -->
+          <div class="flex items-center gap-6">
+            <img [src]="selectedWorker.photoUrl" [alt]="selectedWorker.name" class="w-24 h-24 rounded-full border-2 border-white/10 shadow-xl object-cover">
+            <div>
+              <h3 class="font-display text-2xl text-white/90">{{ selectedWorker.name }}</h3>
+              <p class="font-mono text-[10px] text-[#2fb080] uppercase tracking-[0.2em] mt-1">{{ selectedWorker.role }}</p>
+              <span class="inline-block mt-3 px-2 py-0.5 text-[9px] font-mono uppercase tracking-widest rounded border"
+                    [ngClass]="selectedWorker.status === 'Working' ? 'text-[#2fb080] border-[#2fb080]/30' : 'text-amber-400 border-amber-400/30'">
+                                {{ selectedWorker.status }}
+                            </span>
+            </div>
+          </div>
+
+          <!-- Current Assignment -->
+          <div class="border-t border-white/5 pt-4">
+            <h4 class="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-3">Current Assignment</h4>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="font-mono text-[10px] text-white/40 tracking-widest">Project:</span>
+                <span class="font-mono text-[10px] text-white/80">{{ selectedWorker.currentProject }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-mono text-[10px] text-white/40 tracking-widest">Location:</span>
+                <span class="font-mono text-[10px] text-white/80">{{ selectedWorker.location }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-mono text-[10px] text-white/40 tracking-widest">Hours this week:</span>
+                <span class="font-mono text-[10px] text-white/80">{{ selectedWorker.hoursLogged }} hrs</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Past Projects -->
+          <div class="border-t border-white/5 pt-4">
+            <h4 class="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-3">Past Projects</h4>
+            <ul class="space-y-2">
+              @for (project of selectedWorker.pastProjects; track project) {
+                <li class="font-mono text-[10px] text-white/60 tracking-widest flex items-center gap-2">
+                  <span class="text-white/20">■</span> {{ project }}
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeWorkerDetails()" class="btn-modal-cancel w-full text-center justify-center flex">
+            Back to Crew Details
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
