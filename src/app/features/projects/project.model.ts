@@ -1,4 +1,5 @@
 import {GeometryPoint} from '@features/segments/segment.model';
+import {Cluster} from '@features/clusters/cluster.model';
 
 export enum WorkType {
     EXCAVATION = 'EXCAVATION',
@@ -23,6 +24,7 @@ export interface Project {
     endDate?: string;
     geometry?: GeometryPoint[];
     organizationId?: number;
+    clusters?: Cluster[];
     lifecycle_todo?: WorkType[];
     lifecycle_done?: WorkType[];
 }

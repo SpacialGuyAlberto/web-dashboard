@@ -19,12 +19,9 @@
               <span class="location-icon">🏢</span>
               <h3>{{ cluster.name }}</h3>
             </div>
-            <span class="city-area-tag">{{ cluster.cityArea }}</span>
+            <span class="city-area-tag">{{ cluster.description || 'No description' }}</span>
           </div>
           <div class="status-stack">
-            <span class="status-badge" [ngClass]="getStatusColor(cluster.status)">
-              {{ getStatusText(cluster.status) }}
-            </span>
             <span class="id-badge">ID: {{ cluster.id }}</span>
           </div>
         </div>
@@ -32,11 +29,11 @@
         <div class="cluster-info-grid">
           <div class="info-item">
             <span class="info-label">POPs</span>
-            <span class="info-value">{{ cluster.popCount }}</span>
+            <span class="info-value">{{ getPopCount(cluster) }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Netzverteiler</span>
-            <span class="info-value">{{ cluster.netzverteilerCount }}</span>
+            <span class="info-value">{{ getNetzverteilerCount(cluster) }}</span>
           </div>
         </div>
 
@@ -76,36 +73,20 @@
             </div>
 
             <div class="form-group mb-4">
-              <label class="form-label text-[9px] font-mono uppercase text-white/30 mb-2 block">City Area</label>
-              <input [(ngModel)]="newCluster.cityArea" type="text" class="form-input w-full bg-[#131415] border border-white/5 rounded px-4 py-2 text-white/90 text-sm focus:border-[#6938ef]/50 outline-none" placeholder="e.g., Berlin Mitte">
+              <label class="form-label text-[9px] font-mono uppercase text-white/30 mb-2 block">Description</label>
+              <textarea [(ngModel)]="newCluster.description" class="form-input w-full bg-[#131415] border border-white/5 rounded px-4 py-2 text-white/90 text-sm focus:border-[#6938ef]/50 outline-none" rows="3" placeholder="Description..."></textarea>
             </div>
-
-            <div class="grid grid-cols-2 gap-4 mb-4">
-              <div class="form-group">
-                <label class="form-label text-[9px] font-mono uppercase text-white/30 mb-2 block">POP Count</label>
-                <input [(ngModel)]="newCluster.popCount" type="number" min="1" class="form-input w-full bg-[#131415] border border-white/5 rounded px-4 py-2 text-white/90 text-sm focus:border-[#6938ef]/50 outline-none">
-              </div>
-
-              <div class="form-group">
-                <label class="form-label text-[9px] font-mono uppercase text-white/30 mb-2 block">Netzverteiler Count</label>
-                <input [(ngModel)]="newCluster.netzverteilerCount" type="number" min="0" class="form-input w-full bg-[#131415] border border-white/5 rounded px-4 py-2 text-white/90 text-sm focus:border-[#6938ef]/50 outline-none">
-              </div>
-            </div>
-
+            
             <div class="form-group mb-4">
-              <label class="form-label text-[9px] font-mono uppercase text-white/30 mb-2 block">Initial Status</label>
-              <select [(ngModel)]="newCluster.status" class="form-select w-full bg-[#131415] border border-white/5 rounded px-4 py-2 text-white/90 text-sm focus:border-[#6938ef]/50 outline-none">
-                <option value="PLANNED">Planned</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="COMPLETED">Completed</option>
-              </select>
+              <label class="form-label text-[9px] font-mono uppercase text-white/30 mb-2 block">Project Manager ID</label>
+              <input [(ngModel)]="newCluster.projectManagerId" type="number" class="form-input w-full bg-[#131415] border border-white/5 rounded px-4 py-2 text-white/90 text-sm focus:border-[#6938ef]/50 outline-none" placeholder="e.g., 12">
             </div>
           </div>
         </div>
 
         <div class="modal-footer p-6 border-t border-white/5 flex justify-end gap-3 bg-[#161719]">
           <button (click)="closeCreateModal()" class="btn-action-outline px-6 py-2 rounded text-white/70 hover:text-white border border-white/5 bg-transparent hover:bg-white/5 transition-all text-[10px] font-mono uppercase tracking-widest">Cancel</button>
-          <button (click)="saveCluster()" class="btn-primary px-6 py-2 rounded bg-[#6938ef] text-white hover:bg-[#5b2ecf] transition-all text-[10px] font-mono uppercase tracking-widest disabled:opacity-50" [disabled]="!newCluster.name || !newCluster.cityArea">
+          <button (click)="saveCluster()" class="btn-primary px-6 py-2 rounded bg-[#6938ef] text-white hover:bg-[#5b2ecf] transition-all text-[10px] font-mono uppercase tracking-widest disabled:opacity-50" [disabled]="!newCluster.name">
             Create Cluster
           </button>
         </div>

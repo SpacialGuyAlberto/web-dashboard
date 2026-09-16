@@ -1,0 +1,191 @@
+    <div class="modal-overlay">
+      <div class="modal-container-large">
+        <div class="modal-header p-6 border-b border-white/5 flex flex-col items-center relative bg-[#161719]">
+          <h2 class="font-display text-3xl font-normal text-white mt-2">{{ isEditing ? 'Edit Segment' : 'New Segment' }}</h2>
+        </div>
+
+        <div class="modal-content-scroll">
+          <div class="form-group-list">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">Street Name</label>
+                <input [(ngModel)]="newSegment.streetName" type="text" class="form-input" placeholder="e.g., Hauptstraße">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Street Type</label>
+                <select [(ngModel)]="newSegment.streetType" class="form-select">
+                  <option value="residential">Residential</option>
+                  <option value="highway">Highway</option>
+                  <option value="commercial">Commercial</option>
+                  <option value="industrial">Industrial</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">Work Type</label>
+                <select [(ngModel)]="newSegment.workType" class="form-select">
+                    @for (type of workTypeOptions; track type){
+                      <option [value]="type" class="select-option">
+                        {{type}}
+                      </option>
+                    }
+                </select>
+              </div>
+
+              @if (isEditing && availableTransitions.length > 0) {
+                <div class="form-group">
+                  <label class="form-label">Available Actions</label>
+                  <div class="transition-actions">
+                    @for (transition of availableTransitions; track transition.actionName) {
+                      <button (click)="executeTransition(transition)" class="btn-transition">
+                        {{ transition.actionName }}
+                      </button>
+                    }
+                  </div>
+                  <p class="text-[9px] font-mono text-white/40 mt-1 uppercase tracking-widest">Current State: {{ getStateText(newSegment.currentState) }}</p>
+                </div>
+              } @else {
+                <div class="form-group">
+                  <label class="form-label">Current State</label>
+                  <select [(ngModel)]="newSegment.currentState" [disabled]="isEditing" class="form-select disabled:opacity-50">
+                    <option value="PLAN">Plan</option>
+                    <option value="EXCAVATION">Excavation</option>
+                    <option value="DUCT_INSTALLATION">Duct Installation</option>
+                    <option value="BACKFILL">Backfill</option>
+                    <option value="ASPHALT">Asphalt</option>
+                    <option value="DOCUMENTATION">Documentation</option>
+                    <option value="QA_APPROVAL">QA Approval</option>
+                    <option value="COMPLETED">Completed</option>
+                  </select>
+                </div>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Assigned Crew</label>
+              <select [(ngModel)]="newSegment.assignedCrewId" class="form-select">
+                <option [ngValue]="null">-- No Crew Assigned --</option>
+                @for (crew of crews; track crew.id) {
+                  <option [ngValue]="crew.id">
+                    {{crew.name}} ({{crew.size}} ppl)
+                  </option>
+                }
+              </select>
+            </div>
+
+            <div class="form-grid-2 mt-4">
+              <div class="form-group">
+                <label class="form-label">Start Address</label>
+                <input [ngModel]="startAddress || 'Click on map to get address'" type="text" readonly class="form-input form-input-readonly text-sm">
+              </div>
+              <div class="form-group">
+                <label class="form-label">End Address</label>
+                <input [ngModel]="endAddress || 'Click on map to get address'" type="text" readonly class="form-input form-input-readonly text-sm">
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">Start Point (Lat, Lng)</label>
+                <input [ngModel]="newSegment.startLatitude + ', ' + newSegment.startLongitude" type="text" readonly class="form-input form-input-readonly text-sm">
+              </div>
+              <div class="form-group">
+                <label class="form-label">End Point (Lat, Lng)</label>
+                <input [ngModel]="newSegment.endLatitude + ', ' + newSegment.endLongitude" type="text" readonly class="form-input form-input-readonly text-sm">
+              </div>
+            </div>
+
+            @if (customFieldDefinitions.length > 0) {
+              <div class="mt-6 border-t border-white/10 pt-4">
+                <h4 class="text-[10px] font-mono text-white/50 uppercase tracking-[0.2em] mb-3">Additional Information</h4>
+                <div class="form-grid-2">
+                  @for (field of customFieldDefinitions; track field.fieldKey) {
+                    <div>
+                      <app-dynamic-input [field]="field" [value]="customFieldsData[field.fieldKey]"
+                                         (valueChange)="customFieldsData[field.fieldKey] = $event">
+                      </app-dynamic-input>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="form-group mt-4">
+              <label class="form-label mb-2">Route Selection</label>
+
+
+              <app-segment-creation-map [startLat]="newSegment.startLatitude || 0"
+                                        [startLng]="newSegment.startLongitude || 0" [endLat]="newSegment.endLatitude || 0"
+                                        [endLng]="newSegment.endLongitude || 0" [isEditing]="isEditing" [smartPlan]="smartPlan"
+                                        [projectGeometry]="projectGeometry"
+                                        (coordinatesChanged)="onCoordinatesChanged($event)">
+              </app-segment-creation-map>
+              <p class="length-callout">Calculated Length: <strong>{{ newSegment.length }}m</strong></p>
+            </div>
+
+            @if (smartPlan) {
+              <div class="smart-plan-container">
+                <div class="smart-plan-header">
+                  <span class="text-xl">💡</span>
+                  <h4>Smart Planning Suggestion</h4>
+                </div>
+
+                <div class="smart-plan-grid">
+                  <div>
+                    <p class="smart-plan-label">Recommended Regelplan</p>
+                    <p class="smart-plan-value">{{ smartPlan.suggestedRegelplan }}</p>
+                  </div>
+                  <div>
+                    <p class="smart-plan-label">Safety Score</p>
+                    <p class="font-bold" [class.text-green-500]="smartPlan.safetyScore > 80"
+                       [class.text-yellow-500]="smartPlan.safetyScore <= 80">
+                      {{ smartPlan.safetyScore }}/100
+                    </p>
+                  </div>
+                </div>
+
+                @if (smartPlan.requiresPermit) {
+                  <div class="smart-plan-alert">
+                    <span>⚠️</span>
+                    <strong>PERMIT REQUIRED:</strong> High traffic density detected. Mandatory LSA (Ampel) setup.
+                  </div>
+                }
+
+                <div class="mt-4">
+                  <p class="smart-plan-list-label">Required Safety Materials (Auto-Calculated):</p>
+                  <ul class="smart-plan-list">
+                    @for (material of smartPlan.requiredMaterials; track $index) {
+                      <li class="smart-plan-list-item">
+                        <span class="bullet-blue"></span>
+                        {{ material }}
+                      </li>
+                    }
+                  </ul>
+                </div>
+
+                <div class="environmental-context">
+                  <div class="context-item">
+                    <span>🌡️</span>
+                    <span>{{ smartPlan.environmentalContext.weather.temperature }}°C ({{ smartPlan.environmentalContext.weather.condition }})</span>
+                  </div>
+                  <div class="context-item">
+                    <span>🚗</span>
+                    <span>Traffic: {{ smartPlan.environmentalContext.traffic.congestionLevel }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeModal()" class="btn-edit-outline">Cancel</button>
+          <button (click)="saveSegment()" class="btn-view" [disabled]="!newSegment.streetName">
+            {{ isEditing ? 'Save Changes' : 'Create Segment' }}
+          </button>
+        </div>
+      </div>
+    </div>

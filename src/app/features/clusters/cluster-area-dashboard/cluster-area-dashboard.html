@@ -7,6 +7,7 @@
   
   <!-- Map Area -->
   <div class="map-area transition-all duration-500 ease-in-out relative overflow-hidden"
+       [class.hidden]="!showMap"
        [ngClass]="{
          'flex-1': viewMode === 'map-focused' || viewMode === 'split',
          'absolute bottom-6 right-6 w-80 h-48 rounded-2xl shadow-2xl border-2 border-[#131415] z-50 pointer-events-auto': viewMode === 'data-focused'
@@ -29,7 +30,7 @@
   </div>
 
   <!-- Resizer (only visible if not data-focused) -->
-  <div class="resizer flex items-center justify-center relative" *ngIf="viewMode !== 'data-focused'"
+  <div class="resizer flex items-center justify-center relative" *ngIf="viewMode !== 'data-focused' && showMap"
        (mousedown)="onResizeStart($event)"
        [ngClass]="{
          'cursor-col-resize w-2 -mx-1 hover:bg-white/5 transition-colors z-20': panelPosition === 'left' || panelPosition === 'right',
@@ -51,13 +52,13 @@
        [class.transition-all]="!isResizing"
        [class.duration-500]="!isResizing"
        [ngClass]="{
-         'flex-1 w-full h-full relative': viewMode === 'data-focused',
-         'border-r': panelPosition === 'left' && viewMode !== 'data-focused',
-         'border-l': panelPosition === 'right' && viewMode !== 'data-focused',
-         'border-t': panelPosition === 'bottom' && viewMode !== 'data-focused'
+         'flex-1 w-full h-full relative': viewMode === 'data-focused' || !showMap,
+         'border-r': panelPosition === 'left' && viewMode !== 'data-focused' && showMap,
+         'border-l': panelPosition === 'right' && viewMode !== 'data-focused' && showMap,
+         'border-t': panelPosition === 'bottom' && viewMode !== 'data-focused' && showMap
        }"
-       [style.width.px]="viewMode !== 'data-focused' && panelPosition !== 'bottom' ? panelWidth : null"
-       [style.height.px]="viewMode !== 'data-focused' && panelPosition === 'bottom' ? panelHeight : null">
+       [style.width.px]="viewMode !== 'data-focused' && panelPosition !== 'bottom' && showMap ? panelWidth : null"
+       [style.height.px]="viewMode !== 'data-focused' && panelPosition === 'bottom' && showMap ? panelHeight : null">
     
     <!-- Header -->
     <div class="content-header p-6 border-b border-white/5 shrink-0 flex flex-col gap-5">
@@ -107,6 +108,17 @@
             <span class="text-[9px] font-mono uppercase tracking-widest hidden sm:inline">Data</span>
           </button>
         </div>
+
+        <div class="w-px h-4 bg-white/10 mx-2"></div>
+
+        <!-- Map Visibility Toggle -->
+        <div class="flex gap-1">
+          <button (click)="toggleMap()" [class.text-[#6938ef]]="showMap" class="text-white/40 hover:text-white transition-all cursor-pointer p-1.5 rounded bg-transparent border-none flex items-center gap-1">
+            <svg *ngIf="showMap" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+            <svg *ngIf="!showMap" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+            <span class="text-[9px] font-mono uppercase tracking-widest hidden sm:inline">{{ showMap ? 'Ausblenden' : 'Einblenden' }}</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -154,7 +166,7 @@
       </div>
 
       <!-- Projections (Visible in Split or Data mode) -->
-      <div *ngIf="viewMode !== 'map-focused'" class="projections-section animate-fade-in shrink-0">
+      <div *ngIf="viewMode !== 'map-focused' || !showMap" class="projections-section animate-fade-in shrink-0">
         <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] text-white/50 mb-4">Project Overview & Forecasts</h3>
         <div class="grid grid-cols-3 gap-4">
           <div class="p-4 bg-white/5 border border-white/10 rounded-xl relative overflow-hidden">
@@ -189,26 +201,33 @@
       <div class="nodes-section flex-1 flex flex-col min-h-[300px]">
         <div class="list-header flex justify-between items-center mb-4 shrink-0">
           <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] text-white/50">Network Nodes Breakdown</h3>
-          <button class="bg-white/5 border border-white/5 text-white/70 py-1 px-3 rounded font-mono text-[9px] uppercase tracking-widest hover:bg-[#6938ef] hover:text-white hover:border-[#6938ef] transition-all cursor-pointer">
-            + Add Node
+          <button (click)="openModalFor('SEGMENT')" class="bg-white/5 border border-white/5 text-white/70 py-1 px-3 rounded font-mono text-[9px] uppercase tracking-widest hover:bg-[#6938ef] hover:text-white hover:border-[#6938ef] transition-all cursor-pointer">
+            + New Segment
           </button>
         </div>
         
         <!-- Narrow Accordion View (Map Focused) -->
-        <div *ngIf="viewMode === 'map-focused'" class="flex flex-col gap-3">
+        <div *ngIf="viewMode === 'map-focused' && showMap" class="flex flex-col gap-3">
           @for (group of groupedElements | keyvalue; track group.key) {
             <div class="group-accordion bg-[#131415] border border-white/5 rounded-xl overflow-hidden transition-all duration-300">
               <!-- Group Header -->
-              <button class="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors cursor-pointer border-none bg-transparent" (click)="toggleGroup(group.key)">
-                <span class="text-xs font-mono uppercase tracking-widest text-white/90 flex items-center gap-2">
-                  <div class="w-2 h-2 rounded-full" [style.background-color]="group.value.length ? getColorForType(group.value[0].type) : '#fff'"></div>
-                  {{ group.key }}
-                </span>
+              <div class="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors border-none bg-transparent group/header">
+                <button class="flex-1 flex items-center gap-2 cursor-pointer bg-transparent border-none p-0 text-left" (click)="toggleGroup(group.key)">
+                  <span class="text-xs font-mono uppercase tracking-widest text-white/90 flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full" [style.background-color]="group.value.length ? getColorForType(group.value[0].type) : '#fff'"></div>
+                    {{ group.key }}
+                  </span>
+                </button>
                 <div class="flex items-center gap-3">
+                  <button *ngIf="group.key === 'POP'" (click)="openModalFor('POP')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
+                  <button *ngIf="group.key === 'Netzverteiler'" (click)="openModalFor('DP')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
+                  <button *ngIf="group.key === 'Acometidas' || group.key === 'HEÜPs'" (click)="openModalFor('ACOMETIDA')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
                   <span class="text-[9px] font-mono bg-white/10 px-2 py-0.5 rounded-full text-white/70">{{ group.value.length }}</span>
-                  <svg [class.rotate-180]="expandedGroup === group.key" class="transition-transform duration-300 text-white/40" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+                  <button class="bg-transparent border-none p-0 flex items-center cursor-pointer" (click)="toggleGroup(group.key)">
+                    <svg [class.rotate-180]="expandedGroup === group.key" class="transition-transform duration-300 text-white/40" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+                  </button>
                 </div>
-              </button>
+              </div>
               
               <!-- Group Body -->
               <div class="flex flex-col p-3 pt-0 border-t border-white/5 bg-black/20" *ngIf="expandedGroup === group.key">
@@ -238,7 +257,7 @@
         </div>
 
         <!-- Rich Data Grid Accordion (Split or Data Focused) -->
-        <div *ngIf="viewMode !== 'map-focused'" class="bg-[#131415] border border-white/10 rounded-xl overflow-hidden flex-1 flex flex-col">
+        <div *ngIf="viewMode !== 'map-focused' || !showMap" class="bg-[#131415] border border-white/10 rounded-xl overflow-hidden flex-1 flex flex-col">
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
@@ -255,15 +274,22 @@
               <tbody class="font-mono text-[10px] text-white/80">
                 @for (group of groupedElements | keyvalue; track group.key) {
                   <!-- Accordion Group Header Row -->
-                  <tr class="bg-[#1a1b1e]/50 border-y border-white/5 hover:bg-white/5 transition-colors cursor-pointer" (click)="toggleGroup(group.key)">
+                  <tr class="bg-[#1a1b1e]/50 border-y border-white/5 hover:bg-white/5 transition-colors group/header">
                     <td colspan="7" class="py-3 px-4">
                       <div class="flex items-center justify-between">
-                        <span class="text-xs font-mono uppercase tracking-widest text-white/90 flex items-center gap-2">
-                          <div class="w-2 h-2 rounded-full" [style.background-color]="group.value.length ? getColorForType(group.value[0].type) : '#fff'"></div>
-                          {{ group.key }}
-                          <span class="text-[9px] bg-white/10 px-2 py-0.5 rounded-full text-white/50 ml-2">{{ group.value.length }}</span>
-                        </span>
-                        <svg [class.rotate-180]="expandedGroup === group.key" class="transition-transform duration-300 text-white/40" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+                        <div class="flex items-center cursor-pointer flex-1" (click)="toggleGroup(group.key)">
+                          <span class="text-xs font-mono uppercase tracking-widest text-white/90 flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full" [style.background-color]="group.value.length ? getColorForType(group.value[0].type) : '#fff'"></div>
+                            {{ group.key }}
+                            <span class="text-[9px] bg-white/10 px-2 py-0.5 rounded-full text-white/50 ml-2">{{ group.value.length }}</span>
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                          <button *ngIf="group.key === 'POP'" (click)="openModalFor('POP')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
+                          <button *ngIf="group.key === 'Netzverteiler'" (click)="openModalFor('DP')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
+                          <button *ngIf="group.key === 'Acometidas' || group.key === 'HEÜPs'" (click)="openModalFor('ACOMETIDA')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
+                          <svg (click)="toggleGroup(group.key)" [class.rotate-180]="expandedGroup === group.key" class="transition-transform duration-300 text-white/40 cursor-pointer" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -311,4 +337,120 @@
       </div>
     </div>
   </div>
+  <!-- POP Modal -->
+  @if (showPopModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div class="bg-[#161719] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+        <div class="p-5 border-b border-white/5 flex justify-between items-center">
+          <h2 class="font-display text-xl text-white">Create POP</h2>
+          <button (click)="closeAllModals()" class="text-white/40 hover:text-white transition-colors cursor-pointer bg-transparent border-none">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="p-6 flex flex-col gap-4">
+          <div class="form-group">
+            <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Name</label>
+            <input type="text" [(ngModel)]="newNodeData.name" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-[#6938ef]" placeholder="e.g. POP-10">
+          </div>
+          <div class="form-group">
+            <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Location Address</label>
+            <input type="text" [(ngModel)]="newNodeData.locationAddress" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-[#6938ef]" placeholder="e.g. Hauptstrasse 1">
+          </div>
+          <div class="form-group">
+            <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Max Capacity Ports</label>
+            <input type="number" [(ngModel)]="newNodeData.maxCapacityPorts" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-[#6938ef]" placeholder="e.g. 48">
+          </div>
+        </div>
+        <div class="p-5 border-t border-white/5 flex justify-end gap-3 bg-black/20">
+          <button (click)="closeAllModals()" class="px-4 py-2 text-[10px] font-mono text-white/60 hover:text-white border border-white/10 rounded cursor-pointer transition-colors bg-transparent uppercase tracking-widest">Cancel</button>
+          <button (click)="saveNode()" class="px-4 py-2 text-[10px] font-mono text-white bg-[#6938ef] hover:bg-[#5b2ecf] border-none rounded cursor-pointer transition-colors uppercase tracking-widest">Create POP</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Netzverteiler Modal -->
+  @if (showNvtModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div class="bg-[#161719] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+        <div class="p-5 border-b border-white/5 flex justify-between items-center">
+          <h2 class="font-display text-xl text-white">Create Netzverteiler (DP)</h2>
+          <button (click)="closeAllModals()" class="text-white/40 hover:text-white transition-colors cursor-pointer bg-transparent border-none">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="p-6 flex flex-col gap-4">
+          <div class="form-group">
+            <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Identifier</label>
+            <input type="text" [(ngModel)]="newNodeData.identifier" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-[#2fb080]" placeholder="e.g. NVT-01">
+          </div>
+          <div class="form-group">
+            <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Parent POP ID</label>
+            <input type="number" [(ngModel)]="newNodeData.popId" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-[#2fb080]" placeholder="Enter POP ID">
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="form-group">
+              <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Latitude</label>
+              <input type="number" [(ngModel)]="newNodeData.lat" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-[#2fb080]">
+            </div>
+            <div class="form-group">
+              <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Longitude</label>
+              <input type="number" [(ngModel)]="newNodeData.lng" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-[#2fb080]">
+            </div>
+          </div>
+        </div>
+        <div class="p-5 border-t border-white/5 flex justify-end gap-3 bg-black/20">
+          <button (click)="closeAllModals()" class="px-4 py-2 text-[10px] font-mono text-white/60 hover:text-white border border-white/10 rounded cursor-pointer transition-colors bg-transparent uppercase tracking-widest">Cancel</button>
+          <button (click)="saveNode()" class="px-4 py-2 text-[10px] font-mono text-white bg-[#2fb080] hover:bg-[#27946b] border-none rounded cursor-pointer transition-colors uppercase tracking-widest">Create DP</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Acometida/HEUP Modal -->
+  @if (showAcometidaModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div class="bg-[#161719] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+        <div class="p-5 border-b border-white/5 flex justify-between items-center">
+          <h2 class="font-display text-xl text-white">Create House Connection</h2>
+          <button (click)="closeAllModals()" class="text-white/40 hover:text-white transition-colors cursor-pointer bg-transparent border-none">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="p-6 flex flex-col gap-4">
+          <div class="form-group">
+            <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Address</label>
+            <input type="text" [(ngModel)]="newNodeData.name" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-[#fbbf24]" placeholder="e.g. Hauptstrasse 5">
+          </div>
+          <div class="form-group">
+            <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Parent Netzverteiler ID</label>
+            <input type="number" [(ngModel)]="newNodeData.nvtId" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-[#fbbf24]" placeholder="Enter NVT ID">
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="form-group">
+              <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Latitude</label>
+              <input type="number" [(ngModel)]="newNodeData.lat" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-[#fbbf24]">
+            </div>
+            <div class="form-group">
+              <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Longitude</label>
+              <input type="number" [(ngModel)]="newNodeData.lng" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-[#fbbf24]">
+            </div>
+          </div>
+        </div>
+        <div class="p-5 border-t border-white/5 flex justify-end gap-3 bg-black/20">
+          <button (click)="closeAllModals()" class="px-4 py-2 text-[10px] font-mono text-white/60 hover:text-white border border-white/10 rounded cursor-pointer transition-colors bg-transparent uppercase tracking-widest">Cancel</button>
+          <button (click)="saveNode()" class="px-4 py-2 text-[10px] font-mono text-black bg-[#fbbf24] hover:bg-[#d9a51f] border-none rounded cursor-pointer transition-colors uppercase tracking-widest">Create Connection</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Segment Modal -->
+  @if (showSegmentModal) {
+    <app-segment-create-modal
+      [projectId]="projectId"
+      (saved)="onSegmentSaved($event)"
+      (closed)="closeAllModals()">
+    </app-segment-create-modal>
+  }
 </div>

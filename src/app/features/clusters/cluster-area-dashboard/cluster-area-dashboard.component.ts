@@ -1,7 +1,15 @@
-import { Component, OnInit, ViewChild, HostListener, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, Inject, PLATFORM_ID, ChangeDetectorRef } from '@angular/core';
 import { isPlatformBrowser, CommonModule, KeyValuePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GoogleMapsModule, GoogleMap } from '@angular/google-maps';
+import { FormsModule } from '@angular/forms';
+import { PopService } from '../../infrastructure/pop.service';
+import { NetzverteilerService } from '../../infrastructure/netzverteiler.service';
+import { SegmentService } from '../../segments/segment.service';
+import { Pop } from '../../infrastructure/pop.model';
+import { Netzverteiler } from '../../infrastructure/netzverteiler.model';
+import { Segment } from '../../segments/segment.model';
+import { SegmentCreateModalComponent } from '../../segments/components/segment-create-modal/segment-create-modal.component';
 
 export interface NetworkElement {
   id: string;
@@ -20,7 +28,7 @@ export interface NetworkElement {
 @Component({
   selector: 'app-cluster-area-dashboard',
   standalone: true,
-  imports: [CommonModule, GoogleMapsModule],
+  imports: [CommonModule, GoogleMapsModule, FormsModule, SegmentCreateModalComponent],
   templateUrl: './cluster-area-dashboard.html',
   styleUrls: ['./cluster-area-dashboard.css']
 })
@@ -61,16 +69,19 @@ export class ClusterAreaDashboardComponent implements OnInit {
 
   elements: NetworkElement[] = [];
   
-  stats = {
-    pop: 0,
-    dp: 0,
-    acometida: 0,
-    heup: 0
-  };
+  stats = { pop: 0, dp: 0, acometida: 0, heup: 0 };
 
   isSidebarOpen = true; // Used for mobile/collapsing
   viewMode: 'map-focused' | 'split' | 'data-focused' = 'map-focused';
   panelPosition: 'left' | 'right' | 'bottom' = 'left';
+  showMap: boolean = true;
+
+  toggleMap() {
+    this.showMap = !this.showMap;
+    if (this.showMap) {
+      this.triggerMapResize();
+    }
+  }
 
   // Resizing state
   isResizing = false;
@@ -81,6 +92,38 @@ export class ClusterAreaDashboardComponent implements OnInit {
 
   // Accordion state
   expandedGroup: string = 'POP';
+
+  // Modal States
+  showPopModal = false;
+  showNvtModal = false;
+  showAcometidaModal = false;
+  showSegmentModal = false;
+
+  newNodeType: 'POP' | 'DP' | 'ACOMETIDA' | 'HEUP' | 'SEGMENT' = 'POP';
+  newNodeData: any = {};
+
+  openModalFor(type: 'POP' | 'DP' | 'ACOMETIDA' | 'HEUP' | 'SEGMENT') {
+    this.newNodeType = type;
+    this.newNodeData = {};
+    
+    if (type === 'POP') this.showPopModal = true;
+    else if (type === 'DP') this.showNvtModal = true;
+    else if (type === 'ACOMETIDA' || type === 'HEUP') this.showAcometidaModal = true;
+    else if (type === 'SEGMENT') this.showSegmentModal = true;
+  }
+
+  closeAllModals() {
+    this.showPopModal = false;
+    this.showNvtModal = false;
+    this.showAcometidaModal = false;
+    this.showSegmentModal = false;
+  }
+
+  onSegmentSaved(segment: any) {
+    this.closeAllModals();
+    // Assuming refresh mechanism would be called here if needed
+    // this.loadClusterData();
+  }
 
   get groupedElements() {
     return {
@@ -102,6 +145,10 @@ export class ClusterAreaDashboardComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private popService: PopService,
+    private nvtService: NetzverteilerService,
+    private segmentService: SegmentService,
+    private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -118,27 +165,104 @@ export class ClusterAreaDashboardComponent implements OnInit {
   }
 
   loadClusterData() {
-    const today = new Date();
-    // Generate mock data for visualization around Berlin
-    this.elements = [
-      { id: 'POP-01', type: 'POP', name: 'Main POP Mitte', lat: 52.5200, lng: 13.4050, status: 'ACTIVE', createdBy: 'Luis', createdAt: new Date(2025, 1, 10), forecastDate: new Date(2025, 2, 1), budget: 50000, contractor: 'QuarkBau Internal' },
-      
-      { id: 'DP-01', type: 'DP', name: 'Netzverteiler A', lat: 52.5210, lng: 13.4030, status: 'ACTIVE', createdBy: 'Anna M.', createdAt: new Date(2025, 3, 5), forecastDate: new Date(2025, 4, 10), budget: 12000, contractor: 'Alpha Networks' },
-      { id: 'DP-02', type: 'DP', name: 'Netzverteiler B', lat: 52.5190, lng: 13.4070, status: 'PLANNED', createdBy: 'Luis', createdAt: new Date(), forecastDate: new Date(2026, 1, 15), budget: 15000, contractor: 'Pending' },
-      { id: 'DP-03', type: 'DP', name: 'Netzverteiler C', lat: 52.5180, lng: 13.4020, status: 'ACTIVE', createdBy: 'Max W.', createdAt: new Date(2025, 5, 20), forecastDate: new Date(2025, 8, 1), budget: 11000, contractor: 'Alpha Networks' },
-      
-      { id: 'AC-01', type: 'ACOMETIDA', name: 'Route 1', lat: 52.5215, lng: 13.4025, status: 'ACTIVE', createdBy: 'SysAuto', createdAt: new Date(2025, 4, 1), forecastDate: new Date(2025, 4, 15), budget: 5000, contractor: 'Trenching GMBH' },
-      { id: 'AC-02', type: 'ACOMETIDA', name: 'Route 2', lat: 52.5208, lng: 13.4035, status: 'ACTIVE', createdBy: 'SysAuto', createdAt: new Date(2025, 4, 2), forecastDate: new Date(2025, 4, 18), budget: 4500, contractor: 'Trenching GMBH' },
-      { id: 'AC-03', type: 'ACOMETIDA', name: 'Route 3', lat: 52.5195, lng: 13.4065, status: 'PLANNED', createdBy: 'Luis', createdAt: new Date(), forecastDate: new Date(2026, 2, 1), budget: 6000, contractor: 'Pending' },
-      { id: 'AC-04', type: 'ACOMETIDA', name: 'Route 4', lat: 52.5185, lng: 13.4015, status: 'ERROR', createdBy: 'Max W.', createdAt: new Date(2025, 6, 10), forecastDate: new Date(2025, 7, 20), budget: 5500, contractor: 'Trenching GMBH' },
-      
-      { id: 'HE-01', type: 'HEUP', name: 'House 12', lat: 52.5218, lng: 13.4022, status: 'ACTIVE', createdBy: 'Install Team 1', createdAt: new Date(2025, 4, 20), forecastDate: new Date(2025, 4, 21), budget: 800, contractor: 'InstallPro' },
-      { id: 'HE-02', type: 'HEUP', name: 'House 14', lat: 52.5205, lng: 13.4038, status: 'ACTIVE', createdBy: 'Install Team 1', createdAt: new Date(2025, 4, 22), forecastDate: new Date(2025, 4, 23), budget: 800, contractor: 'InstallPro' },
-      { id: 'HE-03', type: 'HEUP', name: 'House 16', lat: 52.5198, lng: 13.4060, status: 'PLANNED', createdBy: 'Luis', createdAt: new Date(), forecastDate: new Date(2026, 3, 5), budget: 900, contractor: 'Pending' },
-      { id: 'HE-04', type: 'HEUP', name: 'House 18', lat: 52.5188, lng: 13.4012, status: 'ERROR', createdBy: 'Install Team 2', createdAt: new Date(2025, 7, 21), forecastDate: new Date(2025, 7, 21), budget: 850, contractor: 'InstallPro' }
-    ];
+    this.elements = [];
     
-    this.calculateStats();
+    // Load POPs
+    this.popService.getAllPops().subscribe(pops => {
+      pops.filter(p => p.clusterId === this.clusterId).forEach(p => {
+        this.elements.push({
+          id: p.id ? p.id.toString() : 'POP-?',
+          type: 'POP',
+          name: p.name || 'Unnamed POP',
+          lat: (p as any).latitude || this.center.lat,
+          lng: (p as any).longitude || this.center.lng,
+          status: 'PLANNED',
+          createdAt: new Date()
+        });
+      });
+      this.calculateStats();
+      this.cdr.detectChanges();
+    });
+
+    // Load Netzverteilers
+    this.nvtService.getAllNetzverteilers().subscribe(nvts => {
+      nvts.forEach(n => {
+        this.elements.push({
+          id: n.id ? n.id.toString() : 'DP-?',
+          type: 'DP',
+          name: (n as any).identifier || 'Unnamed DP',
+          lat: (n as any).latitude || this.center.lat + 0.001,
+          lng: (n as any).longitude || this.center.lng + 0.001,
+          status: 'PLANNED',
+          createdAt: new Date()
+        });
+      });
+      this.calculateStats();
+      this.cdr.detectChanges();
+    });
+
+    // Load Segments
+    if (this.projectId) {
+      this.segmentService.getProjectSegments(this.projectId).subscribe(segments => {
+        segments.forEach(s => {
+          this.elements.push({
+            id: s.id ? s.id.toString() : 'AC-?',
+            type: 'ACOMETIDA',
+            name: 'Segment ' + s.length + 'm',
+            lat: s.geometry && s.geometry.length > 0 ? s.geometry[0].lat : this.center.lat - 0.001,
+            lng: s.geometry && s.geometry.length > 0 ? s.geometry[0].lng : this.center.lng - 0.001,
+            status: 'PLANNED',
+            createdAt: new Date()
+          });
+        });
+        this.calculateStats();
+        this.cdr.detectChanges();
+      });
+    }
+  }
+
+  saveNode() {
+    if (this.newNodeType === 'POP') {
+      const pop: Partial<Pop> = {
+        clusterId: this.clusterId,
+        name: this.newNodeData.name,
+        locationAddress: this.newNodeData.locationAddress,
+        maxCapacityPorts: this.newNodeData.maxCapacityPorts
+      };
+
+      this.popService.createPop(pop as Pop).subscribe(() => {
+        this.loadClusterData();
+        this.closeAllModals();
+      });
+    } else if (this.newNodeType === 'DP') {
+      const dp: Partial<Netzverteiler> = {
+        popId: this.newNodeData.popId,
+        identifier: this.newNodeData.identifier,
+        latitude: this.newNodeData.lat,
+        longitude: this.newNodeData.lng
+      };
+
+      this.nvtService.createNetzverteiler(dp as Netzverteiler).subscribe(() => {
+        this.loadClusterData();
+        this.closeAllModals();
+      });
+    } else if (this.newNodeType === 'ACOMETIDA') {
+      const seg: Segment = {
+        streetName: this.newNodeData.name || 'Custom Segment',
+        streetType: 'UNKNOWN',
+        workType: 'UNKNOWN',
+        currentState: 'PLANNED',
+        length: 50, // default dummy
+        geometry: [
+          { lat: this.newNodeData.lat, lng: this.newNodeData.lng },
+          { lat: this.newNodeData.lat + 0.0005, lng: this.newNodeData.lng + 0.0005 }
+        ]
+      };
+      this.segmentService.createSegment(this.projectId, seg).subscribe(() => {
+        this.loadClusterData();
+        this.closeAllModals();
+      });
+    }
   }
 
   setViewMode(mode: 'map-focused' | 'split' | 'data-focused') {

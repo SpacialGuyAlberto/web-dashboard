@@ -3,5 +3,6 @@ export interface Pop {
     name: string;
     locationAddress: string;
     maxCapacityPorts: number;
+    clusterId?: number;
     nvtIds?: number[];
 }

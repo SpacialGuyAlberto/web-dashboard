@@ -6,7 +6,9 @@ export interface GeometryPoint {
 
 export interface Segment {
     id?: number;
-    projectId?: number;
+    startNvtId?: number;
+    endNvtId?: number;
+    connectedPopId?: number;
     assignedCrew?: number;
     assignedCrewId?: number;
     streetName: string;

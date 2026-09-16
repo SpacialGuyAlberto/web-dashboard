@@ -1,8 +1,9 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Cluster } from './cluster.model';
+import { ClusterService } from './cluster.service';
 
 @Component({
   selector: 'app-clusters',
@@ -19,47 +20,36 @@ export class ClustersComponent implements OnInit {
   showCreateModal = false;
   
   newCluster: Cluster = {
-    projectId: 0,
     name: '',
-    cityArea: '',
-    popCount: 1,
-    netzverteilerCount: 0,
-    status: 'PLANNED'
+    description: '',
+    projectId: 0
   };
+
+  constructor(
+    private clusterService: ClusterService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.newCluster.projectId = this.projectId;
-    // Mock data for demo
-    this.clusters = [
-      {
-        id: 1,
-        projectId: this.projectId,
-        name: 'Cluster Mitte',
-        cityArea: 'Berlin Mitte',
-        popCount: 2,
-        netzverteilerCount: 15,
-        status: 'IN_PROGRESS'
+    this.loadClusters();
+  }
+
+  loadClusters() {
+    this.clusterService.getClustersByProjectId(this.projectId).subscribe({
+      next: (data) => {
+        this.clusters = data;
+        this.cdr.detectChanges();
       },
-      {
-        id: 2,
-        projectId: this.projectId,
-        name: 'Cluster Kreuzberg',
-        cityArea: 'Friedrichshain-Kreuzberg',
-        popCount: 1,
-        netzverteilerCount: 8,
-        status: 'PLANNED'
-      }
-    ];
+      error: (err) => console.error('Error loading clusters', err)
+    });
   }
 
   openCreateModal() {
     this.newCluster = {
-      projectId: this.projectId,
       name: '',
-      cityArea: '',
-      popCount: 1,
-      netzverteilerCount: 0,
-      status: 'PLANNED'
+      description: '',
+      projectId: this.projectId
     };
     this.showCreateModal = true;
   }
@@ -69,27 +59,24 @@ export class ClustersComponent implements OnInit {
   }
 
   saveCluster() {
-    if (!this.newCluster.name || !this.newCluster.cityArea) return;
+    if (!this.newCluster.name) return;
     
-    const clusterToSave = {
-      ...this.newCluster,
-      id: Math.floor(Math.random() * 1000) + 100
-    };
-    
-    this.clusters.push(clusterToSave);
-    this.closeCreateModal();
+    this.clusterService.createCluster(this.newCluster).subscribe({
+      next: (created) => {
+        this.clusters.push(created);
+        this.closeCreateModal();
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error creating cluster', err)
+    });
   }
-
-  getStatusColor(status: string): string {
-    switch(status) {
-      case 'PLANNED': return 'text-white/50 border-white/10';
-      case 'IN_PROGRESS': return 'text-amber-400 border-amber-400/20';
-      case 'COMPLETED': return 'text-[#2fb080] border-[#2fb080]/20';
-      default: return 'text-white/50 border-white/10';
-    }
+  
+  getPopCount(cluster: Cluster): number {
+    return cluster.pops?.length || 0;
   }
-
-  getStatusText(status: string): string {
-    return status.replace('_', ' ');
+  
+  getNetzverteilerCount(cluster: Cluster): number {
+    if (!cluster.pops) return 0;
+    return cluster.pops.reduce((total, pop) => total + (pop.nvts?.length || 0), 0);
   }
 }

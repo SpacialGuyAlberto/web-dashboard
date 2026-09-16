@@ -18,11 +18,12 @@ import { SafetyService } from '@features/risk-planning/safety.service';
 import { PlanningService } from '@features/risk-planning/planning.service';
 import { WorkType } from '@shared/models/work-type.enum';
 import { GoogleMapsModule } from '@angular/google-maps';
+import { SegmentCreateModalComponent } from './components/segment-create-modal/segment-create-modal.component';
 
 @Component({
   selector: 'app-segments',
   standalone: true,
-  imports: [CommonModule, FormsModule, SafetyProtocolsComponent, IncidentReportComponent, SegmentCreationMapComponent, DynamicInputComponent, GoogleMapsModule],
+  imports: [CommonModule, FormsModule, SafetyProtocolsComponent, IncidentReportComponent, SegmentCreationMapComponent, DynamicInputComponent, GoogleMapsModule, SegmentCreateModalComponent],
   templateUrl: './segments.html',
   styleUrls: ['./segments.css']
 })
@@ -44,33 +45,7 @@ export class SegmentsComponent implements OnInit {
   isEditing = false;
   currentSegmentId: number | null = null;
   selectedSegment: Segment | null = null;
-
-  // Transient address fields for UI
-  startAddress: string = '';
-  endAddress: string = '';
-
-  // Custom Fields
-  customFieldDefinitions: CustomFieldDefinition[] = [];
-  customFieldsData: { [key: string]: any } = {};
-
-  // Workflow
-  availableTransitions: any[] = [];
-  workType = WorkType;
-  workTypeOptions = Object.values(this.workType);
-
-  newSegment: Segment = {
-    streetName: '',
-    streetType: 'residential',
-    workType: this.workType.EXCAVATION,
-    currentState: 'PLAN',
-    length: 0,
-    startLatitude: 0,
-    startLongitude: 0,
-    endLatitude: 0,
-    endLongitude: 0,
-    plannedStartDate: '',
-    plannedEndDate: ''
-  };
+  segmentForModal: Segment | null = null;
 
   constructor(
     private segmentService: SegmentService,
@@ -84,11 +59,8 @@ export class SegmentsComponent implements OnInit {
     private planningService: PlanningService
   ) { }
 
-  smartPlan: any = null;
-
   ngOnInit() {
     this.loadCrews();
-    this.loadCustomFieldDefinitions();
     if (this.projectId) {
       this.loadProjectDetails();
       this.loadSegments();
@@ -104,11 +76,7 @@ export class SegmentsComponent implements OnInit {
     });
   }
 
-  loadCustomFieldDefinitions() {
-    this.customFieldService.getFieldsForEntity('SEGMENT').subscribe(fields => {
-      this.customFieldDefinitions = fields;
-    });
-  }
+  // customFieldService and loadCustomFieldDefinitions are no longer used here
 
   loadCrews() {
     this.subcontractorService.getAllCrews().subscribe(crews => {
@@ -138,60 +106,35 @@ export class SegmentsComponent implements OnInit {
   openCreateModal() {
     this.isEditing = false;
     this.currentSegmentId = null;
-    this.newSegment = {
-      streetName: '',
-      streetType: 'residential',
-      workType: this.workType.EXCAVATION,
-      currentState: 'PLAN',
-      length: 0,
-      startLatitude: 0,
-      startLongitude: 0,
-      startAddress: '',
-      endAddress: '',
-      endLatitude: 0,
-      endLongitude: 0,
-      plannedStartDate: '',
-      plannedEndDate: ''
-    };
-    this.customFieldsData = {}; // Reset custom fields
-    this.availableTransitions = []; // No transitions for new segment (starts at initial state)
+    this.segmentForModal = null;
     this.showCreateModal = true;
-
-    // Invalidate map size after modal opens - increased timeout
-    setTimeout(() => {
-      if (this.mapComponent) {
-        this.mapComponent.invalidateSize();
-      }
-    }, 500);
   }
 
   openEditModal(segment: Segment) {
     this.isEditing = true;
     this.currentSegmentId = segment.id!;
-    this.newSegment = { ...segment };
-    this.startAddress = segment.startAddress || '';
-    this.endAddress = segment.endAddress || '';
-    this.customFieldsData = segment.customFields || {}; // Load existing custom fields
+    this.segmentForModal = segment;
     this.showCreateModal = true;
-
-    this.segmentService.getAvailableTransitions(segment.id!).subscribe(transitions => {
-      this.availableTransitions = transitions;
-    });
-
-    // Invalidate map size after modal opens - increased timeout
-    setTimeout(() => {
-      if (this.mapComponent) {
-        this.mapComponent.invalidateSize();
-      }
-    }, 500);
   }
 
   closeCreateModal() {
     this.showCreateModal = false;
     this.isEditing = false;
     this.currentSegmentId = null;
-    this.startAddress = '';
-    this.endAddress = '';
+    this.segmentForModal = null;
+  }
+
+  onSegmentSaved(segment: Segment) {
+    if (this.isEditing) {
+      const index = this.segments.findIndex(s => s.id === segment.id);
+      if (index !== -1) {
+        this.segments[index] = segment;
+      }
+    } else {
+      this.segments.push(segment);
+    }
+    this.closeCreateModal();
+    this.cdr.detectChanges();
   }
 
   openDetailsModal(segment: Segment) {
@@ -204,90 +147,7 @@ export class SegmentsComponent implements OnInit {
     this.selectedSegment = null;
   }
 
-  onCoordinatesChanged(coords: SegmentCoordinates) {
-    this.newSegment.startLatitude = coords.startLat;
-    this.newSegment.startLongitude = coords.startLng;
-    this.newSegment.endLatitude = coords.endLat;
-    this.newSegment.endLongitude = coords.endLng;
-    this.newSegment.geometry = coords.geometry; // Save 3D geometry
-    if (coords.length) {
-      this.newSegment.length = coords.length;
-    }
-    if (coords.startAddress) {
-      this.startAddress = coords.startAddress;
-    }
-    if (coords.endAddress) {
-      this.endAddress = coords.endAddress;
-    }
-
-    // Fetch Smart Plan Suggestion if we have coordinates and length
-    if (coords.startLat && coords.endLat && coords.length) {
-      this.safetyService.getAutomatedPlan(coords.startLat, coords.startLng, coords.length).subscribe(plan => {
-        this.smartPlan = plan;
-        this.cdr.detectChanges();
-      });
-    }
-  }
-
-  saveSegment() {
-    if (!this.newSegment.streetName) return;
-
-    const segmentToSave = {
-      ...this.newSegment,
-      customFields: this.customFieldsData
-    };
-
-    if (this.isEditing && this.currentSegmentId) {
-      this.segmentService.updateSegment(this.currentSegmentId, segmentToSave).subscribe({
-        next: (updated) => {
-          const index = this.segments.findIndex(s => s.id === updated.id);
-          if (index !== -1) {
-            this.segments[index] = updated;
-          }
-          this.closeCreateModal();
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          this.error = 'Failed to update segment';
-          this.cdr.detectChanges();
-        }
-      });
-    } else {
-      this.segmentService.createSegment(this.projectId, segmentToSave).subscribe({
-        next: (segment) => {
-          this.segments.push(segment);
-          this.closeCreateModal();
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          this.error = 'Failed to create segment';
-          this.cdr.detectChanges();
-        }
-      });
-    }
-  }
-
-  executeTransition(transition: any) {
-    if (!this.currentSegmentId) return;
-
-    this.segmentService.executeTransition(this.currentSegmentId, transition.id, this.customFieldsData).subscribe({
-      next: () => {
-        // Refresh segment to get new state
-        this.segmentService.getSegment(this.currentSegmentId!).subscribe(updated => {
-          const index = this.segments.findIndex(s => s.id === updated.id);
-          if (index !== -1) {
-            this.segments[index] = updated;
-          }
-          this.closeCreateModal();
-          this.cdr.detectChanges();
-        });
-      },
-      error: (err) => {
-        this.error = 'Failed to execute transition';
-        this.cdr.detectChanges();
-      }
-    });
-  }
+  // Segment modal methods have been extracted to SegmentCreateModalComponent
 
   getStateColor(state: string): string {
     const stateColors: Record<string, string> = {
