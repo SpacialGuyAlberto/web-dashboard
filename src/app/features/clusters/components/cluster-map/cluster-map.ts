@@ -24,7 +24,7 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   @Input() viewMode: 'map-focused' | 'split' | 'data-focused' = 'map-focused';
 
   @Output() mapClicked = new EventEmitter<{lat: number, lng: number, address: string}>();
-  @Output() segmentUpdated = new EventEmitter<{route: any[], length: number, startLat: number, startLng: number, endLat: number, endLng: number, startAddress: string, endAddress: string}>();
+  @Output() segmentUpdated = new EventEmitter<{geometry: any[], length: number, startLat: number, startLng: number, endLat: number, endLng: number, startAddress: string, endAddress: string}>();
   @Output() segmentReset = new EventEmitter<void>();
   
   @Output() drawToolChanged = new EventEmitter<'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | null>();
@@ -54,8 +54,7 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   private streetViewLineMarkers: google.maps.Marker[] = [];
 
   tempMarker: { lat: number, lng: number } | null = null;
-  segmentStartPin: { lat: number, lng: number } | null = null;
-  segmentEndPin: { lat: number, lng: number } | null = null;
+  segmentWaypoints: {lat: number, lng: number}[] = [];
   segmentRoute: { lat: number, lng: number }[] = [];
   newSegment: Partial<Segment> = {};
 
@@ -76,8 +75,7 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
     
     if (changes['activeDrawTool'] && !this.activeDrawTool) {
        this.tempMarker = null;
-       this.segmentStartPin = null;
-       this.segmentEndPin = null;
+       this.segmentWaypoints = [];
        this.segmentRoute = [];
        this.update3DOverlay();
     }
@@ -142,18 +140,20 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
     });
   }
 
+  // Allow double-click to finish drawing? Or just accumulate? 
+  // Let's just accumulate. A separate action (like selecting another tool or pressing Escape) stops it.
   private handleSegmentClick(lat: number, lng: number, address: string) {
-      if (!this.segmentStartPin) {
-        this.segmentStartPin = { lat, lng };
-        this.segmentRoute = [this.segmentStartPin];
+      this.segmentWaypoints.push({ lat, lng });
+
+      if (this.segmentWaypoints.length === 1) {
+        this.segmentRoute = [...this.segmentWaypoints];
         this.newSegment.startAddress = address;
         this.update3DOverlay();
-      } else if (!this.segmentEndPin) {
-        this.segmentEndPin = { lat, lng };
+      } else {
         this.newSegment.endAddress = address;
         
-        // Calculate Route
-        this.routingService.getStreetRoute([this.segmentStartPin, this.segmentEndPin]).subscribe(route => {
+        // Calculate Route through all waypoints
+        this.routingService.getStreetRoute(this.segmentWaypoints).subscribe(route => {
           this.segmentRoute = route;
           
           let length = 0;
@@ -164,13 +164,16 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
           }
           length = Math.round(length);
 
+          const startPin = this.segmentWaypoints[0];
+          const endPin = this.segmentWaypoints[this.segmentWaypoints.length - 1];
+
           this.segmentUpdated.emit({
-              route: this.segmentRoute,
+              geometry: this.segmentRoute,
               length: length,
-              startLat: this.segmentStartPin!.lat,
-              startLng: this.segmentStartPin!.lng,
-              endLat: this.segmentEndPin!.lat,
-              endLng: this.segmentEndPin!.lng,
+              startLat: startPin.lat,
+              startLng: startPin.lng,
+              endLat: endPin.lat,
+              endLng: endPin.lng,
               startAddress: this.newSegment.startAddress!,
               endAddress: this.newSegment.endAddress!
           });
@@ -178,15 +181,14 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
           this.update3DOverlay();
           this.cdr.detectChanges();
         });
-      } else {
-        // Reset and start over
-        this.segmentStartPin = { lat, lng };
-        this.segmentRoute = [this.segmentStartPin];
-        this.newSegment.startAddress = address;
-        this.segmentEndPin = null;
-        this.segmentReset.emit();
-        this.update3DOverlay();
       }
+  }
+
+  resetSegmentDrawing() {
+      this.segmentWaypoints = [];
+      this.segmentRoute = [];
+      this.segmentReset.emit();
+      this.update3DOverlay();
   }
 
   private reverseGeocode(latLng: google.maps.LatLng, callback: (address: string) => void) {
@@ -257,55 +259,49 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
         this.streetViewMarkers.push(marker);
     }
     
-    if (this.segmentStartPin) {
-        const marker = new google.maps.Marker({
-            position: this.segmentStartPin,
-            map: this.panorama as any,
-            label: { text: 'S', color: 'white', fontWeight: 'bold' },
-            optimized: false,
-            clickable: false
+    if (this.segmentWaypoints.length > 0) {
+        this.segmentWaypoints.forEach((wp, index) => {
+            const isStart = index === 0;
+            const marker = new google.maps.Marker({
+                position: wp,
+                map: this.panorama as any,
+                label: { text: isStart ? 'S' : (index === this.segmentWaypoints.length - 1 ? 'E' : (index+1).toString()), color: 'white', fontWeight: 'bold' },
+                optimized: false,
+                clickable: false
+            });
+            this.streetViewMarkers.push(marker);
         });
-        this.streetViewMarkers.push(marker);
-    }
-    
-    if (this.segmentEndPin) {
-        const marker = new google.maps.Marker({
-            position: this.segmentEndPin,
-            map: this.panorama as any,
-            label: { text: 'E', color: 'white', fontWeight: 'bold' },
-            optimized: false,
-            clickable: false
-        });
-        this.streetViewMarkers.push(marker);
     }
 
     // Segment Line interpolation
-    if (this.segmentStartPin && this.segmentEndPin && google.maps.geometry) {
-        const p1 = new google.maps.LatLng(this.segmentStartPin.lat, this.segmentStartPin.lng);
-        const p2 = new google.maps.LatLng(this.segmentEndPin.lat, this.segmentEndPin.lng);
-        const dist = google.maps.geometry.spherical.computeDistanceBetween(p1, p2);
+    if (this.segmentRoute && this.segmentRoute.length > 1 && google.maps.geometry) {
+        for (let i = 0; i < this.segmentRoute.length - 1; i++) {
+            const p1 = new google.maps.LatLng(this.segmentRoute[i].lat, this.segmentRoute[i].lng);
+            const p2 = new google.maps.LatLng(this.segmentRoute[i+1].lat, this.segmentRoute[i+1].lng);
+            const dist = google.maps.geometry.spherical.computeDistanceBetween(p1, p2);
 
-        let currentDist = 0;
-        while (currentDist <= dist) {
-            const frac = currentDist / dist;
-            const pos = google.maps.geometry.spherical.interpolate(p1, p2, frac);
+            let currentDist = 0;
+            while (currentDist <= dist) {
+                const frac = currentDist / dist;
+                const pos = google.maps.geometry.spherical.interpolate(p1, p2, frac);
 
-            const dot = new google.maps.Marker({
-                position: { lat: pos.lat(), lng: pos.lng() },
-                map: this.panorama as any,
-                icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    fillColor: '#ff69b4',
-                    fillOpacity: 1.0,
-                    strokeColor: '#ffffff',
-                    strokeWeight: 2,
-                    scale: 6
-                },
-                clickable: false,
-                optimized: false
-            });
-            this.streetViewLineMarkers.push(dot);
-            currentDist += 1.5;
+                const dot = new google.maps.Marker({
+                    position: { lat: pos.lat(), lng: pos.lng() },
+                    map: this.panorama as any,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: '#ff69b4',
+                        fillOpacity: 1.0,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 2,
+                        scale: 6
+                    },
+                    clickable: false,
+                    optimized: false
+                });
+                this.streetViewLineMarkers.push(dot);
+                currentDist += 1.5;
+            }
         }
     }
   }

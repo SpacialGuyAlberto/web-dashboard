@@ -231,12 +231,20 @@ export class ClusterAreaDashboardComponent implements OnInit {
     this.newNodeData.name = event.address;
   }
   
+  @ViewChild(ClusterNodeFormComponent) clusterNodeForm!: ClusterNodeFormComponent;
+
   onSegmentUpdated(event: any) {
-    // Parent handles segment creation via the child modal component directly emitting onSegmentSaved, this is just for state.
+    if (this.clusterNodeForm) {
+      this.clusterNodeForm.updateSegmentCoordinates(event);
+    }
   }
   
   onSegmentReset() {
-    // Reset segment logic if needed
+    if (this.clusterNodeForm) {
+       this.clusterNodeForm.updateSegmentCoordinates({
+          geometry: [], length: 0, startLat: 0, startLng: 0, endLat: 0, endLng: 0, startAddress: '', endAddress: ''
+       });
+    }
   }
 
   handleDrawToolChanged(tool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | null) {

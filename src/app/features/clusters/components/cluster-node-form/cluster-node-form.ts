@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SegmentCreateModalComponent } from '../../../segments/components/segment-create-modal/segment-create-modal.component';
@@ -17,6 +17,8 @@ export class ClusterNodeFormComponent {
   
   @Output() saveRequested = new EventEmitter<void>();
   @Output() segmentSaved = new EventEmitter<any>();
+  
+  @ViewChild(SegmentCreateModalComponent) segmentModal!: SegmentCreateModalComponent;
 
   onSave() {
     this.saveRequested.emit();
@@ -24,5 +26,11 @@ export class ClusterNodeFormComponent {
 
   onSegmentSaved(segment: any) {
     this.segmentSaved.emit(segment);
+  }
+  
+  updateSegmentCoordinates(event: any) {
+    if (this.segmentModal) {
+      this.segmentModal.updateExternalCoordinates(event);
+    }
   }
 }

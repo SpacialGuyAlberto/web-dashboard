@@ -1,7 +1,7 @@
-    <!-- Top Toolbar Area (20% height) -->
-    <div class="w-full h-[20%] flex flex-col items-center justify-center relative p-6 bg-transparent z-[1000]">
+    <!-- Top Toolbar Area -->
+    <div class="absolute top-0 left-0 w-full flex flex-col items-center pt-6 bg-transparent z-[1000] pointer-events-none">
       <!-- Search Input -->
-      <div class="w-72 mb-4">
+      <div class="w-72 mb-4 pointer-events-auto">
         <div class="relative flex items-center bg-[#161719]/90 backdrop-blur-md border border-white/20 rounded shadow-2xl p-1">
           <svg class="absolute left-3 text-white/50" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           <input #searchInput type="text" placeholder="Search address..." class="w-full bg-transparent border-none text-white text-xs py-1.5 pl-8 pr-2 outline-none font-mono">
@@ -10,7 +10,7 @@
 
       <!-- AutoCAD-style Toolbar -->
       @if (isMapEditMode) {
-        <div class="bg-[#161719]/90 backdrop-blur-md border border-white/10 rounded-full shadow-2xl flex items-center p-1.5 gap-1">
+        <div class="bg-[#161719]/90 backdrop-blur-md border border-white/10 rounded-full shadow-2xl flex items-center p-1.5 gap-1 pointer-events-auto">
           <span class="text-[9px] font-mono text-white/50 uppercase tracking-widest px-3">Draw Tool:</span>
           <button (click)="setDrawTool('POP')" [ngClass]="activeDrawTool === 'POP' ? 'bg-[#6938ef] text-white' : 'bg-white/5 text-white/60 hover:text-white'" class="px-3 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-widest transition-all border-none cursor-pointer">POP</button>
           <button (click)="setDrawTool('DP')" [ngClass]="activeDrawTool === 'DP' ? 'bg-[#2fb080] text-white' : 'bg-white/5 text-white/60 hover:text-white'" class="px-3 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-widest transition-all border-none cursor-pointer">Netzverteiler</button>
@@ -29,7 +29,7 @@
       }
     </div>
 
-    <div class="flex h-[80%] w-full">
+    <div class="relative w-full h-full">
       <div [class.hidden]="isMapEditMode && is3DMode" class="w-full h-full relative">
         <google-map
           height="100%"
@@ -51,13 +51,10 @@
             <map-marker [position]="{ lat: tempMarker.lat, lng: tempMarker.lng }"></map-marker>
           }
 
-          @if (segmentStartPin) {
-            <map-marker [position]="{ lat: segmentStartPin.lat, lng: segmentStartPin.lng }" [options]="{ icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' }"></map-marker>
+          @for (wp of segmentWaypoints; track $index) {
+            <map-marker [position]="{ lat: wp.lat, lng: wp.lng }" [options]="{ icon: $index === 0 ? 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' }"></map-marker>
           }
-          @if (segmentEndPin) {
-            <map-marker [position]="{ lat: segmentEndPin.lat, lng: segmentEndPin.lng }" [options]="{ icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' }"></map-marker>
-          }
-          @if (segmentStartPin && segmentEndPin && segmentRoute.length > 0) {
+          @if (segmentRoute.length > 0) {
             <map-polyline [path]="segmentRoute" [options]="{ strokeColor: '#ff69b4', strokeWeight: 4, strokeOpacity: 0.8 }"></map-polyline>
           }
 
@@ -72,7 +69,7 @@
     </div>
 
     <!-- Map Click Prompt -->
-    @if (isMapEditMode && activeDrawTool && ((activeDrawTool !== 'SEGMENT' && !tempMarker) || (activeDrawTool === 'SEGMENT' && !segmentEndPin))) {
+    @if (isMapEditMode && activeDrawTool && (!tempMarker)) {
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#161719]/90 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl p-6 flex flex-col items-center justify-center animate-pulse z-[1000] pointer-events-none">
         <div class="w-12 h-12 rounded-full flex items-center justify-center mb-3"
              [ngClass]="{
@@ -90,7 +87,7 @@
         <h3 class="text-white text-lg font-medium mb-1 text-center">Click on the map</h3>
         <p class="text-white/50 text-sm font-mono text-center">
           @if (activeDrawTool === 'SEGMENT') {
-            {{ segmentStartPin ? 'Click to place End Point' : 'Click to place Start Point' }}
+            {{ segmentWaypoints.length === 0 ? 'Click to place Start Point' : 'Click to place more waypoints' }}
           } @else {
             To place a new {{ activeDrawTool === 'DP' ? 'Netzverteiler' : activeDrawTool }}
           }
