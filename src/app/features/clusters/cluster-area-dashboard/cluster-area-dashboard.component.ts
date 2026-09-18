@@ -11,13 +11,14 @@ import { HuepService } from '../../infrastructure/huep.service';
 import { Huep } from '../../infrastructure/huep.model';
 
 import { ClusterMapComponent } from '../components/cluster-map/cluster-map';
+import { combineLatest } from 'rxjs';
 import { ClusterStatsComponent } from '../components/cluster-stats/cluster-stats';
 import { ClusterNodesAccordionComponent } from '../components/cluster-nodes-accordion/cluster-nodes-accordion';
 import { ClusterNodeFormComponent } from '../components/cluster-node-form/cluster-node-form';
 
 export interface NetworkElement {
   id: string;
-  type: 'POP' | 'DP' | 'ACOMETIDA' | 'HEUP';
+  type: 'POP' | 'DP' | 'ACOMETIDA' | 'HEUP' | 'SEGMENT';
   name: string;
   lat: number;
   lng: number;
@@ -82,8 +83,9 @@ export class ClusterAreaDashboardComponent implements OnInit {
   };
 
   elements: NetworkElement[] = [];
-  stats = { pop: 0, dp: 0, acometida: 0, heup: 0 };
-  groupedElements: { [key: string]: NetworkElement[] } = { 'POP': [], 'Netzverteiler': [], 'Acometidas': [], 'HEÜPs': [] };
+  segments: Segment[] = [];
+  stats = { pop: 0, dp: 0, acometida: 0, heup: 0, segment: 0 };
+  groupedElements: { [key: string]: NetworkElement[] } = { 'POP': [], 'Netzverteiler': [], 'Acometidas': [], 'HEÜPs': [], 'Segments': [] };
   
   isSidebarOpen = true;
   viewMode: 'map-focused' | 'split' | 'data-focused' = 'map-focused';
@@ -124,14 +126,17 @@ export class ClusterAreaDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      this.projectId = +params['projectId'];
-      this.projectName = params['projectName'] || 'Project';
-    });
-    
-    this.route.params.subscribe(params => {
+    combineLatest([
+      this.route.params,
+      this.route.queryParams
+    ]).subscribe(([params, queryParams]) => {
       this.clusterId = +params['clusterId'];
-      this.loadClusterData();
+      this.projectId = +queryParams['projectId'];
+      this.projectName = queryParams['projectName'] || 'Project';
+      
+      if (this.projectId && this.clusterId) {
+        this.loadClusterData();
+      }
     });
   }
 
@@ -154,8 +159,9 @@ export class ClusterAreaDashboardComponent implements OnInit {
 
     if (this.projectId) {
       this.segmentService.getProjectSegments(this.projectId).subscribe(segments => {
+        this.segments = segments;
         segments.forEach(s => {
-          this.elements.push({ id: s.id ? s.id.toString() : 'AC-?', type: 'ACOMETIDA', name: 'Segment ' + s.length + 'm', lat: s.geometry && s.geometry.length > 0 ? s.geometry[0].lat : this.center.lat - 0.001, lng: s.geometry && s.geometry.length > 0 ? s.geometry[0].lng : this.center.lng - 0.001, status: 'PLANNED', createdAt: new Date() });
+          this.elements.push({ id: s.id ? s.id.toString() : 'AC-?', type: 'SEGMENT', name: (s.workType ? s.workType + ' ' : '') + 'Segment ' + s.length + 'm', lat: s.geometry && s.geometry.length > 0 ? s.geometry[0].lat : this.center.lat - 0.001, lng: s.geometry && s.geometry.length > 0 ? s.geometry[0].lng : this.center.lng - 0.001, status: 'PLANNED', createdAt: new Date() });
         });
         this.calculateStats();
       });
@@ -167,14 +173,16 @@ export class ClusterAreaDashboardComponent implements OnInit {
       pop: this.elements.filter(e => e.type === 'POP').length,
       dp: this.elements.filter(e => e.type === 'DP').length,
       acometida: this.elements.filter(e => e.type === 'ACOMETIDA').length,
-      heup: this.elements.filter(e => e.type === 'HEUP').length
+      heup: this.elements.filter(e => e.type === 'HEUP').length,
+      segment: this.elements.filter(e => e.type === 'SEGMENT').length
     };
     
     this.groupedElements = {
       'POP': this.elements.filter(e => e.type === 'POP'),
       'Netzverteiler': this.elements.filter(e => e.type === 'DP'),
       'Acometidas': this.elements.filter(e => e.type === 'ACOMETIDA'),
-      'HEÜPs': this.elements.filter(e => e.type === 'HEUP')
+      'HEÜPs': this.elements.filter(e => e.type === 'HEUP'),
+      'Segments': this.elements.filter(e => e.type === 'SEGMENT')
     };
     this.cdr.detectChanges();
   }

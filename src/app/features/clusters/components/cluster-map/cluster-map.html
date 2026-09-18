@@ -30,7 +30,7 @@
     </div>
 
     <div class="relative w-full h-full">
-      <div [class.hidden]="isMapEditMode && is3DMode" class="w-full h-full relative">
+      <div [class.hidden]="is3DMode" class="w-full h-full relative">
         <google-map
           height="100%"
           width="100%"
@@ -40,12 +40,64 @@
           (mapClick)="onMapClick($event)">
 
           @for (element of elements; track element.id) {
-            <map-marker
-              [position]="{ lat: element.lat, lng: element.lng }"
-              [options]="{ icon: getIconForType(element.type) }"
-              [title]="element.name">
-            </map-marker>
+            @if (element.type !== 'ACOMETIDA') {
+              <map-marker
+                [position]="{ lat: element.lat, lng: element.lng }"
+                [options]="{ icon: getIconForType(element.type) }"
+                [title]="element.name"
+                (mapClick)="onNodeClick(element, $event)">
+              </map-marker>
+            }
           }
+
+          @for (seg of segments; track seg.id) {
+            @if (seg.geometry && seg.geometry.length > 0) {
+              <map-polyline
+                [path]="seg.geometry"
+                [options]="getSegmentOptions(seg)"
+                (polylineClick)="onSegmentClick(seg, $event)">
+              </map-polyline>
+            }
+          }
+
+          <map-info-window [position]="infoWindowPosition">
+            @if (selectedSegment) {
+              <div class="bg-[#161719] text-white p-3 rounded shadow-lg font-sans min-w-[200px]">
+                <div class="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
+                  <h3 class="font-display font-bold text-[#eab308] m-0 text-sm flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                    Segment
+                  </h3>
+                  <span class="text-[9px] font-mono uppercase bg-white/10 px-2 py-0.5 rounded text-white/60">{{ selectedSegment.workType || 'Standard' }}</span>
+                </div>
+                <div class="flex flex-col gap-1 text-xs">
+                  <div class="flex justify-between"><span class="text-white/50">Length:</span> <span class="font-mono text-white/90">{{ selectedSegment.length }}m</span></div>
+                  @if (selectedSegment.streetName) {
+                    <div class="flex justify-between gap-4"><span class="text-white/50">Street:</span> <span class="font-mono text-white/90 truncate max-w-[120px]">{{ selectedSegment.streetName }}</span></div>
+                  }
+                  <div class="flex justify-between"><span class="text-white/50">Status:</span> <span class="font-mono text-white/90">{{ selectedSegment.currentState || 'PLANNED' }}</span></div>
+                </div>
+              </div>
+            }
+            @if (selectedNode) {
+              <div class="bg-[#161719] text-white p-3 rounded shadow-lg font-sans min-w-[200px]">
+                <div class="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
+                  <h3 class="font-display font-bold text-[#2fb080] m-0 text-sm flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect><circle cx="12" cy="12" r="3"></circle></svg>
+                    {{ selectedNode.type }}
+                  </h3>
+                  <span class="text-[9px] font-mono uppercase bg-white/10 px-2 py-0.5 rounded text-white/60">{{ selectedNode.status }}</span>
+                </div>
+                <div class="flex flex-col gap-1 text-xs mb-3">
+                  <div class="flex justify-between gap-4"><span class="text-white/50">Name:</span> <span class="font-mono text-white/90 truncate max-w-[120px]">{{ selectedNode.name }}</span></div>
+                </div>
+                <button (click)="viewNodeIn3D(selectedNode)" class="w-full bg-[#2fb080] hover:bg-[#259068] text-white py-1.5 rounded text-xs font-medium transition-colors flex items-center justify-center gap-2 border-none cursor-pointer">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                  View in 3D
+                </button>
+              </div>
+            }
+          </map-info-window>
 
           @if (tempMarker) {
             <map-marker [position]="{ lat: tempMarker.lat, lng: tempMarker.lng }"></map-marker>
@@ -61,9 +113,22 @@
         </google-map>
       </div>
 
-      @if (isMapEditMode && is3DMode) {
+      @if (is3DMode) {
         <div class="w-full h-full relative">
           <div #streetViewDiv class="w-full h-full"></div>
+          
+          <!-- 3D Navigation Overlay -->
+          <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-[#161719]/90 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl p-2 flex items-center gap-2 overflow-x-auto max-w-[80%] z-[1000] pointer-events-auto">
+            <span class="text-[9px] font-mono text-white/50 uppercase tracking-widest px-2 whitespace-nowrap">Go to Node:</span>
+            @for (element of elements; track element.id) {
+              @if (element.type === 'POP' || element.type === 'DP') {
+                <button (click)="viewNodeIn3D(element)" class="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg whitespace-nowrap transition-colors cursor-pointer text-white">
+                  <span class="w-2 h-2 rounded-full" [style.backgroundColor]="element.type === 'POP' ? '#6938ef' : '#2fb080'"></span>
+                  <span class="text-xs font-medium">{{ element.name }}</span>
+                </button>
+              }
+            }
+          </div>
         </div>
       }
     </div>

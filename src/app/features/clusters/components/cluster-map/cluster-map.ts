@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GoogleMapsModule, GoogleMap } from '@angular/google-maps';
+import { GoogleMapsModule, GoogleMap, MapInfoWindow } from '@angular/google-maps';
 import { NetworkElement } from '../../cluster-area-dashboard/cluster-area-dashboard.component';
 import { RoutingService } from '../../../gis/routing.service';
 import { Segment } from '../../../segments/segment.model';
@@ -13,6 +13,7 @@ import { Segment } from '../../../segments/segment.model';
 })
 export class ClusterMapComponent implements AfterViewInit, OnChanges {
   @Input() elements: NetworkElement[] = [];
+  @Input() segments: Segment[] = [];
   @Input() center: google.maps.LatLngLiteral = { lat: 52.5200, lng: 13.4050 };
   @Input() zoom: number = 16;
   @Input() mapOptions!: google.maps.MapOptions;
@@ -44,6 +45,7 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   }
 
   @ViewChild(GoogleMap, { static: false }) map!: GoogleMap;
+  @ViewChild(MapInfoWindow, { static: false }) infoWindow!: MapInfoWindow;
   @ViewChild('streetViewDiv', { static: false }) streetViewDiv!: ElementRef;
   @ViewChild('searchInput', { static: false }) searchInputElement!: ElementRef;
 
@@ -57,6 +59,10 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   segmentWaypoints: {lat: number, lng: number}[] = [];
   segmentRoute: { lat: number, lng: number }[] = [];
   newSegment: Partial<Segment> = {};
+  
+  selectedSegment: Segment | null = null;
+  selectedNode: NetworkElement | null = null;
+  infoWindowPosition: google.maps.LatLngLiteral = { lat: 0, lng: 0 };
 
   constructor(private routingService: RoutingService, private cdr: ChangeDetectorRef) {}
 
@@ -239,10 +245,10 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
         const marker = new google.maps.Marker({
             position: { lat: element.lat, lng: element.lng },
             map: this.panorama as any,
-            label: { text: element.type.substring(0, 3), color: 'white', fontWeight: 'bold' },
+            icon: this.get3DIconForType(element.type),
             title: element.name,
             optimized: false,
-            clickable: false
+            clickable: true
         });
         this.streetViewMarkers.push(marker);
     });
@@ -273,7 +279,7 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
         });
     }
 
-    // Segment Line interpolation
+    // Segment Line interpolation for current drawing
     if (this.segmentRoute && this.segmentRoute.length > 1 && google.maps.geometry) {
         for (let i = 0; i < this.segmentRoute.length - 1; i++) {
             const p1 = new google.maps.LatLng(this.segmentRoute[i].lat, this.segmentRoute[i].lng);
@@ -290,9 +296,9 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
                     map: this.panorama as any,
                     icon: {
                         path: google.maps.SymbolPath.CIRCLE,
-                        fillColor: '#ff69b4',
+                        fillColor: '#ffffff',
                         fillOpacity: 1.0,
-                        strokeColor: '#ffffff',
+                        strokeColor: '#ff69b4',
                         strokeWeight: 2,
                         scale: 6
                     },
@@ -300,10 +306,88 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
                     optimized: false
                 });
                 this.streetViewLineMarkers.push(dot);
-                currentDist += 1.5;
+                currentDist += 0.5;
             }
         }
     }
+
+    // Render Saved Segments in 3D asynchronously
+    if (this.segments && this.segments.length > 0 && google.maps.geometry) {
+        this.renderSegmentsAsync();
+    }
+  }
+
+  private renderTaskVersion = 0;
+
+  private renderSegmentsAsync() {
+    this.renderTaskVersion++;
+    const currentVersion = this.renderTaskVersion;
+    
+    // Create a copy of the segments array to process
+    const segmentsToRender = [...this.segments];
+    let currentIndex = 0;
+    
+    // Render in chunks of 5 segments at a time
+    const chunkSize = 5;
+
+    const renderChunk = () => {
+      // If a new update started, cancel this task
+      if (this.renderTaskVersion !== currentVersion || !this.panorama) return;
+
+      const end = Math.min(currentIndex + chunkSize, segmentsToRender.length);
+      
+      for (let i = currentIndex; i < end; i++) {
+        const seg = segmentsToRender[i];
+        if (seg.geometry && seg.geometry.length > 1) {
+            const options = this.getSegmentOptions(seg);
+            const color = options.strokeColor as string;
+            
+            for (let j = 0; j < seg.geometry.length - 1; j++) {
+                const p1 = new google.maps.LatLng(seg.geometry[j].lat, seg.geometry[j].lng);
+                const p2 = new google.maps.LatLng(seg.geometry[j+1].lat, seg.geometry[j+1].lng);
+                const dist = google.maps.geometry.spherical.computeDistanceBetween(p1, p2);
+
+                let currentDist = 0;
+                while (currentDist <= dist) {
+                    const frac = currentDist / dist;
+                    const pos = google.maps.geometry.spherical.interpolate(p1, p2, frac);
+
+                    const dot = new google.maps.Marker({
+                        position: { lat: pos.lat(), lng: pos.lng() },
+                        map: this.panorama as any,
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            fillColor: color,
+                            fillOpacity: 0.9,
+                            strokeColor: '#000000',
+                            strokeWeight: 1,
+                            scale: 8
+                        },
+                        title: seg.streetName || 'Segment',
+                        clickable: true,
+                        optimized: false
+                    });
+                    
+                    dot.addListener('click', (e: any) => this.onSegmentClick(seg, e));
+                    this.streetViewLineMarkers.push(dot);
+                    
+                    // Spacing: 0.5 meters to make it look like a continuous cable
+                    currentDist += 0.5; 
+                }
+            }
+        }
+      }
+      
+      currentIndex = end;
+      
+      // If there are more segments, schedule the next chunk
+      if (currentIndex < segmentsToRender.length) {
+        requestAnimationFrame(renderChunk);
+      }
+    };
+    
+    // Start the first chunk
+    requestAnimationFrame(renderChunk);
   }
 
   getIconForType(type: string): string {
@@ -338,6 +422,49 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
     return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
   }
 
+  get3DIconForType(type: string): string {
+    let topColor = '#ffffff';
+    let leftColor = '#cccccc';
+    let rightColor = '#aaaaaa';
+    let scale = 48;
+
+    switch(type) {
+      case 'POP':
+        topColor = '#8e66f2';
+        leftColor = '#5327c9';
+        rightColor = '#6938ef';
+        scale = 64; // bigger
+        break;
+      case 'DP':
+        topColor = '#59c79f';
+        leftColor = '#218f65';
+        rightColor = '#2fb080';
+        scale = 48;
+        break;
+      case 'HEUP':
+        topColor = '#f26868';
+        leftColor = '#cc2a2a';
+        rightColor = '#ef4444';
+        scale = 32;
+        break;
+      default:
+        topColor = '#ffffff';
+        leftColor = '#cccccc';
+        rightColor = '#aaaaaa';
+    }
+
+    // Isometric Cube SVG
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="${scale}" height="${scale}">
+        <polygon points="50,15 90,35 50,55 10,35" fill="${topColor}" stroke="#111" stroke-width="2"/>
+        <polygon points="10,35 50,55 50,85 10,65" fill="${leftColor}" stroke="#111" stroke-width="2"/>
+        <polygon points="50,55 90,35 90,65 50,85" fill="${rightColor}" stroke="#111" stroke-width="2"/>
+        <text x="50" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle" transform="skewY(26)">${type.substring(0, 3)}</text>
+      </svg>
+    `;
+    return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+  }
+
   getColorForType(type: string): string {
     switch(type) {
       case 'POP': return '#6938ef'; 
@@ -345,6 +472,72 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
       case 'ACOMETIDA': return '#fbbf24'; 
       case 'HEUP': return '#ef4444'; 
       default: return '#ffffff';
+    }
+  }
+
+  getSegmentOptions(segment: Segment): google.maps.PolylineOptions {
+    let color = '#ff69b4';
+    let weight = 4;
+    
+    const workType = (segment.workType || '').toLowerCase();
+    if (workType.includes('excavaci') || workType.includes('excavation') || workType.includes('trench')) {
+      color = '#eab308'; // yellow
+      weight = 5;
+    } else if (workType.includes('aerial')) {
+      color = '#3b82f6'; // blue
+      weight = 3;
+    } else if (workType.includes('micro')) {
+      color = '#10b981'; // green
+      weight = 3;
+    }
+
+    return {
+      strokeColor: color,
+      strokeWeight: weight,
+      strokeOpacity: 0.8,
+      zIndex: 1
+    };
+  }
+
+  onSegmentClick(segment: Segment, event: google.maps.MapMouseEvent) {
+    this.selectedSegment = segment;
+    this.selectedNode = null;
+    if (event.latLng) {
+      this.infoWindowPosition = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+      this.cdr.detectChanges();
+      if (this.infoWindow) {
+        this.infoWindow.open();
+      }
+    }
+  }
+
+  onNodeClick(element: NetworkElement, event: google.maps.MapMouseEvent) {
+    this.selectedNode = element;
+    this.selectedSegment = null;
+    if (event.latLng) {
+      this.infoWindowPosition = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+      this.cdr.detectChanges();
+      if (this.infoWindow) {
+        this.infoWindow.open();
+      }
+    }
+  }
+
+  viewNodeIn3D(element: NetworkElement) {
+    this.center = { lat: element.lat, lng: element.lng };
+    if (this.map && this.map.googleMap) {
+      this.map.googleMap.panTo(this.center);
+    }
+    if (this.panorama) {
+      this.panorama.setPosition(this.center);
+    }
+    
+    if (this.infoWindow) {
+      this.infoWindow.close();
+    }
+    
+    if (!this.is3DMode) {
+      this.toggle3DMode();
     }
   }
 }

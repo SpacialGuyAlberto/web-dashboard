@@ -1,5 +1,5 @@
       <!-- Stats Grid -->
-      <div class="sidebar-stats-grid grid gap-4 shrink-0" [ngClass]="viewMode === 'map-focused' && panelPosition !== 'bottom' ? 'grid-cols-2' : 'grid-cols-4'">
+      <div class="sidebar-stats-grid grid gap-4 shrink-0" [ngClass]="viewMode === 'map-focused' && panelPosition !== 'bottom' ? 'grid-cols-2' : 'grid-cols-5'">
         <div class="stat-card flex items-center gap-4 bg-[#131415] border border-white/5 p-4 rounded-xl">
           <div class="stat-icon w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-[#6938ef]/10 text-[#6938ef] border border-[#6938ef]/30">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L22 7l-10 5L2 7l10-5zm0 15l-10-5v5l10 5 10-5v-5l-10 5zm0-5l-10-5v5l10 5 10-5v-5l-10 5z"/></svg>
@@ -34,6 +34,15 @@
           <div class="stat-info flex flex-col">
             <span class="text-[9px] font-mono uppercase tracking-widest text-white/40">HEÜPs</span>
             <span class="text-lg font-mono text-white/90 leading-none mt-1">{{ stats.heup }}</span>
+          </div>
+        </div>
+        <div class="stat-card flex items-center gap-4 bg-[#131415] border border-white/5 p-4 rounded-xl">
+          <div class="stat-icon w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-[#ff69b4]/10 text-[#ff69b4] border border-[#ff69b4]/30">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          </div>
+          <div class="stat-info flex flex-col">
+            <span class="text-[9px] font-mono uppercase tracking-widest text-white/40">Segments</span>
+            <span class="text-lg font-mono text-white/90 leading-none mt-1">{{ stats.segment }}</span>
           </div>
         </div>
       </div>

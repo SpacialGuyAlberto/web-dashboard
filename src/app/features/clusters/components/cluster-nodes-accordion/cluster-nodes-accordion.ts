@@ -36,6 +36,7 @@ export class ClusterNodesAccordionComponent {
       case 'DP': return '#2fb080';
       case 'ACOMETIDA': return '#fbbf24';
       case 'HEUP': return '#ef4444';
+      case 'SEGMENT': return '#ff69b4';
       default: return '#ffffff';
     }
   }
