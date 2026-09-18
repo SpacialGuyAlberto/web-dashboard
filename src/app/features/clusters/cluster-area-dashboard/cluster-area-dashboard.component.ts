@@ -9,6 +9,8 @@ import { SegmentService } from '../../segments/segment.service';
 import { Pop } from '../../infrastructure/pop.model';
 import { Netzverteiler } from '../../infrastructure/netzverteiler.model';
 import { Segment } from '../../segments/segment.model';
+import { HuepService } from '../../infrastructure/huep.service';
+import { Huep } from '../../infrastructure/huep.model';
 import { WorkType } from '@shared/models/work-type.enum';
 import { CustomFieldDefinition } from '@features/field-config/custom-field.model';
 
@@ -137,6 +139,7 @@ export class ClusterAreaDashboardComponent implements OnInit, AfterViewInit {
   @ViewChild('searchInput', { static: false }) searchInputElement!: ElementRef;
   private panorama: google.maps.StreetViewPanorama | null = null;
   private autocomplete: google.maps.places.Autocomplete | null = null;
+  private geocoder: google.maps.Geocoder = new google.maps.Geocoder();
   private streetViewMarkers: google.maps.Marker[] = [];
   private streetViewLineMarkers: google.maps.Marker[] = [];
 
@@ -343,10 +346,16 @@ export class ClusterAreaDashboardComponent implements OnInit, AfterViewInit {
         this.segmentStartPin = { lat: event.latLng.lat(), lng: event.latLng.lng() };
         this.newSegment.startLatitude = this.segmentStartPin.lat;
         this.newSegment.startLongitude = this.segmentStartPin.lng;
+        this.reverseGeocode(event.latLng, (address) => {
+          this.newSegment.startAddress = address;
+        });
       } else if (!this.segmentEndPin) {
         this.segmentEndPin = { lat: event.latLng.lat(), lng: event.latLng.lng() };
         this.newSegment.endLatitude = this.segmentEndPin.lat;
         this.newSegment.endLongitude = this.segmentEndPin.lng;
+        this.reverseGeocode(event.latLng, (address) => {
+          this.newSegment.endAddress = address;
+        });
         // Mock Smart Planning generation
         this.generateSmartPlan();
       } else {
@@ -354,6 +363,9 @@ export class ClusterAreaDashboardComponent implements OnInit, AfterViewInit {
         this.segmentStartPin = { lat: event.latLng.lat(), lng: event.latLng.lng() };
         this.newSegment.startLatitude = this.segmentStartPin.lat;
         this.newSegment.startLongitude = this.segmentStartPin.lng;
+        this.reverseGeocode(event.latLng, (address) => {
+          this.newSegment.startAddress = address;
+        });
         this.segmentEndPin = null;
         this.smartPlan = null;
       }
@@ -363,8 +375,21 @@ export class ClusterAreaDashboardComponent implements OnInit, AfterViewInit {
         lng: event.latLng.lng()
       };
       this.newNodeData = {};
+      this.reverseGeocode(event.latLng, (address) => {
+        this.newNodeData.locationAddress = address;
+        this.newNodeData.name = address; // Also pre-fill name for convenience
+      });
     }
     this.update3DOverlay();
+  }
+
+  private reverseGeocode(latLng: google.maps.LatLng, callback: (address: string) => void) {
+    this.geocoder.geocode({ location: latLng }, (results, status) => {
+      if (status === 'OK' && results && results[0]) {
+        callback(results[0].formatted_address);
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   generateSmartPlan() {
@@ -393,23 +418,79 @@ export class ClusterAreaDashboardComponent implements OnInit, AfterViewInit {
     if (this.activeDrawTool === 'SEGMENT') {
       if (!this.segmentStartPin || !this.segmentEndPin) return;
       
-      const segmentData = {
-        ...this.newSegment,
+      const segmentData: Segment = {
+        ...this.newSegment as any,
         startLatitude: this.segmentStartPin.lat,
         startLongitude: this.segmentStartPin.lng,
         endLatitude: this.segmentEndPin.lat,
         endLongitude: this.segmentEndPin.lng,
-        smartPlan: this.smartPlan
+        geometry: [
+          { lat: this.segmentStartPin.lat, lng: this.segmentStartPin.lng },
+          { lat: this.segmentEndPin.lat, lng: this.segmentEndPin.lng }
+        ]
       };
-      console.log('Saving segment:', segmentData);
-      // Here you would call segmentService.createSegment(segmentData)
+      
+      this.segmentService.createSegment(this.projectId, segmentData).subscribe({
+        next: (res) => {
+          console.log('Segment created successfully', res);
+          this.loadClusterData();
+          this.toggleEditMode();
+        },
+        error: (err) => {
+          console.error('Error creating segment', err);
+        }
+      });
+
     } else {
       if (!this.tempMarker) return;
-      console.log(`Saving node (${this.activeDrawTool}):`, this.newNodeData, 'at', this.tempMarker);
-      // Here you would call the respective node service
+      
+      if (this.activeDrawTool === 'POP') {
+        const popData: Partial<Pop> = {
+          name: this.newNodeData.name,
+          identifier: this.newNodeData.identifier,
+          locationAddress: this.newNodeData.locationAddress,
+          maxCapacityPorts: this.newNodeData.maxCapacityPorts || 0,
+          latitude: this.tempMarker.lat,
+          longitude: this.tempMarker.lng,
+          clusterId: this.clusterId
+        };
+        this.popService.createPop(popData).subscribe({
+          next: () => {
+            this.loadClusterData();
+            this.toggleEditMode();
+          }
+        });
+      } else if (this.activeDrawTool === 'DP') {
+        const nvtData: Partial<Netzverteiler> = {
+          identifier: this.newNodeData.identifier,
+          locationAddress: this.newNodeData.locationAddress,
+          latitude: this.tempMarker.lat,
+          longitude: this.tempMarker.lng,
+          popId: 1 // Default or selected POP ID
+        };
+        this.nvtService.createNetzverteiler(nvtData).subscribe({
+          next: () => {
+            this.loadClusterData();
+            this.toggleEditMode();
+          }
+        });
+      } else if (this.activeDrawTool === 'ACOMETIDA') {
+        const huepData: Partial<Huep> = {
+          identifier: this.newNodeData.identifier,
+          streetAddress: this.newNodeData.name,
+          latitude: this.tempMarker.lat,
+          longitude: this.tempMarker.lng,
+          status: 'PLANNED',
+          netzverteilerId: 1 // Default or selected DP ID
+        };
+        this.huepService.createHuep(huepData).subscribe({
+          next: () => {
+            this.loadClusterData();
+            this.toggleEditMode();
+          }
+        });
+      }
     }
-
-    this.toggleEditMode(); // Exit edit mode on save
   }
 
   onSegmentSaved(segment: any) {
@@ -438,6 +519,7 @@ export class ClusterAreaDashboardComponent implements OnInit, AfterViewInit {
     private popService: PopService,
     private nvtService: NetzverteilerService,
     private segmentService: SegmentService,
+    private huepService: HuepService,
     private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
