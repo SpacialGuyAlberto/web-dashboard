@@ -23,7 +23,7 @@ import { SegmentCreateModalComponent } from './components/segment-create-modal/s
 @Component({
   selector: 'app-segments',
   standalone: true,
-  imports: [CommonModule, FormsModule, SafetyProtocolsComponent, IncidentReportComponent, SegmentCreationMapComponent, DynamicInputComponent, GoogleMapsModule, SegmentCreateModalComponent],
+  imports: [CommonModule, FormsModule, SafetyProtocolsComponent, IncidentReportComponent, GoogleMapsModule, SegmentCreateModalComponent],
   templateUrl: './segments.html',
   styleUrls: ['./segments.css']
 })

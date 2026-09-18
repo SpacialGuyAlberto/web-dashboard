@@ -104,9 +104,6 @@
     @apply w-full bg-[#131415] border border-white/5 text-white/40 py-3 rounded-md font-mono text-[9px] uppercase tracking-widest flex items-center justify-center gap-3 hover:text-white hover:bg-white/5 transition-all mt-3;
 }
 
-.modal-container-large {
-    @apply bg-[#131415] rounded-xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10;
-}
 
 .details-section {
     @apply space-y-10;

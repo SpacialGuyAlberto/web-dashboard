@@ -63,6 +63,10 @@
         @apply bg-[#131415] rounded-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10;
     }
 
+    .modal-container-large {
+        @apply bg-[#131415] rounded-xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10;
+    }
+
     .modal-header-with-close {
         @apply p-8 border-b border-white/5 flex justify-between items-start bg-[#161719];
     }

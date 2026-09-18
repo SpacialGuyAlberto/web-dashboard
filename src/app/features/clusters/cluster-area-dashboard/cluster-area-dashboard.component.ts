@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, HostListener, Inject, PLATFORM_ID, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, Inject, PLATFORM_ID, ChangeDetectorRef, ElementRef, AfterViewInit } from '@angular/core';
 import { isPlatformBrowser, CommonModule, KeyValuePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GoogleMapsModule, GoogleMap } from '@angular/google-maps';
@@ -9,7 +9,8 @@ import { SegmentService } from '../../segments/segment.service';
 import { Pop } from '../../infrastructure/pop.model';
 import { Netzverteiler } from '../../infrastructure/netzverteiler.model';
 import { Segment } from '../../segments/segment.model';
-import { SegmentCreateModalComponent } from '../../segments/components/segment-create-modal/segment-create-modal.component';
+import { WorkType } from '@shared/models/work-type.enum';
+import { CustomFieldDefinition } from '@features/field-config/custom-field.model';
 
 export interface NetworkElement {
   id: string;
@@ -28,23 +29,59 @@ export interface NetworkElement {
 @Component({
   selector: 'app-cluster-area-dashboard',
   standalone: true,
-  imports: [CommonModule, GoogleMapsModule, FormsModule, SegmentCreateModalComponent],
+  imports: [CommonModule, GoogleMapsModule, FormsModule],
   templateUrl: './cluster-area-dashboard.html',
   styleUrls: ['./cluster-area-dashboard.css']
 })
-export class ClusterAreaDashboardComponent implements OnInit {
+export class ClusterAreaDashboardComponent implements OnInit, AfterViewInit {
   @ViewChild(GoogleMap, { static: false }) map!: GoogleMap;
+
+  ngAfterViewInit() {
+    this.initSearchAutocomplete();
+  }
 
   projectId!: number;
   projectName!: string;
   clusterId!: number;
   
+  isEditing: boolean = false;
+
   center: google.maps.LatLngLiteral = { lat: 52.5200, lng: 13.4050 };
   zoom = 16;
   mapOptions: google.maps.MapOptions = {
     disableDefaultUI: true,
     zoomControl: true,
     mapTypeId: 'roadmap',
+    tilt: 0,
+    styles: [
+      { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+      { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+      { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+      { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#d59563' }] },
+      { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#d59563' }] },
+      { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#263c3f' }] },
+      { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#6b9a76' }] },
+      { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#38414e' }] },
+      { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#212a37' }] },
+      { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#9ca5b3' }] },
+      { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#746855' }] },
+      { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#1f2835' }] },
+      { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#f3d19c' }] },
+      { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#2f3948' }] },
+      { featureType: 'transit.station', elementType: 'labels.text.fill', stylers: [{ color: '#d59563' }] },
+      { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#17263c' }] },
+      { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#515c6d' }] },
+      { featureType: 'water', elementType: 'labels.text.stroke', stylers: [{ color: '#17263c' }] }
+    ]
+  };
+
+  map3DOptions: google.maps.MapOptions = {
+    disableDefaultUI: true,
+    zoomControl: true,
+    mapTypeId: 'roadmap',
+    tilt: 45,
+    heading: 0,
+    mapId: '8f000b200b3e6c38',
     styles: [
       { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
       { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
@@ -93,46 +130,299 @@ export class ClusterAreaDashboardComponent implements OnInit {
   // Accordion state
   expandedGroup: string = 'POP';
 
-  // Modal States
-  showPopModal = false;
-  showNvtModal = false;
-  showAcometidaModal = false;
+  // Map Editor States
+  isMapEditMode = false;
+  is3DMode = false;
+  @ViewChild('streetViewDiv', { static: false }) streetViewDiv!: ElementRef;
+  @ViewChild('searchInput', { static: false }) searchInputElement!: ElementRef;
+  private panorama: google.maps.StreetViewPanorama | null = null;
+  private autocomplete: google.maps.places.Autocomplete | null = null;
+  private streetViewMarkers: google.maps.Marker[] = [];
+  private streetViewLineMarkers: google.maps.Marker[] = [];
+
+  activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | null = null;
+  tempMarker: { lat: number, lng: number } | null = null;
+  
+  // Segment Specific States
+  segmentStartPin: { lat: number, lng: number } | null = null;
+  segmentEndPin: { lat: number, lng: number } | null = null;
+  newSegment: Partial<Segment> = {};
+  smartPlan: any = null;
+  workTypeOptions = Object.values(WorkType);
+  customFieldDefinitions: CustomFieldDefinition[] = [];
+  customFieldsData: { [key: string]: any } = {};
+
+  newNodeData: any = {};
   showSegmentModal = false;
 
-  newNodeType: 'POP' | 'DP' | 'ACOMETIDA' | 'HEUP' | 'SEGMENT' = 'POP';
-  newNodeData: any = {};
+  toggleEditMode() {
+    this.isMapEditMode = !this.isMapEditMode;
+    if (this.isMapEditMode) {
+      this.showMap = true;
+      this.setViewMode('map-focused');
+      this.activeDrawTool = null;
+      this.tempMarker = null;
+      this.is3DMode = false;
+    } else {
+      this.activeDrawTool = null;
+      this.tempMarker = null;
+    }
+  }
 
-  openModalFor(type: 'POP' | 'DP' | 'ACOMETIDA' | 'HEUP' | 'SEGMENT') {
-    this.newNodeType = type;
+  toggle3DMode() {
+    this.is3DMode = !this.is3DMode;
+    this.triggerMapResize();
+    if (this.is3DMode) {
+      setTimeout(() => this.initPanorama(), 100);
+    } else {
+      this.panorama = null;
+    }
+  }
+
+  private initPanorama() {
+    if (this.streetViewDiv && !this.panorama) {
+        this.panorama = new google.maps.StreetViewPanorama(
+            this.streetViewDiv.nativeElement,
+            {
+                position: this.center,
+                pov: { heading: 34, pitch: 10 },
+                disableDefaultUI: false,
+                clickToGo: true,
+                linksControl: true,
+                addressControl: true,
+                imageDateControl: true,
+                enableCloseButton: false,
+                visible: true
+            }
+        );
+        this.panorama.addListener('visible_changed', () => {
+            if (this.panorama?.getVisible()) {
+                this.update3DOverlay();
+            }
+        });
+        setTimeout(() => this.update3DOverlay(), 500);
+    }
+  }
+
+  public update3DOverlay() {
+    if (!this.panorama) return;
+
+    this.streetViewMarkers.forEach(m => m.setMap(null));
+    this.streetViewMarkers = [];
+    this.streetViewLineMarkers.forEach(m => m.setMap(null));
+    this.streetViewLineMarkers = [];
+
+    // Nodes
+    this.elements.forEach(element => {
+        const marker = new google.maps.Marker({
+            position: { lat: element.lat, lng: element.lng },
+            map: this.panorama as any,
+            label: { text: element.type.substring(0, 3), color: 'white', fontWeight: 'bold' },
+            title: element.name,
+            optimized: false,
+            clickable: false
+        });
+        this.streetViewMarkers.push(marker);
+    });
+
+    // Active Tool markers
+    if (this.tempMarker) {
+        const marker = new google.maps.Marker({
+            position: this.tempMarker,
+            map: this.panorama as any,
+            label: { text: 'NEW', color: 'yellow', fontWeight: 'bold' },
+            optimized: false,
+            clickable: false
+        });
+        this.streetViewMarkers.push(marker);
+    }
+    if (this.segmentStartPin) {
+        const marker = new google.maps.Marker({
+            position: this.segmentStartPin,
+            map: this.panorama as any,
+            label: { text: 'S', color: 'white', fontWeight: 'bold' },
+            optimized: false,
+            clickable: false
+        });
+        this.streetViewMarkers.push(marker);
+    }
+    if (this.segmentEndPin) {
+        const marker = new google.maps.Marker({
+            position: this.segmentEndPin,
+            map: this.panorama as any,
+            label: { text: 'E', color: 'white', fontWeight: 'bold' },
+            optimized: false,
+            clickable: false
+        });
+        this.streetViewMarkers.push(marker);
+    }
+
+    // Segment Line interpolation
+    if (this.segmentStartPin && this.segmentEndPin && google.maps.geometry) {
+        const p1 = new google.maps.LatLng(this.segmentStartPin.lat, this.segmentStartPin.lng);
+        const p2 = new google.maps.LatLng(this.segmentEndPin.lat, this.segmentEndPin.lng);
+        const dist = google.maps.geometry.spherical.computeDistanceBetween(p1, p2);
+
+        let currentDist = 0;
+        while (currentDist <= dist) {
+            const frac = currentDist / dist;
+            const pos = google.maps.geometry.spherical.interpolate(p1, p2, frac);
+
+            const dot = new google.maps.Marker({
+                position: { lat: pos.lat(), lng: pos.lng() },
+                map: this.panorama as any,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: '#ff69b4',
+                    fillOpacity: 1.0,
+                    strokeColor: '#ffffff',
+                    strokeWeight: 2,
+                    scale: 6
+                },
+                clickable: false,
+                optimized: false
+            });
+            this.streetViewLineMarkers.push(dot);
+            currentDist += 1.5;
+        }
+    }
+  }
+
+  private initSearchAutocomplete() {
+    if (!this.searchInputElement) {
+        setTimeout(() => this.initSearchAutocomplete(), 500);
+        return;
+    }
+    this.autocomplete = new google.maps.places.Autocomplete(this.searchInputElement.nativeElement, {
+        componentRestrictions: { country: 'DE' },
+        fields: ['geometry', 'name', 'formatted_address']
+    });
+    this.autocomplete.addListener('place_changed', () => {
+        const place = this.autocomplete?.getPlace();
+        if (place && place.geometry && place.geometry.location) {
+            const lat = place.geometry.location.lat();
+            const lng = place.geometry.location.lng();
+            this.center = { lat, lng };
+            this.zoom = 18;
+            
+            if (this.map && this.map.googleMap) {
+                this.map.googleMap.panTo(this.center);
+                this.map.googleMap.setZoom(18);
+            }
+
+            if (this.panorama) {
+                this.panorama.setPosition(this.center);
+            }
+        }
+    });
+  }
+
+  openModalFor(type: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT') {
+    this.showMap = true;
+    this.isMapEditMode = true;
+    this.setViewMode('map-focused');
+    this.setDrawTool(type);
+  }
+
+  setDrawTool(tool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | null) {
+    this.activeDrawTool = tool;
+    this.tempMarker = null;
+    this.segmentStartPin = null;
+    this.segmentEndPin = null;
+    this.smartPlan = null;
+    this.newSegment = {};
     this.newNodeData = {};
+    this.update3DOverlay();
+  }
+
+  onMapClick(event: google.maps.MapMouseEvent) {
+    if (!this.isMapEditMode || !this.activeDrawTool || !event.latLng) return;
     
-    if (type === 'POP') this.showPopModal = true;
-    else if (type === 'DP') this.showNvtModal = true;
-    else if (type === 'ACOMETIDA' || type === 'HEUP') this.showAcometidaModal = true;
-    else if (type === 'SEGMENT') this.showSegmentModal = true;
+    if (this.activeDrawTool === 'SEGMENT') {
+      if (!this.segmentStartPin) {
+        this.segmentStartPin = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+        this.newSegment.startLatitude = this.segmentStartPin.lat;
+        this.newSegment.startLongitude = this.segmentStartPin.lng;
+      } else if (!this.segmentEndPin) {
+        this.segmentEndPin = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+        this.newSegment.endLatitude = this.segmentEndPin.lat;
+        this.newSegment.endLongitude = this.segmentEndPin.lng;
+        // Mock Smart Planning generation
+        this.generateSmartPlan();
+      } else {
+        // Reset and start over
+        this.segmentStartPin = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+        this.newSegment.startLatitude = this.segmentStartPin.lat;
+        this.newSegment.startLongitude = this.segmentStartPin.lng;
+        this.segmentEndPin = null;
+        this.smartPlan = null;
+      }
+    } else {
+      this.tempMarker = {
+        lat: event.latLng.lat(),
+        lng: event.latLng.lng()
+      };
+      this.newNodeData = {};
+    }
+    this.update3DOverlay();
+  }
+
+  generateSmartPlan() {
+    this.smartPlan = {
+      suggestedRegelplan: 'RSA-95 Type B',
+      safetyScore: 85,
+      requiresPermit: true,
+      requiredMaterials: ['Absperrgitter x4', 'Leitkegel x10', 'LSA Ampelanlage'],
+      environmentalContext: {
+        weather: { temperature: 15, condition: 'Clear' },
+        traffic: { congestionLevel: 'Moderate' }
+      }
+    };
+  }
+
+  closeQuickForm() {
+    this.tempMarker = null;
+    this.newNodeData = {};
   }
 
   closeAllModals() {
-    this.showPopModal = false;
-    this.showNvtModal = false;
-    this.showAcometidaModal = false;
     this.showSegmentModal = false;
+  }
+
+  saveUnifiedElement() {
+    if (this.activeDrawTool === 'SEGMENT') {
+      if (!this.segmentStartPin || !this.segmentEndPin) return;
+      
+      const segmentData = {
+        ...this.newSegment,
+        startLatitude: this.segmentStartPin.lat,
+        startLongitude: this.segmentStartPin.lng,
+        endLatitude: this.segmentEndPin.lat,
+        endLongitude: this.segmentEndPin.lng,
+        smartPlan: this.smartPlan
+      };
+      console.log('Saving segment:', segmentData);
+      // Here you would call segmentService.createSegment(segmentData)
+    } else {
+      if (!this.tempMarker) return;
+      console.log(`Saving node (${this.activeDrawTool}):`, this.newNodeData, 'at', this.tempMarker);
+      // Here you would call the respective node service
+    }
+
+    this.toggleEditMode(); // Exit edit mode on save
   }
 
   onSegmentSaved(segment: any) {
     this.closeAllModals();
-    // Assuming refresh mechanism would be called here if needed
-    // this.loadClusterData();
+    this.loadClusterData();
   }
 
-  get groupedElements() {
-    return {
-      'POP': this.elements.filter(e => e.type === 'POP'),
-      'Netzverteiler': this.elements.filter(e => e.type === 'DP'),
-      'Acometidas': this.elements.filter(e => e.type === 'ACOMETIDA'),
-      'HEÜPs': this.elements.filter(e => e.type === 'HEUP')
-    };
-  }
+  groupedElements: { [key: string]: NetworkElement[] } = {
+    'POP': [],
+    'Netzverteiler': [],
+    'Acometidas': [],
+    'HEÜPs': []
+  };
 
   projections = {
     totalBudget: 450000,
@@ -222,31 +512,35 @@ export class ClusterAreaDashboardComponent implements OnInit {
   }
 
   saveNode() {
-    if (this.newNodeType === 'POP') {
-      const pop: Partial<Pop> = {
+    if (!this.tempMarker) return;
+
+    if (this.activeDrawTool === 'POP') {
+      const pop: any = {
         clusterId: this.clusterId,
         name: this.newNodeData.name,
         locationAddress: this.newNodeData.locationAddress,
-        maxCapacityPorts: this.newNodeData.maxCapacityPorts
+        maxCapacityPorts: this.newNodeData.maxCapacityPorts,
+        latitude: this.tempMarker.lat,
+        longitude: this.tempMarker.lng
       };
 
       this.popService.createPop(pop as Pop).subscribe(() => {
         this.loadClusterData();
-        this.closeAllModals();
+        this.closeQuickForm();
       });
-    } else if (this.newNodeType === 'DP') {
-      const dp: Partial<Netzverteiler> = {
+    } else if (this.activeDrawTool === 'DP') {
+      const dp: any = {
         popId: this.newNodeData.popId,
         identifier: this.newNodeData.identifier,
-        latitude: this.newNodeData.lat,
-        longitude: this.newNodeData.lng
+        latitude: this.tempMarker.lat,
+        longitude: this.tempMarker.lng
       };
 
       this.nvtService.createNetzverteiler(dp as Netzverteiler).subscribe(() => {
         this.loadClusterData();
-        this.closeAllModals();
+        this.closeQuickForm();
       });
-    } else if (this.newNodeType === 'ACOMETIDA') {
+    } else if (this.activeDrawTool === 'ACOMETIDA') {
       const seg: Segment = {
         streetName: this.newNodeData.name || 'Custom Segment',
         streetType: 'UNKNOWN',
@@ -254,13 +548,13 @@ export class ClusterAreaDashboardComponent implements OnInit {
         currentState: 'PLANNED',
         length: 50, // default dummy
         geometry: [
-          { lat: this.newNodeData.lat, lng: this.newNodeData.lng },
-          { lat: this.newNodeData.lat + 0.0005, lng: this.newNodeData.lng + 0.0005 }
+          { lat: this.tempMarker.lat, lng: this.tempMarker.lng },
+          { lat: this.tempMarker.lat + 0.0005, lng: this.tempMarker.lng + 0.0005 }
         ]
       };
       this.segmentService.createSegment(this.projectId, seg).subscribe(() => {
         this.loadClusterData();
-        this.closeAllModals();
+        this.closeQuickForm();
       });
     }
   }
@@ -336,6 +630,13 @@ export class ClusterAreaDashboardComponent implements OnInit {
       dp: this.elements.filter(e => e.type === 'DP').length,
       acometida: this.elements.filter(e => e.type === 'ACOMETIDA').length,
       heup: this.elements.filter(e => e.type === 'HEUP').length
+    };
+    
+    this.groupedElements = {
+      'POP': this.elements.filter(e => e.type === 'POP'),
+      'Netzverteiler': this.elements.filter(e => e.type === 'DP'),
+      'Acometidas': this.elements.filter(e => e.type === 'ACOMETIDA'),
+      'HEÜPs': this.elements.filter(e => e.type === 'HEUP')
     };
   }
 
