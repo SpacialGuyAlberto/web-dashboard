@@ -26,6 +26,8 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
   @Input() isEditing: boolean = false;
   @Input() initialSegment: Segment | null = null;
   @Input() currentSegmentId: number | null = null;
+  @Input() isEmbedded: boolean = false;
+  @Input() hideMap: boolean = false;
 
   @Output() saved = new EventEmitter<Segment>();
   @Output() closed = new EventEmitter<void>();
@@ -128,6 +130,10 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
     this.subcontractorService.getAllCrews().subscribe(crews => {
       this.crews = crews;
     });
+  }
+
+  updateExternalCoordinates(coords: SegmentCoordinates) {
+    this.onCoordinatesChanged(coords);
   }
 
   onCoordinatesChanged(coords: SegmentCoordinates) {

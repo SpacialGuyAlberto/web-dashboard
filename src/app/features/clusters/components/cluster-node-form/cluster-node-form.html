@@ -1,0 +1,72 @@
+        <!-- Unified Details Panel (Unreal Engine Style) -->
+        <div class="details-panel flex flex-col gap-6 animate-fade-in">
+          <div class="bg-[#131415] border border-white/10 rounded-xl p-5 shadow-inner">
+            @if (!activeDrawTool && !isEditing) {
+              <div class="flex flex-col items-center justify-center py-10 text-center">
+                <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-white/40"><path d="M12 2L2 22h20L12 2zm0 4l7 14H5l7-14z"/></svg>
+                </div>
+                <h3 class="text-white text-lg font-medium mb-2">Select a Tool</h3>
+                <p class="text-white/40 text-xs font-mono max-w-xs leading-relaxed">Choose a drawing tool from the toolbar on the map to start creating new elements.</p>
+              </div>
+            } @else {
+              <h3 class="font-display text-xl text-white mb-4">
+                {{ isEditing ? 'Edit' : 'Create' }}
+                <span [ngClass]="{
+                  'text-[#6938ef]': activeDrawTool === 'POP',
+                  'text-[#2fb080]': activeDrawTool === 'DP',
+                  'text-[#fbbf24]': activeDrawTool === 'ACOMETIDA',
+                  'text-[#ff69b4]': activeDrawTool === 'SEGMENT'
+                }">{{ activeDrawTool === 'DP' ? 'Netzverteiler' : activeDrawTool }}</span>
+              </h3>
+
+              <!-- Common Node Fields -->
+              @if (activeDrawTool !== 'SEGMENT') {
+              <div class="form-group mb-4">
+                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Identifier</label>
+                <input type="text" [(ngModel)]="newNodeData.identifier" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors">
+              </div>
+              <div *ngIf="activeDrawTool !== 'DP'" class="form-group mb-4">
+                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">{{ activeDrawTool === 'ACOMETIDA' ? 'Address' : 'Name' }}</label>
+                <input type="text" [(ngModel)]="newNodeData.name" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors">
+              </div>
+              <div *ngIf="activeDrawTool === 'POP'" class="form-group mb-4">
+                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Location Address</label>
+                <input type="text" [(ngModel)]="newNodeData.locationAddress" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors">
+              </div>
+              <div *ngIf="activeDrawTool === 'POP'" class="form-group mb-4">
+                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Max Capacity Ports</label>
+                <input type="number" [(ngModel)]="newNodeData.maxCapacityPorts" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors">
+              </div>
+              <div *ngIf="tempMarker" class="form-group mb-4 bg-white/5 p-3 rounded border border-white/10">
+                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Coordinates (Auto-filled)</label>
+                <p class="text-xs text-white/80 font-mono">{{ tempMarker.lat.toFixed(6) }}, {{ tempMarker.lng.toFixed(6) }}</p>
+              </div>
+            }
+
+            <!-- Segment Specific Fields embedded via component -->
+            @if (activeDrawTool === 'SEGMENT') {
+              <div class="flex-1 mt-4 border-t border-white/10 pt-4">
+                <!-- IMPORTANT: Notice that the modal requires projectId input. But for now, we just pass what the parent provides, or hardcode 1, depending on how parent manages it. -->
+                <app-segment-create-modal 
+                  [isEmbedded]="true" 
+                  [hideMap]="true" 
+                  [projectId]="1" 
+                  (saved)="onSegmentSaved($event)">
+                </app-segment-create-modal>
+              </div>
+            }
+
+            <button *ngIf="activeDrawTool !== 'SEGMENT'" (click)="onSave()" class="w-full mt-4 py-3 rounded text-[11px] font-bold font-mono uppercase tracking-[0.2em] transition-all"
+                    [disabled]="!tempMarker"
+                    [ngClass]="{
+                      'bg-[#6938ef] text-white hover:bg-[#5b2ecf]': activeDrawTool === 'POP',
+                      'bg-[#2fb080] text-white hover:bg-[#27946b]': activeDrawTool === 'DP',
+                      'bg-[#fbbf24] text-black hover:bg-[#d9a51f]': activeDrawTool === 'ACOMETIDA',
+                      'opacity-50 cursor-not-allowed': !tempMarker
+                    }">
+              {{ isEditing ? 'Update' : 'Create' }} {{ activeDrawTool === 'DP' ? 'Netzverteiler' : activeDrawTool }}
+            </button>
+            }
+          </div>
+        </div>

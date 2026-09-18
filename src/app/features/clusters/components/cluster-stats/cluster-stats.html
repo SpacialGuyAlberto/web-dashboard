@@ -1,0 +1,39 @@
+      <!-- Stats Grid -->
+      <div class="sidebar-stats-grid grid gap-4 shrink-0" [ngClass]="viewMode === 'map-focused' && panelPosition !== 'bottom' ? 'grid-cols-2' : 'grid-cols-4'">
+        <div class="stat-card flex items-center gap-4 bg-[#131415] border border-white/5 p-4 rounded-xl">
+          <div class="stat-icon w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-[#6938ef]/10 text-[#6938ef] border border-[#6938ef]/30">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L22 7l-10 5L2 7l10-5zm0 15l-10-5v5l10 5 10-5v-5l-10 5zm0-5l-10-5v5l10 5 10-5v-5l-10 5z"/></svg>
+          </div>
+          <div class="stat-info flex flex-col">
+            <span class="text-[9px] font-mono uppercase tracking-widest text-white/40">POPs</span>
+            <span class="text-lg font-mono text-white/90 leading-none mt-1">{{ stats.pop }}</span>
+          </div>
+        </div>
+        <div class="stat-card flex items-center gap-4 bg-[#131415] border border-white/5 p-4 rounded-xl">
+          <div class="stat-icon w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-[#2fb080]/10 text-[#2fb080] border border-[#2fb080]/30">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2 2h8v2H8V8zm0 4h8v2H8v-2z"/></svg>
+          </div>
+          <div class="stat-info flex flex-col">
+            <span class="text-[9px] font-mono uppercase tracking-widest text-white/40">Netzverteiler</span>
+            <span class="text-lg font-mono text-white/90 leading-none mt-1">{{ stats.dp }}</span>
+          </div>
+        </div>
+        <div class="stat-card flex items-center gap-4 bg-[#131415] border border-white/5 p-4 rounded-xl">
+          <div class="stat-icon w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-[#fbbf24]/10 text-[#fbbf24] border border-[#fbbf24]/30">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          </div>
+          <div class="stat-info flex flex-col">
+            <span class="text-[9px] font-mono uppercase tracking-widest text-white/40">Acometidas</span>
+            <span class="text-lg font-mono text-white/90 leading-none mt-1">{{ stats.acometida }}</span>
+          </div>
+        </div>
+        <div class="stat-card flex items-center gap-4 bg-[#131415] border border-white/5 p-4 rounded-xl">
+          <div class="stat-icon w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/30">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          </div>
+          <div class="stat-info flex flex-col">
+            <span class="text-[9px] font-mono uppercase tracking-widest text-white/40">HEÜPs</span>
+            <span class="text-lg font-mono text-white/90 leading-none mt-1">{{ stats.heup }}</span>
+          </div>
+        </div>
+      </div>

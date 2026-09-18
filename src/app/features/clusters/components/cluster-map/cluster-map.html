@@ -1,0 +1,99 @@
+    <!-- Top Toolbar Area (20% height) -->
+    <div class="w-full h-[20%] flex flex-col items-center justify-center relative p-6 bg-transparent z-[1000]">
+      <!-- Search Input -->
+      <div class="w-72 mb-4">
+        <div class="relative flex items-center bg-[#161719]/90 backdrop-blur-md border border-white/20 rounded shadow-2xl p-1">
+          <svg class="absolute left-3 text-white/50" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input #searchInput type="text" placeholder="Search address..." class="w-full bg-transparent border-none text-white text-xs py-1.5 pl-8 pr-2 outline-none font-mono">
+        </div>
+      </div>
+
+      <!-- AutoCAD-style Toolbar -->
+      @if (isMapEditMode) {
+        <div class="bg-[#161719]/90 backdrop-blur-md border border-white/10 rounded-full shadow-2xl flex items-center p-1.5 gap-1">
+          <span class="text-[9px] font-mono text-white/50 uppercase tracking-widest px-3">Draw Tool:</span>
+          <button (click)="setDrawTool('POP')" [ngClass]="activeDrawTool === 'POP' ? 'bg-[#6938ef] text-white' : 'bg-white/5 text-white/60 hover:text-white'" class="px-3 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-widest transition-all border-none cursor-pointer">POP</button>
+          <button (click)="setDrawTool('DP')" [ngClass]="activeDrawTool === 'DP' ? 'bg-[#2fb080] text-white' : 'bg-white/5 text-white/60 hover:text-white'" class="px-3 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-widest transition-all border-none cursor-pointer">Netzverteiler</button>
+          <button (click)="setDrawTool('ACOMETIDA')" [ngClass]="activeDrawTool === 'ACOMETIDA' ? 'bg-[#fbbf24] text-black' : 'bg-white/5 text-white/60 hover:text-white'" class="px-3 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-widest transition-all border-none cursor-pointer">Acometida</button>
+          <button (click)="setDrawTool('SEGMENT')" [ngClass]="activeDrawTool === 'SEGMENT' ? 'bg-[#ff69b4] text-white' : 'bg-white/5 text-white/60 hover:text-white'" class="px-3 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-widest transition-all border-none cursor-pointer">Segment</button>
+          <div class="w-px h-4 bg-white/10 mx-2"></div>
+          <button (click)="toggle3DMode()" [ngClass]="is3DMode ? 'bg-[#2fb080]/20 text-[#2fb080]' : 'bg-white/5 text-white/60 hover:text-white'" class="px-3 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-widest transition-all border-none cursor-pointer flex items-center gap-1">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            3D
+          </button>
+          <button (click)="exitEditMode()" class="text-white/60 hover:text-[#ef4444] px-3 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-widest transition-all border-none cursor-pointer flex items-center gap-1">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
+            Exit
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="flex h-[80%] w-full">
+      <div [class.hidden]="isMapEditMode && is3DMode" class="w-full h-full relative">
+        <google-map
+          height="100%"
+          width="100%"
+          [center]="center"
+          [zoom]="zoom"
+          [options]="mapOptions"
+          (mapClick)="onMapClick($event)">
+
+          @for (element of elements; track element.id) {
+            <map-marker
+              [position]="{ lat: element.lat, lng: element.lng }"
+              [options]="{ icon: getIconForType(element.type) }"
+              [title]="element.name">
+            </map-marker>
+          }
+
+          @if (tempMarker) {
+            <map-marker [position]="{ lat: tempMarker.lat, lng: tempMarker.lng }"></map-marker>
+          }
+
+          @if (segmentStartPin) {
+            <map-marker [position]="{ lat: segmentStartPin.lat, lng: segmentStartPin.lng }" [options]="{ icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' }"></map-marker>
+          }
+          @if (segmentEndPin) {
+            <map-marker [position]="{ lat: segmentEndPin.lat, lng: segmentEndPin.lng }" [options]="{ icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' }"></map-marker>
+          }
+          @if (segmentStartPin && segmentEndPin && segmentRoute.length > 0) {
+            <map-polyline [path]="segmentRoute" [options]="{ strokeColor: '#ff69b4', strokeWeight: 4, strokeOpacity: 0.8 }"></map-polyline>
+          }
+
+        </google-map>
+      </div>
+
+      @if (isMapEditMode && is3DMode) {
+        <div class="w-full h-full relative">
+          <div #streetViewDiv class="w-full h-full"></div>
+        </div>
+      }
+    </div>
+
+    <!-- Map Click Prompt -->
+    @if (isMapEditMode && activeDrawTool && ((activeDrawTool !== 'SEGMENT' && !tempMarker) || (activeDrawTool === 'SEGMENT' && !segmentEndPin))) {
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#161719]/90 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl p-6 flex flex-col items-center justify-center animate-pulse z-[1000] pointer-events-none">
+        <div class="w-12 h-12 rounded-full flex items-center justify-center mb-3"
+             [ngClass]="{
+               'bg-[#6938ef]/20': activeDrawTool === 'POP',
+               'bg-[#2fb080]/20': activeDrawTool === 'DP',
+               'bg-[#fbbf24]/20': activeDrawTool === 'ACOMETIDA',
+               'bg-[#ff69b4]/20': activeDrawTool === 'SEGMENT'
+             }">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+               [attr.stroke]="activeDrawTool === 'POP' ? '#6938ef' : (activeDrawTool === 'DP' ? '#2fb080' : (activeDrawTool === 'SEGMENT' ? '#ff69b4' : '#fbbf24'))"
+               stroke-width="2">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/>
+          </svg>
+        </div>
+        <h3 class="text-white text-lg font-medium mb-1 text-center">Click on the map</h3>
+        <p class="text-white/50 text-sm font-mono text-center">
+          @if (activeDrawTool === 'SEGMENT') {
+            {{ segmentStartPin ? 'Click to place End Point' : 'Click to place Start Point' }}
+          } @else {
+            To place a new {{ activeDrawTool === 'DP' ? 'Netzverteiler' : activeDrawTool }}
+          }
+        </p>
+      </div>
+    }

@@ -1,10 +1,10 @@
-    <div class="modal-overlay">
-      <div class="modal-container-large">
-        <div class="modal-header p-6 border-b border-white/5 flex flex-col items-center relative bg-[#161719]">
+    <div [ngClass]="isEmbedded ? 'w-full h-full flex flex-col gap-6' : 'modal-overlay'">
+      <div [ngClass]="isEmbedded ? 'flex flex-col flex-1' : 'modal-container-large'">
+        <div *ngIf="!isEmbedded" class="modal-header p-6 border-b border-white/5 flex flex-col items-center relative bg-[#161719]">
           <h2 class="font-display text-3xl font-normal text-white mt-2">{{ isEditing ? 'Edit Segment' : 'New Segment' }}</h2>
         </div>
 
-        <div class="modal-content-scroll">
+        <div [ngClass]="isEmbedded ? 'flex-1 overflow-y-auto custom-scrollbar' : 'modal-content-scroll'">
           <div class="form-group-list">
             <div class="form-grid-2">
               <div class="form-group">
@@ -113,7 +113,7 @@
               </div>
             }
 
-            <div class="form-group mt-4">
+            <div *ngIf="!hideMap" class="form-group mt-4">
               <label class="form-label mb-2">Route Selection</label>
 
 
@@ -181,9 +181,9 @@
           </div>
         </div>
 
-        <div class="modal-footer">
-          <button (click)="closeModal()" class="btn-edit-outline">Cancel</button>
-          <button (click)="saveSegment()" class="btn-view" [disabled]="!newSegment.streetName">
+        <div [ngClass]="isEmbedded ? 'pt-4 mt-6 border-t border-white/10 flex justify-end gap-3' : 'modal-footer'">
+          <button *ngIf="!isEmbedded" (click)="closeModal()" class="btn-edit-outline">Cancel</button>
+          <button (click)="saveSegment()" [ngClass]="isEmbedded ? 'px-6 py-2.5 bg-[#6938ef] hover:bg-[#5b2ecf] text-white text-[10px] font-mono tracking-widest uppercase rounded-lg transition-colors border-none cursor-pointer w-full' : 'btn-view'" [disabled]="!newSegment.streetName">
             {{ isEditing ? 'Save Changes' : 'Create Segment' }}
           </button>
         </div>
