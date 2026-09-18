@@ -45,7 +45,7 @@
     </div>
 
     <div class="flex h-[80%] w-full">
-      <div [ngClass]="isMapEditMode && is3DMode ? 'w-1/2' : 'w-full'" class="h-full relative">
+      <div [class.hidden]="isMapEditMode && is3DMode" class="w-full h-full relative">
         <google-map
           height="100%"
           width="100%"
@@ -80,7 +80,7 @@
       </div>
 
       @if (isMapEditMode && is3DMode) {
-        <div class="w-1/2 h-full border-l border-[#131415] relative">
+        <div class="w-full h-full relative">
           <div #streetViewDiv class="w-full h-full"></div>
         </div>
       }
