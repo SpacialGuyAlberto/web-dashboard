@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, map } from 'rxjs';
 
 import { Subcontractor, Crew } from './subcontractor.model';
 import {Segment} from '@features/segments/segment.model';
@@ -96,6 +96,15 @@ export class SubcontractorService {
     }
 
     getAllCrews(): Observable<Crew[]> {
-        return of(this.get<Crew>(this.CREWS_KEY));
+        return this.http.get<any[]>(`${this.apiUrl}/field/crews`).pipe(
+            map(backendCrews => backendCrews.map(c => ({
+                id: c.id,
+                name: c.name,
+                foremanName: c.leader || 'Unknown',
+                size: c.members || 0,
+                vehiclePlate: c.location || '',
+                subcontractor: { name: c.currentProject || 'Unknown' } as Subcontractor
+            })))
+        );
     }
 }

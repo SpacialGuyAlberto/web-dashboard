@@ -78,6 +78,17 @@
 
             <div class="form-grid-2 mt-4">
               <div class="form-group">
+                <label class="form-label">Planned Start Date</label>
+                <input [(ngModel)]="newSegment.plannedStartDate" type="date" class="form-input text-sm">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Planned End Date</label>
+                <input [(ngModel)]="newSegment.plannedEndDate" type="date" class="form-input text-sm">
+              </div>
+            </div>
+
+            <div class="form-grid-2 mt-4">
+              <div class="form-group">
                 <label class="form-label">Start Address</label>
                 <input [ngModel]="startAddress || 'Click on map to get address'" type="text" readonly class="form-input form-input-readonly text-sm">
               </div>

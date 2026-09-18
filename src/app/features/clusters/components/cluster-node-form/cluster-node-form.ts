@@ -14,6 +14,7 @@ export class ClusterNodeFormComponent {
   @Input() isEditing: boolean = false;
   @Input() tempMarker: { lat: number, lng: number } | null = null;
   @Input() newNodeData: any = {};
+  @Input() projectId!: number;
   
   @Output() saveRequested = new EventEmitter<void>();
   @Output() segmentSaved = new EventEmitter<any>();
