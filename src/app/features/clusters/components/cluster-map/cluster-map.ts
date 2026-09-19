@@ -228,7 +228,14 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
                 this.update3DOverlay();
             }
         });
-        setTimeout(() => this.update3DOverlay(), 500);
+        
+        // Force a resize event to prevent the black screen issue on first load
+        setTimeout(() => {
+            if (this.panorama) {
+                google.maps.event.trigger(this.panorama, 'resize');
+                this.update3DOverlay();
+            }
+        }, 300);
     }
   }
 
@@ -423,45 +430,90 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   }
 
   get3DIconForType(type: string): string {
-    let topColor = '#ffffff';
-    let leftColor = '#cccccc';
-    let rightColor = '#aaaaaa';
-    let scale = 48;
+    let svg = '';
 
-    switch(type) {
-      case 'POP':
-        topColor = '#8e66f2';
-        leftColor = '#5327c9';
-        rightColor = '#6938ef';
-        scale = 64; // bigger
-        break;
-      case 'DP':
-        topColor = '#59c79f';
-        leftColor = '#218f65';
-        rightColor = '#2fb080';
-        scale = 48;
-        break;
-      case 'HEUP':
+    if (type === 'POP') {
+      // Taller, larger imposing building with a door and AC vents
+      const scale = 140; 
+      const topColor = '#8e66f2';
+      const leftColor = '#5327c9';
+      const rightColor = '#6938ef';
+      const detailColor = '#2d156b';
+      
+      svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160" width="${scale}" height="${scale}">
+          <!-- Roof -->
+          <polygon points="60,20 100,40 60,60 20,40" fill="${topColor}" stroke="#111" stroke-width="2"/>
+          <!-- Left Wall -->
+          <polygon points="20,40 60,60 60,140 20,120" fill="${leftColor}" stroke="#111" stroke-width="2"/>
+          <!-- Right Wall -->
+          <polygon points="60,60 100,40 100,120 60,140" fill="${rightColor}" stroke="#111" stroke-width="2"/>
+          
+          <!-- Door on Left Wall -->
+          <polygon points="30,70 50,80 50,135 30,125" fill="${detailColor}" stroke="#111" stroke-width="1.5"/>
+          <!-- Door handle -->
+          <circle cx="45" cy="107" r="1.5" fill="#fff" />
+          
+          <!-- AC Vents on Right Wall -->
+          <polygon points="70,70 90,60 90,63 70,73" fill="${detailColor}"/>
+          <polygon points="70,78 90,68 90,71 70,81" fill="${detailColor}"/>
+          <polygon points="70,86 90,76 90,79 70,89" fill="${detailColor}"/>
+          <polygon points="70,94 90,84 90,87 70,97" fill="${detailColor}"/>
+          <polygon points="70,102 90,92 90,95 70,105" fill="${detailColor}"/>
+          
+          <!-- POP Label -->
+          <text x="60" y="47" font-family="sans-serif" font-size="16" font-weight="bold" fill="#fff" text-anchor="middle" transform="skewY(26)">POP</text>
+        </svg>
+      `;
+    } else if (type === 'DP') {
+      // Medium Street Cabinet
+      const scale = 80;
+      const topColor = '#59c79f';
+      const leftColor = '#218f65';
+      const rightColor = '#2fb080';
+      const detailColor = '#135c40';
+
+      svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="${scale}" height="${scale}">
+          <!-- Roof -->
+          <polygon points="50,20 90,40 50,60 10,40" fill="${topColor}" stroke="#111" stroke-width="2"/>
+          <!-- Left Wall -->
+          <polygon points="10,40 50,60 50,110 10,90" fill="${leftColor}" stroke="#111" stroke-width="2"/>
+          <!-- Right Wall -->
+          <polygon points="50,60 90,40 90,90 50,110" fill="${rightColor}" stroke="#111" stroke-width="2"/>
+          
+          <!-- Cabinet Doors Outline on Left Wall -->
+          <line x1="30" y1="50" x2="30" y2="100" stroke="${detailColor}" stroke-width="1.5"/>
+          <!-- Small lock/handle -->
+          <rect x="28" y="70" width="4" height="6" fill="#111" transform="skewY(26)"/>
+          
+          <!-- DP Label -->
+          <text x="70" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle" transform="skewY(-26)">DP</text>
+        </svg>
+      `;
+    } else {
+      // Standard small box for others (HEUP, etc.)
+      const scale = 40;
+      let topColor = '#ffffff';
+      let leftColor = '#cccccc';
+      let rightColor = '#aaaaaa';
+
+      if (type === 'HEUP') {
         topColor = '#f26868';
         leftColor = '#cc2a2a';
         rightColor = '#ef4444';
-        scale = 32;
-        break;
-      default:
-        topColor = '#ffffff';
-        leftColor = '#cccccc';
-        rightColor = '#aaaaaa';
-    }
+      }
 
-    // Isometric Cube SVG
-    const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="${scale}" height="${scale}">
-        <polygon points="50,15 90,35 50,55 10,35" fill="${topColor}" stroke="#111" stroke-width="2"/>
-        <polygon points="10,35 50,55 50,85 10,65" fill="${leftColor}" stroke="#111" stroke-width="2"/>
-        <polygon points="50,55 90,35 90,65 50,85" fill="${rightColor}" stroke="#111" stroke-width="2"/>
-        <text x="50" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle" transform="skewY(26)">${type.substring(0, 3)}</text>
-      </svg>
-    `;
+      svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="${scale}" height="${scale}">
+          <polygon points="50,15 90,35 50,55 10,35" fill="${topColor}" stroke="#111" stroke-width="2"/>
+          <polygon points="10,35 50,55 50,85 10,65" fill="${leftColor}" stroke="#111" stroke-width="2"/>
+          <polygon points="50,55 90,35 90,65 50,85" fill="${rightColor}" stroke="#111" stroke-width="2"/>
+          <text x="50" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle" transform="skewY(26)">${type.substring(0, 3)}</text>
+        </svg>
+      `;
+    }
+    
     return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
   }
 
