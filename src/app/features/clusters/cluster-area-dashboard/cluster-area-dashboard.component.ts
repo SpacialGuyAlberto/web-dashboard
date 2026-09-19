@@ -97,6 +97,7 @@ export class ClusterAreaDashboardComponent implements OnInit {
   tempMarker: { lat: number, lng: number } | null = null;
   newNodeData: any = {};
   availablePops: Pop[] = [];
+  highlightedType: string | null = null;
   
   @ViewChild(ClusterMapComponent) clusterMap!: ClusterMapComponent;
 
@@ -204,6 +205,10 @@ export class ClusterAreaDashboardComponent implements OnInit {
       else if (mode === 'split') { this.panelWidth = window.innerWidth * 0.45; this.panelHeight = window.innerHeight * 0.5; }
     }
     if (this.clusterMap) this.clusterMap.triggerMapResize();
+  }
+
+  onStatClicked(type: string) {
+    this.highlightedType = type || null;
   }
 
   setPanelPosition(pos: 'left' | 'right' | 'bottom') {

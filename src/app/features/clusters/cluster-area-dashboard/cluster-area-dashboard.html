@@ -67,7 +67,9 @@
         <app-cluster-stats 
             [stats]="stats" 
             [viewMode]="viewMode" 
-            [panelPosition]="panelPosition">
+            [panelPosition]="panelPosition"
+            [highlightedType]="highlightedType"
+            (statClicked)="onStatClicked($event)">
         </app-cluster-stats>
 
         <!-- Projections (Visible in Split or Data mode) -->
@@ -108,6 +110,7 @@
                 [groupedElements]="groupedElements" 
                 [viewMode]="viewMode" 
                 [showMap]="showMap" 
+                [highlightedType]="highlightedType"
                 (createRequested)="openModalFor($event)" 
                 (nodeClicked)="onNodeClicked($event)"
                 (editRequested)="onEditNodeRequested($event)">
@@ -147,6 +150,7 @@
         [activeDrawTool]="activeDrawTool"
         [showMap]="showMap"
         [viewMode]="viewMode"
+        [highlightedType]="highlightedType"
         (mapClicked)="onMapClicked($event)"
         (segmentUpdated)="onSegmentUpdated($event)"
         (segmentReset)="onSegmentReset()"

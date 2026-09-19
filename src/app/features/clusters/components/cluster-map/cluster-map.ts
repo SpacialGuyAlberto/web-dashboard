@@ -23,6 +23,7 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   @Input() activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | null = null;
   @Input() showMap: boolean = true;
   @Input() viewMode: 'map-focused' | 'split' | 'data-focused' = 'map-focused';
+  @Input() highlightedType: string | null = null;
 
   @Output() mapClicked = new EventEmitter<{lat: number, lng: number, address: string}>();
   @Output() segmentUpdated = new EventEmitter<{geometry: any[], length: number, startLat: number, startLng: number, endLat: number, endLng: number, startAddress: string, endAddress: string}>();
@@ -527,6 +528,11 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
     }
   }
 
+  getMarkerOpacity(type: string): number {
+    if (!this.highlightedType) return 1.0;
+    return this.highlightedType === type ? 1.0 : 0.2;
+  }
+
   getSegmentOptions(segment: Segment): google.maps.PolylineOptions {
     let color = '#ff69b4';
     let weight = 4;
@@ -543,11 +549,16 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
       weight = 3;
     }
 
+    let opacity = 0.8;
+    if (this.highlightedType) {
+      opacity = this.highlightedType === 'SEGMENT' ? 1.0 : 0.2;
+    }
+
     return {
       strokeColor: color,
       strokeWeight: weight,
-      strokeOpacity: 0.8,
-      zIndex: 1
+      strokeOpacity: opacity,
+      zIndex: this.highlightedType === 'SEGMENT' ? 10 : 1
     };
   }
 

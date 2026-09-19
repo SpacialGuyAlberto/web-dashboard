@@ -43,7 +43,7 @@
             @if (element.type !== 'ACOMETIDA') {
               <map-marker
                 [position]="{ lat: element.lat, lng: element.lng }"
-                [options]="{ icon: getIconForType(element.type) }"
+                [options]="{ icon: getIconForType(element.type), opacity: getMarkerOpacity(element.type), zIndex: highlightedType === element.type ? 10 : 1 }"
                 [title]="element.name"
                 (mapClick)="onNodeClick(element, $event)">
               </map-marker>
