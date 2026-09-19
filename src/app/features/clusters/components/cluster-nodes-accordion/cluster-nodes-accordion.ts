@@ -15,6 +15,8 @@ export class ClusterNodesAccordionComponent {
   
   @Output() createRequested = new EventEmitter<'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT'>();
   @Output() nodeClicked = new EventEmitter<NetworkElement>();
+  @Output() editRequested = new EventEmitter<NetworkElement>();
+
 
   expandedGroup: string = 'POP';
 
@@ -28,6 +30,11 @@ export class ClusterNodesAccordionComponent {
 
   onNodeClick(element: NetworkElement) {
     this.nodeClicked.emit(element);
+  }
+
+  onEditClick(event: Event, element: NetworkElement) {
+    event.stopPropagation();
+    this.editRequested.emit(element);
   }
 
   getColorForType(type: string): string {

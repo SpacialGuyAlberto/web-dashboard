@@ -109,7 +109,8 @@
                 [viewMode]="viewMode" 
                 [showMap]="showMap" 
                 (createRequested)="openModalFor($event)" 
-                (nodeClicked)="onNodeClicked($event)">
+                (nodeClicked)="onNodeClicked($event)"
+                (editRequested)="onEditNodeRequested($event)">
             </app-cluster-nodes-accordion>
             
             <app-cluster-node-form 

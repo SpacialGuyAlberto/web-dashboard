@@ -290,6 +290,32 @@ export class ClusterAreaDashboardComponent implements OnInit {
     }
   }
 
+  onEditNodeRequested(element: NetworkElement) {
+    this.showMap = true;
+    this.isMapEditMode = true;
+    this.setViewMode('map-focused');
+    this.activeDrawTool = element.type as any;
+    this.tempMarker = { lat: element.lat, lng: element.lng };
+    this.isEditing = true;
+
+    // Fetch or construct full node data based on type
+    if (element.type === 'POP') {
+       this.popService.getPop(parseInt(element.id)).subscribe(pop => {
+          this.newNodeData = { ...pop };
+       });
+    } else if (element.type === 'DP') {
+       this.nvtService.getNetzverteiler(parseInt(element.id)).subscribe(dp => {
+          this.newNodeData = { ...dp };
+       });
+    } else if (element.type === 'SEGMENT' || element.type === 'ACOMETIDA') {
+       this.segmentService.getSegment(parseInt(element.id)).subscribe(segment => {
+          this.newNodeData = { ...segment };
+       });
+    } else {
+       this.newNodeData = { ...element };
+    }
+  }
+
   goBack() {
     this.router.navigate(['/project-details'], { queryParams: { projectId: this.projectId, projectName: this.projectName } });
   }
@@ -300,10 +326,18 @@ export class ClusterAreaDashboardComponent implements OnInit {
 
     if (this.activeDrawTool === 'POP') {
       const pop: any = { clusterId: this.clusterId, name: this.newNodeData.name, locationAddress: this.newNodeData.locationAddress, maxCapacityPorts: this.newNodeData.maxCapacityPorts, latitude: this.tempMarker.lat, longitude: this.tempMarker.lng };
-      this.popService.createPop(pop as Pop).subscribe(() => { this.loadClusterData(); this.tempMarker = null; });
+      if (this.isEditing) {
+        this.popService.updatePop(this.newNodeData.id, pop as Pop).subscribe(() => { this.loadClusterData(); this.tempMarker = null; this.isEditing = false; });
+      } else {
+        this.popService.createPop(pop as Pop).subscribe(() => { this.loadClusterData(); this.tempMarker = null; });
+      }
     } else if (this.activeDrawTool === 'DP') {
       const dp: any = { popId: this.newNodeData.popId, identifier: this.newNodeData.identifier, locationAddress: this.newNodeData.locationAddress, latitude: this.tempMarker.lat, longitude: this.tempMarker.lng };
-      this.nvtService.createNetzverteiler(dp as Netzverteiler).subscribe(() => { this.loadClusterData(); this.tempMarker = null; });
+      if (this.isEditing) {
+        this.nvtService.updateNetzverteiler(this.newNodeData.id, dp as Netzverteiler).subscribe(() => { this.loadClusterData(); this.tempMarker = null; this.isEditing = false; });
+      } else {
+        this.nvtService.createNetzverteiler(dp as Netzverteiler).subscribe(() => { this.loadClusterData(); this.tempMarker = null; });
+      }
     } else if (this.activeDrawTool === 'ACOMETIDA') {
       const seg: Segment = { streetName: this.newNodeData.name || 'Custom Segment', streetType: 'UNKNOWN', workType: 'UNKNOWN', currentState: 'PLANNED', length: 50, geometry: [ { lat: this.tempMarker.lat, lng: this.tempMarker.lng }, { lat: this.tempMarker.lat + 0.0005, lng: this.tempMarker.lng + 0.0005 } ] };
       this.segmentService.createSegment(this.projectId, seg).subscribe(() => { this.loadClusterData(); this.tempMarker = null; });
@@ -313,6 +347,7 @@ export class ClusterAreaDashboardComponent implements OnInit {
   onSegmentSaved(segment: any) {
     this.activeDrawTool = null;
     this.tempMarker = null;
+    this.isEditing = false;
     this.loadClusterData();
   }
 }

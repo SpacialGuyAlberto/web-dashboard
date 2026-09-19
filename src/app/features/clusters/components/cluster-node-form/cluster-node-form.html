@@ -63,6 +63,9 @@
                   [isEmbedded]="true" 
                   [hideMap]="true" 
                   [projectId]="projectId" 
+                  [isEditing]="isEditing"
+                  [initialSegment]="newNodeData"
+                  [currentSegmentId]="newNodeData.id"
                   (saved)="onSegmentSaved($event)">
                 </app-segment-create-modal>
               </div>
