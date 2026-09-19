@@ -30,6 +30,17 @@
                 <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">{{ activeDrawTool === 'ACOMETIDA' ? 'Address' : 'Name' }}</label>
                 <input type="text" [(ngModel)]="newNodeData.name" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors">
               </div>
+              <div *ngIf="activeDrawTool === 'DP'" class="form-group mb-4">
+                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Location Address</label>
+                <input type="text" [(ngModel)]="newNodeData.locationAddress" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors">
+              </div>
+              <div *ngIf="activeDrawTool === 'DP'" class="form-group mb-4">
+                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">POP</label>
+                <select [(ngModel)]="newNodeData.popId" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors cursor-pointer">
+                  <option [ngValue]="undefined" disabled selected>Select a POP</option>
+                  <option *ngFor="let pop of availablePops" [ngValue]="pop.id">{{ pop.name }}</option>
+                </select>
+              </div>
               <div *ngIf="activeDrawTool === 'POP'" class="form-group mb-4">
                 <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Location Address</label>
                 <input type="text" [(ngModel)]="newNodeData.locationAddress" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors">

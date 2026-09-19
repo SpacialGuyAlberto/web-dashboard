@@ -96,6 +96,7 @@ export class ClusterAreaDashboardComponent implements OnInit {
   activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | null = null;
   tempMarker: { lat: number, lng: number } | null = null;
   newNodeData: any = {};
+  availablePops: Pop[] = [];
   
   @ViewChild(ClusterMapComponent) clusterMap!: ClusterMapComponent;
 
@@ -144,7 +145,8 @@ export class ClusterAreaDashboardComponent implements OnInit {
     this.elements = [];
     
     this.popService.getAllPops().subscribe(pops => {
-      pops.filter(p => p.clusterId === this.clusterId).forEach(p => {
+      this.availablePops = pops.filter(p => p.clusterId === this.clusterId);
+      this.availablePops.forEach(p => {
         this.elements.push({ id: p.id ? p.id.toString() : 'POP-?', type: 'POP', name: p.name || 'Unnamed POP', lat: (p as any).latitude || this.center.lat, lng: (p as any).longitude || this.center.lng, status: 'PLANNED', createdAt: new Date() });
       });
       this.calculateStats();
@@ -300,7 +302,7 @@ export class ClusterAreaDashboardComponent implements OnInit {
       const pop: any = { clusterId: this.clusterId, name: this.newNodeData.name, locationAddress: this.newNodeData.locationAddress, maxCapacityPorts: this.newNodeData.maxCapacityPorts, latitude: this.tempMarker.lat, longitude: this.tempMarker.lng };
       this.popService.createPop(pop as Pop).subscribe(() => { this.loadClusterData(); this.tempMarker = null; });
     } else if (this.activeDrawTool === 'DP') {
-      const dp: any = { popId: this.newNodeData.popId, identifier: this.newNodeData.identifier, latitude: this.tempMarker.lat, longitude: this.tempMarker.lng };
+      const dp: any = { popId: this.newNodeData.popId, identifier: this.newNodeData.identifier, locationAddress: this.newNodeData.locationAddress, latitude: this.tempMarker.lat, longitude: this.tempMarker.lng };
       this.nvtService.createNetzverteiler(dp as Netzverteiler).subscribe(() => { this.loadClusterData(); this.tempMarker = null; });
     } else if (this.activeDrawTool === 'ACOMETIDA') {
       const seg: Segment = { streetName: this.newNodeData.name || 'Custom Segment', streetType: 'UNKNOWN', workType: 'UNKNOWN', currentState: 'PLANNED', length: 50, geometry: [ { lat: this.tempMarker.lat, lng: this.tempMarker.lng }, { lat: this.tempMarker.lat + 0.0005, lng: this.tempMarker.lng + 0.0005 } ] };

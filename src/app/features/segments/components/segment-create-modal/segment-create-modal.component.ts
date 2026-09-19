@@ -12,6 +12,9 @@ import { CustomFieldService } from '@features/field-config/custom-field.service'
 import { SafetyService } from '@features/risk-planning/safety.service';
 import { PlanningService } from '@features/risk-planning/planning.service';
 import { WorkType } from '@shared/models/work-type.enum';
+import { Netzverteiler } from '../../../infrastructure/netzverteiler.model';
+import { NetzverteilerService } from '../../../infrastructure/netzverteiler.service';
+
 
 @Component({
   selector: 'app-segment-create-modal',
@@ -33,6 +36,7 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
   @Output() closed = new EventEmitter<void>();
 
   crews: Crew[] = [];
+  netzverteilers: Netzverteiler[] = [];
   projectGeometry: {lat: number, lng: number}[] | null = null;
 
   startAddress: string = '';
@@ -54,11 +58,13 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
     private safetyService: SafetyService,
     private customFieldService: CustomFieldService,
     private planningService: PlanningService,
+    private nvtService: NetzverteilerService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     this.loadCrews();
+    this.loadNetzverteilers();
     this.loadCustomFieldDefinitions();
     if (this.projectId) {
       this.loadProjectDetails();
@@ -131,6 +137,13 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
       this.crews = crews;
     });
   }
+
+  loadNetzverteilers() {
+    this.nvtService.getAllNetzverteilers().subscribe(nvts => {
+      this.netzverteilers = nvts;
+    });
+  }
+
 
   updateExternalCoordinates(coords: SegmentCoordinates) {
     this.onCoordinatesChanged(coords);

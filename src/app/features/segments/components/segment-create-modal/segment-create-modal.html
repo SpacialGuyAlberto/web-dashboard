@@ -78,6 +78,27 @@
 
             <div class="form-grid-2 mt-4">
               <div class="form-group">
+                <label class="form-label">Start Netzverteiler</label>
+                <select [(ngModel)]="newSegment.startNvtId" class="form-select cursor-pointer">
+                  <option [ngValue]="undefined">-- None --</option>
+                  @for (nvt of netzverteilers; track nvt.id) {
+                    <option [ngValue]="nvt.id">{{nvt.identifier}}</option>
+                  }
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">End Netzverteiler</label>
+                <select [(ngModel)]="newSegment.endNvtId" class="form-select cursor-pointer">
+                  <option [ngValue]="undefined">-- None --</option>
+                  @for (nvt of netzverteilers; track nvt.id) {
+                    <option [ngValue]="nvt.id">{{nvt.identifier}}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid-2 mt-4">
+              <div class="form-group">
                 <label class="form-label">Planned Start Date</label>
                 <input [(ngModel)]="newSegment.plannedStartDate" type="date" class="form-input text-sm">
               </div>

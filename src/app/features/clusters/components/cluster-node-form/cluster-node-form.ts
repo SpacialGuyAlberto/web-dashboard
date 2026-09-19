@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SegmentCreateModalComponent } from '../../../segments/components/segment-create-modal/segment-create-modal.component';
+import { Pop } from '../../../infrastructure/pop.model';
 
 @Component({
   selector: 'app-cluster-node-form',
@@ -15,6 +16,7 @@ export class ClusterNodeFormComponent {
   @Input() tempMarker: { lat: number, lng: number } | null = null;
   @Input() newNodeData: any = {};
   @Input() projectId!: number;
+  @Input() availablePops: Pop[] = [];
   
   @Output() saveRequested = new EventEmitter<void>();
   @Output() segmentSaved = new EventEmitter<any>();
