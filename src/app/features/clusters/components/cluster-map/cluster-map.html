@@ -29,6 +29,28 @@
       }
     </div>
 
+    <!-- Segment Editor Overlay -->
+    <div *ngIf="editingSegment" class="absolute top-6 left-1/2 -translate-x-1/2 bg-[#131415] border border-white/10 rounded-xl p-4 shadow-2xl z-50 flex items-center gap-4 animate-slide-down pointer-events-auto">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-[#ff69b4]/10 text-[#ff69b4] flex items-center justify-center border border-[#ff69b4]/30">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        </div>
+        <div>
+          <h3 class="text-white font-mono text-sm m-0">Editing Segment</h3>
+          <span class="text-white/50 text-[10px] font-mono uppercase">{{ editingSegment.streetName || 'Unknown Street' }}</span>
+        </div>
+      </div>
+      
+      <div class="w-px h-8 bg-white/10 mx-2"></div>
+      
+      <button (click)="cancelSegmentEdit()" class="px-4 py-1.5 rounded-lg border border-white/10 text-white/70 hover:bg-white/5 text-xs font-mono uppercase transition-colors cursor-pointer">
+        Cancel
+      </button>
+      <button (click)="saveSegmentEdit()" class="px-4 py-1.5 rounded-lg bg-[#ff69b4] text-white text-xs font-mono uppercase hover:bg-[#ff69b4]/90 transition-colors shadow-[0_0_15px_rgba(255,105,180,0.3)] cursor-pointer">
+        Save Position
+      </button>
+    </div>
+
     <div class="relative w-full h-full">
       <div [class.hidden]="is3DMode" class="w-full h-full relative">
         <google-map
@@ -51,13 +73,22 @@
           }
 
           @for (seg of segments; track seg.id) {
-            @if (seg.geometry && seg.geometry.length > 0) {
+            @if (seg.geometry && seg.geometry.length > 0 && (!editingSegment || seg.id !== editingSegment.id)) {
               <map-polyline
                 [path]="seg.geometry"
                 [options]="getSegmentOptions(seg)"
                 (polylineClick)="onSegmentClick(seg, $event)">
               </map-polyline>
             }
+          }
+
+          <!-- Editable Polyline -->
+          @if (editingSegment && editingSegment.geometry) {
+             <map-polyline
+                #editPolyline="mapPolyline"
+                [path]="editingSegment.geometry"
+                [options]="getEditableSegmentOptions(editingSegment)">
+             </map-polyline>
           }
 
           <map-info-window [position]="infoWindowPosition">

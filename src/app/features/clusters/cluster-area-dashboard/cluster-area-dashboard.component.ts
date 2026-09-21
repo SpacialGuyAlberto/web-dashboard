@@ -9,6 +9,7 @@ import { Netzverteiler } from '../../infrastructure/netzverteiler.model';
 import { Segment } from '../../segments/segment.model';
 import { HuepService } from '../../infrastructure/huep.service';
 import { Huep } from '../../infrastructure/huep.model';
+import { IntelligenceService } from '../infrastructure/intelligence.service';
 
 import { ClusterMapComponent } from '../components/cluster-map/cluster-map';
 import { combineLatest } from 'rxjs';
@@ -93,11 +94,12 @@ export class ClusterAreaDashboardComponent implements OnInit {
   showMap: boolean = true;
   isMapEditMode = false;
   is3DMode = false;
-  activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | null = null;
+  activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | null = null;
   tempMarker: { lat: number, lng: number } | null = null;
   newNodeData: any = {};
   availablePops: Pop[] = [];
   highlightedType: string | null = null;
+  impactedElementIds: string[] = []; // IDs of nodes impacted by a risk scenario
   
   @ViewChild(ClusterMapComponent) clusterMap!: ClusterMapComponent;
 
@@ -123,6 +125,7 @@ export class ClusterAreaDashboardComponent implements OnInit {
     private nvtService: NetzverteilerService,
     private segmentService: SegmentService,
     private huepService: HuepService,
+    private intelligenceService: IntelligenceService,
     private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
@@ -253,6 +256,14 @@ export class ClusterAreaDashboardComponent implements OnInit {
       this.clusterNodeForm.updateSegmentCoordinates(event);
     }
   }
+
+  onSaveSegmentPosition(updatedSegment: Segment) {
+    if (updatedSegment.id) {
+       this.segmentService.updateSegment(updatedSegment.id, updatedSegment).subscribe(() => {
+          this.loadClusterData();
+       });
+    }
+  }
   
   onSegmentReset() {
     if (this.clusterNodeForm) {
@@ -262,7 +273,7 @@ export class ClusterAreaDashboardComponent implements OnInit {
     }
   }
 
-  handleDrawToolChanged(tool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | null) {
+  handleDrawToolChanged(tool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | null) {
     this.activeDrawTool = tool;
     this.tempMarker = null;
     this.newNodeData = {};
@@ -278,7 +289,7 @@ export class ClusterAreaDashboardComponent implements OnInit {
     this.tempMarker = null;
   }
 
-  openModalFor(type: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT') {
+  openModalFor(type: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP') {
     this.showMap = true;
     this.isMapEditMode = true;
     this.setViewMode('map-focused');
@@ -292,6 +303,14 @@ export class ClusterAreaDashboardComponent implements OnInit {
       this.router.navigate(['/project-details/clusters', this.clusterId, 'pop', element.id], { queryParams: { projectId: this.projectId, projectName: this.projectName } });
     } else if (element.type === 'DP') {
       this.router.navigate(['/project-details/clusters', this.clusterId, 'dp', element.id], { queryParams: { projectId: this.projectId, projectName: this.projectName } });
+    } else if (element.type === 'SEGMENT') {
+      // Feature 1: Trigger risk calculation automatically when clicking a segment?
+      // Or we can create a dedicated button in the modal. Let's just calculate risk here to demo.
+      this.intelligenceService.calculateRiskForSegment(parseInt(element.id)).subscribe(impacted => {
+        // "impacted" will be a list of maps with "affectedHeupId"
+        this.impactedElementIds = impacted.map(i => i.affectedHeupId ? i.affectedHeupId.toString() : '');
+        this.cdr.detectChanges();
+      });
     }
   }
 

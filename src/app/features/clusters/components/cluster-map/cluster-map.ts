@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GoogleMapsModule, GoogleMap, MapInfoWindow } from '@angular/google-maps';
+import { GoogleMapsModule, GoogleMap, MapInfoWindow, MapPolyline } from '@angular/google-maps';
 import { NetworkElement } from '../../cluster-area-dashboard/cluster-area-dashboard.component';
 import { RoutingService } from '../../../gis/routing.service';
 import { Segment } from '../../../segments/segment.model';
@@ -20,20 +20,22 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   @Input() map3DOptions!: google.maps.MapOptions;
   @Input() isMapEditMode: boolean = false;
   @Input() is3DMode: boolean = false;
-  @Input() activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | null = null;
+  @Input() activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | null = null;
   @Input() showMap: boolean = true;
   @Input() viewMode: 'map-focused' | 'split' | 'data-focused' = 'map-focused';
   @Input() highlightedType: string | null = null;
+  @Input() impactedElementIds: string[] = []; // Used for intelligence highlighting
 
   @Output() mapClicked = new EventEmitter<{lat: number, lng: number, address: string}>();
   @Output() segmentUpdated = new EventEmitter<{geometry: any[], length: number, startLat: number, startLng: number, endLat: number, endLng: number, startAddress: string, endAddress: string}>();
   @Output() segmentReset = new EventEmitter<void>();
   
-  @Output() drawToolChanged = new EventEmitter<'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | null>();
+  @Output() drawToolChanged = new EventEmitter<'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | null>();
   @Output() toggle3DModeEvent = new EventEmitter<void>();
   @Output() exitEditModeEvent = new EventEmitter<void>();
+  @Output() saveSegmentPosition = new EventEmitter<Segment>();
 
-  setDrawTool(tool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | null) {
+  setDrawTool(tool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | null) {
     this.drawToolChanged.emit(tool);
   }
 
@@ -49,6 +51,7 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   @ViewChild(MapInfoWindow, { static: false }) infoWindow!: MapInfoWindow;
   @ViewChild('streetViewDiv', { static: false }) streetViewDiv!: ElementRef;
   @ViewChild('searchInput', { static: false }) searchInputElement!: ElementRef;
+  @ViewChild('editPolyline') editPolyline!: MapPolyline;
 
   private panorama: google.maps.StreetViewPanorama | null = null;
   private autocomplete: google.maps.places.Autocomplete | null = null;
@@ -64,6 +67,7 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   selectedSegment: Segment | null = null;
   selectedNode: NetworkElement | null = null;
   infoWindowPosition: google.maps.LatLngLiteral = { lat: 0, lng: 0 };
+  editingSegment: Segment | null = null;
 
   constructor(private routingService: RoutingService, private cdr: ChangeDetectorRef) {}
 
@@ -147,8 +151,6 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
     });
   }
 
-  // Allow double-click to finish drawing? Or just accumulate? 
-  // Let's just accumulate. A separate action (like selecting another tool or pressing Escape) stops it.
   private handleSegmentClick(lat: number, lng: number, address: string) {
       this.segmentWaypoints.push({ lat, lng });
 
@@ -159,7 +161,6 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
       } else {
         this.newSegment.endAddress = address;
         
-        // Calculate Route through all waypoints
         this.routingService.getStreetRoute(this.segmentWaypoints).subscribe(route => {
           this.segmentRoute = route;
           
@@ -230,7 +231,6 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
             }
         });
         
-        // Force a resize event to prevent the black screen issue on first load
         setTimeout(() => {
             if (this.panorama) {
                 google.maps.event.trigger(this.panorama, 'resize');
@@ -248,7 +248,6 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
     this.streetViewLineMarkers.forEach(m => m.setMap(null));
     this.streetViewLineMarkers = [];
 
-    // Nodes
     this.elements.forEach(element => {
         const marker = new google.maps.Marker({
             position: { lat: element.lat, lng: element.lng },
@@ -261,7 +260,6 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
         this.streetViewMarkers.push(marker);
     });
 
-    // Active Tool markers
     if (this.tempMarker && this.activeDrawTool !== 'SEGMENT') {
         const marker = new google.maps.Marker({
             position: this.tempMarker,
@@ -287,7 +285,6 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
         });
     }
 
-    // Segment Line interpolation for current drawing
     if (this.segmentRoute && this.segmentRoute.length > 1 && google.maps.geometry) {
         for (let i = 0; i < this.segmentRoute.length - 1; i++) {
             const p1 = new google.maps.LatLng(this.segmentRoute[i].lat, this.segmentRoute[i].lng);
@@ -319,7 +316,6 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
         }
     }
 
-    // Render Saved Segments in 3D asynchronously
     if (this.segments && this.segments.length > 0 && google.maps.geometry) {
         this.renderSegmentsAsync();
     }
@@ -331,15 +327,12 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
     this.renderTaskVersion++;
     const currentVersion = this.renderTaskVersion;
     
-    // Create a copy of the segments array to process
     const segmentsToRender = [...this.segments];
     let currentIndex = 0;
     
-    // Render in chunks of 5 segments at a time
     const chunkSize = 5;
 
     const renderChunk = () => {
-      // If a new update started, cancel this task
       if (this.renderTaskVersion !== currentVersion || !this.panorama) return;
 
       const end = Math.min(currentIndex + chunkSize, segmentsToRender.length);
@@ -379,7 +372,6 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
                     dot.addListener('click', (e: any) => this.onSegmentClick(seg, e));
                     this.streetViewLineMarkers.push(dot);
                     
-                    // Spacing: 0.5 meters to make it look like a continuous cable
                     currentDist += 0.5; 
                 }
             }
@@ -388,13 +380,11 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
       
       currentIndex = end;
       
-      // If there are more segments, schedule the next chunk
       if (currentIndex < segmentsToRender.length) {
         requestAnimationFrame(renderChunk);
       }
     };
     
-    // Start the first chunk
     requestAnimationFrame(renderChunk);
   }
 
@@ -404,19 +394,19 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
     let scale = 1;
     
     switch(type) {
-      case 'POP': // Hexagon or Server rack
+      case 'POP': 
         path = 'M12 2L22 7l-10 5L2 7l10-5zm0 15l-10-5v5l10 5 10-5v-5l-10 5zm0-5l-10-5v5l10 5 10-5v-5l-10 5z';
         scale = 1.2;
         break;
-      case 'DP': // Square/Cabinet
+      case 'DP': 
         path = 'M4 4h16v16H4V4zm2 2v12h12V6H6zm2 2h8v2H8V8zm0 4h8v2H8v-2z';
         scale = 1.1;
         break;
-      case 'ACOMETIDA': // Arrow/Line
+      case 'ACOMETIDA': 
         path = 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z';
         scale = 0.9;
         break;
-      case 'HEUP': // Home
+      case 'HEUP': 
         path = 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z';
         scale = 1.0;
         break;
@@ -434,7 +424,6 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
     let svg = '';
 
     if (type === 'POP') {
-      // Taller, larger imposing building with a door and AC vents
       const scale = 140; 
       const topColor = '#8e66f2';
       const leftColor = '#5327c9';
@@ -443,31 +432,23 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
       
       svg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160" width="${scale}" height="${scale}">
-          <!-- Roof -->
           <polygon points="60,20 100,40 60,60 20,40" fill="${topColor}" stroke="#111" stroke-width="2"/>
-          <!-- Left Wall -->
           <polygon points="20,40 60,60 60,140 20,120" fill="${leftColor}" stroke="#111" stroke-width="2"/>
-          <!-- Right Wall -->
           <polygon points="60,60 100,40 100,120 60,140" fill="${rightColor}" stroke="#111" stroke-width="2"/>
           
-          <!-- Door on Left Wall -->
           <polygon points="30,70 50,80 50,135 30,125" fill="${detailColor}" stroke="#111" stroke-width="1.5"/>
-          <!-- Door handle -->
           <circle cx="45" cy="107" r="1.5" fill="#fff" />
           
-          <!-- AC Vents on Right Wall -->
           <polygon points="70,70 90,60 90,63 70,73" fill="${detailColor}"/>
           <polygon points="70,78 90,68 90,71 70,81" fill="${detailColor}"/>
           <polygon points="70,86 90,76 90,79 70,89" fill="${detailColor}"/>
           <polygon points="70,94 90,84 90,87 70,97" fill="${detailColor}"/>
           <polygon points="70,102 90,92 90,95 70,105" fill="${detailColor}"/>
           
-          <!-- POP Label -->
           <text x="60" y="47" font-family="sans-serif" font-size="16" font-weight="bold" fill="#fff" text-anchor="middle" transform="skewY(26)">POP</text>
         </svg>
       `;
     } else if (type === 'DP') {
-      // Medium Street Cabinet
       const scale = 80;
       const topColor = '#59c79f';
       const leftColor = '#218f65';
@@ -476,24 +457,17 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
 
       svg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="${scale}" height="${scale}">
-          <!-- Roof -->
           <polygon points="50,20 90,40 50,60 10,40" fill="${topColor}" stroke="#111" stroke-width="2"/>
-          <!-- Left Wall -->
           <polygon points="10,40 50,60 50,110 10,90" fill="${leftColor}" stroke="#111" stroke-width="2"/>
-          <!-- Right Wall -->
           <polygon points="50,60 90,40 90,90 50,110" fill="${rightColor}" stroke="#111" stroke-width="2"/>
           
-          <!-- Cabinet Doors Outline on Left Wall -->
           <line x1="30" y1="50" x2="30" y2="100" stroke="${detailColor}" stroke-width="1.5"/>
-          <!-- Small lock/handle -->
           <rect x="28" y="70" width="4" height="6" fill="#111" transform="skewY(26)"/>
           
-          <!-- DP Label -->
           <text x="70" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle" transform="skewY(-26)">DP</text>
         </svg>
       `;
     } else {
-      // Standard small box for others (HEUP, etc.)
       const scale = 40;
       let topColor = '#ffffff';
       let leftColor = '#cccccc';
@@ -539,13 +513,13 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
     
     const workType = (segment.workType || '').toLowerCase();
     if (workType.includes('excavaci') || workType.includes('excavation') || workType.includes('trench')) {
-      color = '#eab308'; // yellow
+      color = '#eab308'; 
       weight = 5;
     } else if (workType.includes('aerial')) {
-      color = '#3b82f6'; // blue
+      color = '#3b82f6'; 
       weight = 3;
     } else if (workType.includes('micro')) {
-      color = '#10b981'; // green
+      color = '#10b981'; 
       weight = 3;
     }
 
@@ -562,7 +536,28 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
     };
   }
 
+  getEditableSegmentOptions(segment: Segment): google.maps.PolylineOptions {
+    return {
+      strokeColor: '#ff69b4',
+      strokeWeight: 8,
+      strokeOpacity: 0.8,
+      zIndex: 100,
+      editable: true,
+      draggable: true
+    };
+  }
+
   onSegmentClick(segment: Segment, event: google.maps.MapMouseEvent) {
+    if (this.isMapEditMode || this.activeDrawTool) return;
+    
+    // Intelligent segment editor condition: only edit if PLAN/PLANNED
+    if (segment.currentState === 'PLAN' || segment.currentState === 'PLANNED') {
+      this.editingSegment = segment;
+      if (this.infoWindow) this.infoWindow.close();
+      this.cdr.detectChanges();
+      return;
+    }
+    
     this.selectedSegment = segment;
     this.selectedNode = null;
     if (event.latLng) {
@@ -571,6 +566,23 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
       if (this.infoWindow) {
         this.infoWindow.open();
       }
+    }
+  }
+
+  cancelSegmentEdit() {
+    this.editingSegment = null;
+    this.cdr.detectChanges();
+  }
+
+  saveSegmentEdit() {
+    if (this.editingSegment && this.editPolyline && this.editPolyline.polyline) {
+      const path = this.editPolyline.polyline.getPath();
+      const newGeometry = path.getArray().map(latLng => ({ lat: latLng.lat(), lng: latLng.lng() }));
+      
+      const updatedSegment = { ...this.editingSegment, geometry: newGeometry };
+      this.saveSegmentPosition.emit(updatedSegment);
+      this.editingSegment = null;
+      this.cdr.detectChanges();
     }
   }
 

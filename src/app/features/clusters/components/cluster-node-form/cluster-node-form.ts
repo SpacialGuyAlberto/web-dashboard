@@ -11,7 +11,7 @@ import { Pop } from '../../../infrastructure/pop.model';
   templateUrl: './cluster-node-form.html'
 })
 export class ClusterNodeFormComponent {
-  @Input() activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | null = null;
+  @Input() activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | null = null;
   @Input() isEditing: boolean = false;
   @Input() tempMarker: { lat: number, lng: number } | null = null;
   @Input() newNodeData: any = {};

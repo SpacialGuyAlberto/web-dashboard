@@ -14,7 +14,7 @@ export class ClusterNodesAccordionComponent implements OnChanges {
   @Input() showMap: boolean = true;
   @Input() highlightedType: string | null = null;
   
-  @Output() createRequested = new EventEmitter<'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT'>();
+  @Output() createRequested = new EventEmitter<'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP'>();
   @Output() nodeClicked = new EventEmitter<NetworkElement>();
   @Output() editRequested = new EventEmitter<NetworkElement>();
 
@@ -39,7 +39,7 @@ export class ClusterNodesAccordionComponent implements OnChanges {
     this.expandedGroup = this.expandedGroup === group ? '' : group;
   }
 
-  openModalFor(type: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT') {
+  openModalFor(type: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP') {
     this.createRequested.emit(type);
   }
 
