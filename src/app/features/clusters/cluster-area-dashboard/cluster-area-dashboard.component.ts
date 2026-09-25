@@ -148,19 +148,24 @@ export class ClusterAreaDashboardComponent implements OnInit {
   loadClusterData() {
     this.elements = [];
     
-    this.popService.getAllPops().subscribe(pops => {
+    combineLatest([
+      this.popService.getAllPops(),
+      this.nvtService.getAllNetzverteilers()
+    ]).subscribe(([pops, nvts]) => {
       this.availablePops = pops.filter(p => p.clusterId === this.clusterId);
+      const popIdsInCluster = this.availablePops.map(p => p.id);
+
       this.availablePops.forEach(p => {
         this.elements.push({ id: p.id ? p.id.toString() : 'POP-?', type: 'POP', name: p.name || 'Unnamed POP', lat: (p as any).latitude || this.center.lat, lng: (p as any).longitude || this.center.lng, status: 'PLANNED', createdAt: new Date() });
       });
-      this.calculateStats();
-    });
 
-    this.nvtService.getAllNetzverteilers().subscribe(nvts => {
-      nvts.forEach(n => {
+      const clusterNvts = nvts.filter(n => popIdsInCluster.includes((n as any).popId));
+      clusterNvts.forEach(n => {
         this.elements.push({ id: n.id ? n.id.toString() : 'DP-?', type: 'DP', name: (n as any).identifier || 'Unnamed DP', lat: (n as any).latitude || this.center.lat + 0.001, lng: (n as any).longitude || this.center.lng + 0.001, status: 'PLANNED', createdAt: new Date() });
       });
+
       this.calculateStats();
+      this.recenterMap();
     });
 
     if (this.projectId) {
@@ -170,7 +175,21 @@ export class ClusterAreaDashboardComponent implements OnInit {
           this.elements.push({ id: s.id ? s.id.toString() : 'AC-?', type: 'SEGMENT', name: (s.workType ? s.workType + ' ' : '') + 'Segment ' + s.length + 'm', lat: s.geometry && s.geometry.length > 0 ? s.geometry[0].lat : this.center.lat - 0.001, lng: s.geometry && s.geometry.length > 0 ? s.geometry[0].lng : this.center.lng - 0.001, status: 'PLANNED', createdAt: new Date() });
         });
         this.calculateStats();
+        this.recenterMap();
       });
+    }
+  }
+
+  recenterMap() {
+    const validElements = this.elements.filter(e => e.lat && e.lng && (Math.abs(e.lat - 52.5200) > 0.01 || Math.abs(e.lng - 13.4050) > 0.01));
+    if (validElements.length > 0) {
+      const latSum = validElements.reduce((sum, e) => sum + e.lat, 0);
+      const lngSum = validElements.reduce((sum, e) => sum + e.lng, 0);
+      this.center = { lat: latSum / validElements.length, lng: lngSum / validElements.length };
+      if (this.clusterMap && this.clusterMap.map && this.clusterMap.map.googleMap) {
+         this.clusterMap.map.googleMap.panTo(this.center);
+      }
+      this.cdr.detectChanges();
     }
   }
 
