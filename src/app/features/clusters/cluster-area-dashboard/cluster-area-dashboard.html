@@ -158,7 +158,8 @@
         (segmentReset)="onSegmentReset()"
         (drawToolChanged)="handleDrawToolChanged($event)"
         (toggle3DModeEvent)="handleToggle3DMode()"
-        (exitEditModeEvent)="handleExitEditMode()">
+        (exitEditModeEvent)="handleExitEditMode()"
+        (editSegmentRequested)="onEditSegmentFromMap($event)">
     </app-cluster-map>
   </div>
 </div>

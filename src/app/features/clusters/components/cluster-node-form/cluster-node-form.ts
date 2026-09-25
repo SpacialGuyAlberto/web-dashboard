@@ -20,6 +20,7 @@ export class ClusterNodeFormComponent {
   
   @Output() saveRequested = new EventEmitter<void>();
   @Output() segmentSaved = new EventEmitter<any>();
+  @Output() locateRequested = new EventEmitter<{lat: number, lng: number}>();
   
   @ViewChild(SegmentCreateModalComponent) segmentModal!: SegmentCreateModalComponent;
 
@@ -34,6 +35,17 @@ export class ClusterNodeFormComponent {
   updateSegmentCoordinates(event: any) {
     if (this.segmentModal) {
       this.segmentModal.updateExternalCoordinates(event);
+    }
+  }
+
+  selectPop(pop: Pop) {
+    this.newNodeData.popId = pop.id;
+  }
+
+  locatePop(event: Event, pop: Pop) {
+    event.stopPropagation();
+    if (pop.latitude && pop.longitude) {
+      this.locateRequested.emit({ lat: pop.latitude, lng: pop.longitude });
     }
   }
 }

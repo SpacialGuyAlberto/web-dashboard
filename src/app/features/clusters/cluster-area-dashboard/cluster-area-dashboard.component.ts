@@ -243,10 +243,14 @@ export class ClusterAreaDashboardComponent implements OnInit {
   }
 
   // Map Interaction Handlers
-  onMapClicked(event: {lat: number, lng: number, address: string}) {
+  onMapClicked(event: {lat: number, lng: number, address: string, elevation?: number}) {
     this.tempMarker = { lat: event.lat, lng: event.lng };
     this.newNodeData.locationAddress = event.address;
     this.newNodeData.name = event.address;
+    if (event.elevation !== undefined) {
+      this.newNodeData.elevation = event.elevation;
+      // Puedes pasar esta elevación a tus servicios cuando se crea el nodo o segmento
+    }
   }
   
   @ViewChild(ClusterNodeFormComponent) clusterNodeForm!: ClusterNodeFormComponent;
@@ -332,12 +336,39 @@ export class ClusterAreaDashboardComponent implements OnInit {
           this.newNodeData = { ...dp };
        });
     } else if (element.type === 'SEGMENT' || element.type === 'ACOMETIDA') {
-       this.segmentService.getSegment(parseInt(element.id)).subscribe(segment => {
-          this.newNodeData = { ...segment };
-       });
+       const localSegment = this.segments.find(s => s.id === parseInt(element.id));
+       if (localSegment) {
+          console.log('Using locally loaded segment:', localSegment);
+          this.newNodeData = { ...localSegment };
+          this.cdr.detectChanges();
+       } else {
+         this.segmentService.getSegment(parseInt(element.id)).subscribe({
+           next: (segment) => {
+              console.log('Fetched segment from API:', segment);
+              this.newNodeData = { ...segment };
+              this.cdr.detectChanges();
+           },
+           error: (err) => {
+              console.error('Error fetching segment:', err);
+           }
+         });
+       }
     } else {
        this.newNodeData = { ...element };
     }
+  }
+
+  onEditSegmentFromMap(segment: Segment) {
+    if (!segment.id) return;
+    const networkElement: NetworkElement = {
+      id: segment.id.toString(),
+      type: 'SEGMENT',
+      name: segment.streetName || 'Segment',
+      lat: segment.geometry && segment.geometry.length > 0 ? segment.geometry[0].lat : this.center.lat,
+      lng: segment.geometry && segment.geometry.length > 0 ? segment.geometry[0].lng : this.center.lng,
+      status: 'PLANNED'
+    };
+    this.onEditNodeRequested(networkElement);
   }
 
   goBack() {
@@ -349,14 +380,14 @@ export class ClusterAreaDashboardComponent implements OnInit {
     if (!this.tempMarker) return;
 
     if (this.activeDrawTool === 'POP') {
-      const pop: any = { clusterId: this.clusterId, name: this.newNodeData.name, locationAddress: this.newNodeData.locationAddress, maxCapacityPorts: this.newNodeData.maxCapacityPorts, latitude: this.tempMarker.lat, longitude: this.tempMarker.lng };
+      const pop: any = { clusterId: this.clusterId, name: this.newNodeData.name, locationAddress: this.newNodeData.locationAddress, maxCapacityPorts: this.newNodeData.maxCapacityPorts, latitude: this.tempMarker.lat, longitude: this.tempMarker.lng, elevation: this.newNodeData.elevation };
       if (this.isEditing) {
         this.popService.updatePop(this.newNodeData.id, pop as Pop).subscribe(() => { this.loadClusterData(); this.tempMarker = null; this.isEditing = false; });
       } else {
         this.popService.createPop(pop as Pop).subscribe(() => { this.loadClusterData(); this.tempMarker = null; });
       }
     } else if (this.activeDrawTool === 'DP') {
-      const dp: any = { popId: this.newNodeData.popId, identifier: this.newNodeData.identifier, locationAddress: this.newNodeData.locationAddress, latitude: this.tempMarker.lat, longitude: this.tempMarker.lng };
+      const dp: any = { popId: this.newNodeData.popId, identifier: this.newNodeData.identifier, locationAddress: this.newNodeData.locationAddress, latitude: this.tempMarker.lat, longitude: this.tempMarker.lng, elevation: this.newNodeData.elevation };
       if (this.isEditing) {
         this.nvtService.updateNetzverteiler(this.newNodeData.id, dp as Netzverteiler).subscribe(() => { this.loadClusterData(); this.tempMarker = null; this.isEditing = false; });
       } else {

@@ -26,7 +26,7 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   @Input() highlightedType: string | null = null;
   @Input() impactedElementIds: string[] = []; // Used for intelligence highlighting
 
-  @Output() mapClicked = new EventEmitter<{lat: number, lng: number, address: string}>();
+  @Output() mapClicked = new EventEmitter<{lat: number, lng: number, address: string, elevation?: number}>();
   @Output() segmentUpdated = new EventEmitter<{geometry: any[], length: number, startLat: number, startLng: number, endLat: number, endLng: number, startAddress: string, endAddress: string}>();
   @Output() segmentReset = new EventEmitter<void>();
   
@@ -34,6 +34,7 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   @Output() toggle3DModeEvent = new EventEmitter<void>();
   @Output() exitEditModeEvent = new EventEmitter<void>();
   @Output() saveSegmentPosition = new EventEmitter<Segment>();
+  @Output() editSegmentRequested = new EventEmitter<Segment>();
 
   setDrawTool(tool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | null) {
     this.drawToolChanged.emit(tool);
@@ -56,6 +57,7 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   private panorama: google.maps.StreetViewPanorama | null = null;
   private autocomplete: google.maps.places.Autocomplete | null = null;
   private geocoder: google.maps.Geocoder = new google.maps.Geocoder();
+  private elevationService: google.maps.ElevationService = new google.maps.ElevationService();
   private streetViewMarkers: google.maps.Marker[] = [];
   private streetViewLineMarkers: google.maps.Marker[] = [];
 
@@ -138,28 +140,49 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
     
     const clickedLat = event.latLng.lat();
     const clickedLng = event.latLng.lng();
+    const loc = event.latLng;
 
-    this.reverseGeocode(event.latLng, (address) => {
-      this.mapClicked.emit({lat: clickedLat, lng: clickedLng, address: address});
-      
-      if (this.activeDrawTool === 'SEGMENT') {
-        this.handleSegmentClick(clickedLat, clickedLng, address);
-      } else {
-        this.tempMarker = { lat: clickedLat, lng: clickedLng };
-        this.update3DOverlay();
-      }
+    this.reverseGeocode(loc, (address) => {
+      this.elevationService.getElevationForLocations({ locations: [loc] })
+        .then((response) => {
+          let elevation = 0;
+          if (response.results && response.results.length > 0) {
+            elevation = response.results[0].elevation;
+          }
+          
+          this.mapClicked.emit({lat: clickedLat, lng: clickedLng, address: address, elevation: elevation});
+          
+          if (this.activeDrawTool === 'SEGMENT') {
+            this.handleSegmentClick(clickedLat, clickedLng, address, elevation);
+          } else {
+            this.tempMarker = { lat: clickedLat, lng: clickedLng };
+            this.update3DOverlay();
+          }
+        })
+        .catch((e) => {
+          console.error("Elevation service failed due to: " + e);
+          this.mapClicked.emit({lat: clickedLat, lng: clickedLng, address: address});
+          if (this.activeDrawTool === 'SEGMENT') {
+            this.handleSegmentClick(clickedLat, clickedLng, address);
+          } else {
+            this.tempMarker = { lat: clickedLat, lng: clickedLng };
+            this.update3DOverlay();
+          }
+        });
     });
   }
 
-  private handleSegmentClick(lat: number, lng: number, address: string) {
+  private handleSegmentClick(lat: number, lng: number, address: string, elevation?: number) {
       this.segmentWaypoints.push({ lat, lng });
 
       if (this.segmentWaypoints.length === 1) {
         this.segmentRoute = [...this.segmentWaypoints];
         this.newSegment.startAddress = address;
+        if (elevation !== undefined) this.newSegment.startElevation = elevation;
         this.update3DOverlay();
       } else {
         this.newSegment.endAddress = address;
+        if (elevation !== undefined) this.newSegment.endElevation = elevation;
         
         this.routingService.getStreetRoute(this.segmentWaypoints).subscribe(route => {
           this.segmentRoute = route;
@@ -550,14 +573,6 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   onSegmentClick(segment: Segment, event: google.maps.MapMouseEvent) {
     if (this.isMapEditMode || this.activeDrawTool) return;
     
-    // Intelligent segment editor condition: only edit if PLAN/PLANNED
-    if (segment.currentState === 'PLAN' || segment.currentState === 'PLANNED') {
-      this.editingSegment = segment;
-      if (this.infoWindow) this.infoWindow.close();
-      this.cdr.detectChanges();
-      return;
-    }
-    
     this.selectedSegment = segment;
     this.selectedNode = null;
     if (event.latLng) {
@@ -565,6 +580,15 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
       this.cdr.detectChanges();
       if (this.infoWindow) {
         this.infoWindow.open();
+      }
+    }
+  }
+
+  requestSegmentEdit() {
+    if (this.selectedSegment) {
+      this.editSegmentRequested.emit(this.selectedSegment);
+      if (this.infoWindow) {
+        this.infoWindow.close();
       }
     }
   }

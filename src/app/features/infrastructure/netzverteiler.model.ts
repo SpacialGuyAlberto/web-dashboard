@@ -4,6 +4,7 @@ export interface Netzverteiler {
     locationAddress?: string;
     latitude: number;
     longitude: number;
+    elevation?: number;
     popId: number;
     huepIds?: number[];
 }

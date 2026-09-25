@@ -35,11 +35,29 @@
                 <input type="text" [(ngModel)]="newNodeData.locationAddress" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors">
               </div>
               <div *ngIf="activeDrawTool === 'DP'" class="form-group mb-4">
-                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">POP</label>
-                <select [(ngModel)]="newNodeData.popId" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors cursor-pointer">
-                  <option [ngValue]="undefined" disabled selected>Select a POP</option>
-                  <option *ngFor="let pop of availablePops" [ngValue]="pop.id">{{ pop.name }}</option>
-                </select>
+                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-2">POP (Select to assign)</label>
+                
+                <div class="flex flex-col gap-2 max-h-48 overflow-y-auto custom-scrollbar pr-1">
+                  <div *ngFor="let pop of availablePops" 
+                       class="flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer"
+                       [ngClass]="{'bg-[#6938ef]/20 border-[#6938ef]': newNodeData.popId === pop.id, 'bg-[#0a0a0c] border-white/10 hover:border-white/30': newNodeData.popId !== pop.id}"
+                       (click)="selectPop(pop)">
+                    <div class="flex flex-col">
+                      <span class="text-xs font-mono text-white">{{ pop.name }}</span>
+                      <span class="text-[10px] text-white/40 font-sans mt-0.5">{{ pop.locationAddress || 'No address' }}</span>
+                    </div>
+                    <button *ngIf="pop.latitude && pop.longitude" 
+                            (click)="locatePop($event, pop)" 
+                            class="p-1.5 rounded-full hover:bg-white/10 text-white/50 hover:text-white transition-colors"
+                            title="Locate on Map">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                    </button>
+                  </div>
+                  
+                  <div *ngIf="availablePops.length === 0" class="text-center p-4 border border-white/5 border-dashed rounded-lg">
+                    <span class="text-[10px] font-mono text-white/40 uppercase tracking-widest">No POPs available</span>
+                  </div>
+                </div>
               </div>
               <div *ngIf="activeDrawTool === 'POP'" class="form-group mb-4">
                 <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Location Address</label>
@@ -52,6 +70,8 @@
               <div *ngIf="tempMarker" class="form-group mb-4 bg-white/5 p-3 rounded border border-white/10">
                 <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Coordinates (Auto-filled)</label>
                 <p class="text-xs text-white/80 font-mono">{{ tempMarker.lat.toFixed(6) }}, {{ tempMarker.lng.toFixed(6) }}</p>
+                <label *ngIf="newNodeData.elevation !== undefined" class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5 mt-2">Elevation (Google API)</label>
+                <p *ngIf="newNodeData.elevation !== undefined" class="text-xs text-[#2fb080] font-mono">{{ newNodeData.elevation.toFixed(2) }} m</p>
               </div>
             }
 

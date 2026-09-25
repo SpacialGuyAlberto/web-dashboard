@@ -73,15 +73,18 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['initialSegment']) {
-      if (this.initialSegment) {
-        this.newSegment = { ...this.initialSegment };
-        this.startAddress = this.initialSegment.startAddress || '';
-        this.endAddress = this.initialSegment.endAddress || '';
-        this.customFieldsData = this.initialSegment.customFields || {};
+      const seg = changes['initialSegment'].currentValue;
+      console.log('SegmentCreateModalComponent ngOnChanges initialSegment:', seg);
+      if (seg && Object.keys(seg).length > 0) {
+        this.newSegment = { ...this.getDefaultSegment(), ...seg };
+        this.startAddress = seg.startAddress || '';
+        this.endAddress = seg.endAddress || '';
+        this.customFieldsData = seg.customFields || {};
         
         if (this.isEditing && this.currentSegmentId) {
           this.segmentService.getAvailableTransitions(this.currentSegmentId).subscribe(transitions => {
             this.availableTransitions = transitions;
+            this.cdr.detectChanges();
           });
         }
       } else {
@@ -91,6 +94,8 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
         this.customFieldsData = {};
         this.availableTransitions = [];
       }
+      
+      this.cdr.detectChanges();
       
       // Map requires slight delay to render fully in a modal
       setTimeout(() => {

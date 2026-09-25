@@ -5,6 +5,7 @@ export interface Pop {
     locationAddress: string;
     latitude?: number;
     longitude?: number;
+    elevation?: number;
     maxCapacityPorts: number;
     clusterId?: number;
     nvtIds?: number[];

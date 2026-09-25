@@ -18,8 +18,10 @@ export interface Segment {
     length: number;
     startLatitude?: number;
     startLongitude?: number;
+    startElevation?: number;
     endLatitude?: number;
     endLongitude?: number;
+    endElevation?: number;
     startAddress?: string;
     endAddress?: string;
     geometry?: GeometryPoint[];
