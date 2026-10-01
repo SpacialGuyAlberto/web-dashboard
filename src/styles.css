@@ -7,21 +7,30 @@
 @layer components {
     /* Shared Form Styles */
     .form-label {
-        @apply block text-[11px] font-black uppercase text-slate-400 mb-2 tracking-widest;
+        @apply block text-[10px] font-medium uppercase text-slate-400/90 mb-2 tracking-[0.25em] transition-colors duration-300;
+    }
+
+    .form-label:hover {
+        @apply text-slate-300;
     }
 
     .form-input,
     .form-select {
-        @apply w-full bg-[#131415] border border-white/5 rounded-md px-4 py-3 font-mono text-xs text-white/80 focus:ring-1 focus:ring-[#6938ef]/50 transition-all placeholder-white/20;
+        @apply w-full bg-[#16171a]/80 backdrop-blur-md border border-white/5 rounded-lg px-4 py-3 font-mono text-xs text-white/90 shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)] transition-all duration-300 placeholder-white/20;
+    }
+
+    .form-input:hover,
+    .form-select:hover {
+        @apply border-white/10 bg-[#16171a] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)];
     }
 
     .form-input:focus,
     .form-select:focus {
-        @apply ring-1 ring-[#6938ef]/50 border-[#6938ef]/50 outline-none bg-[#161719];
+        @apply border-[#6938ef]/50 bg-[#121316] outline-none shadow-[0_0_15px_rgba(105,56,239,0.15),inset_0_1px_1px_rgba(255,255,255,0.02)] ring-1 ring-[#6938ef]/50;
     }
 
     .form-input-readonly {
-        @apply bg-[#131415] text-white/40 cursor-default border border-white/5;
+        @apply bg-[#0f1012] text-white/30 cursor-not-allowed border-transparent shadow-none;
     }
 
     /* Shared Tab Styles */

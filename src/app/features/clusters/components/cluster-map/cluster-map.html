@@ -199,4 +199,46 @@
           }
         </p>
       </div>
+      
+      <!-- Live Vector Analytics (Only for SEGMENT) -->
+      @if (activeDrawTool === 'SEGMENT' && segmentVectors && segmentVectors.length > 0) {
+      <div class="absolute top-[60%] left-1/2 -translate-x-1/2 w-96 bg-[#131415]/95 backdrop-blur-md rounded-xl border border-pink-500/20 shadow-2xl z-[1000] overflow-hidden">
+        <div class="p-4 border-b border-white/5 flex items-center gap-3 bg-[#161719]/80">
+          <span class="text-xl">📏</span>
+          <div>
+            <h3 class="text-[10px] font-mono text-white uppercase tracking-[0.2em]">Vector Analytics</h3>
+            <p class="text-[9px] text-white/40 font-mono tracking-widest">LIVE ELEVATION & SLOPES</p>
+          </div>
+        </div>
+        <div class="max-h-[250px] overflow-y-auto custom-scrollbar">
+          <table class="w-full text-left">
+            <thead class="sticky top-0 bg-[#161719] border-b border-white/5 text-[9px] font-mono text-white/40 uppercase tracking-[0.2em]">
+              <tr>
+                <th class="px-4 py-3">Vector</th>
+                <th class="px-4 py-3">Distance</th>
+                <th class="px-4 py-3">Slope</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+              @for (v of segmentVectors; track v.index) {
+                <tr class="hover:bg-white/5 transition-colors">
+                  <td class="px-4 py-3">
+                    <span class="px-2 py-1 rounded bg-pink-500/10 text-pink-400 text-[9px] font-mono tracking-widest border border-pink-500/20">
+                      V{{ v.index }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-3 text-[10px] font-mono text-white/80">{{ v.distance | number:'1.2-2' }}m</td>
+                  <td class="px-4 py-3 text-[10px] font-mono font-bold" 
+                      [class.text-red-400]="v.slope > 10 || v.slope < -10" 
+                      [class.text-green-400]="v.slope <= 10 && v.slope >= -10">
+                      <span *ngIf="v.slope > 0">▲</span><span *ngIf="v.slope < 0">▼</span>
+                      {{ (v.slope > 0 ? v.slope : -v.slope) | number:'1.2-2' }}%
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      }
     }

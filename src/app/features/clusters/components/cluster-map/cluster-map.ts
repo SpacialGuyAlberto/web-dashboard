@@ -195,23 +195,80 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
           }
           length = Math.round(length);
 
-          const startPin = this.segmentWaypoints[0];
-          const endPin = this.segmentWaypoints[this.segmentWaypoints.length - 1];
+          const emitSegmentUpdate = () => {
+              const startPin = this.segmentWaypoints[0];
+              const endPin = this.segmentWaypoints[this.segmentWaypoints.length - 1];
+              this.segmentUpdated.emit({
+                  geometry: this.segmentRoute,
+                  length: length,
+                  startLat: startPin.lat,
+                  startLng: startPin.lng,
+                  endLat: endPin.lat,
+                  endLng: endPin.lng,
+                  startAddress: this.newSegment.startAddress!,
+                  endAddress: this.newSegment.endAddress!
+              });
+              this.update3DOverlay();
+              this.cdr.detectChanges();
+          };
 
-          this.segmentUpdated.emit({
-              geometry: this.segmentRoute,
-              length: length,
-              startLat: startPin.lat,
-              startLng: startPin.lng,
-              endLat: endPin.lat,
-              endLng: endPin.lng,
-              startAddress: this.newSegment.startAddress!,
-              endAddress: this.newSegment.endAddress!
-          });
-          
-          this.update3DOverlay();
-          this.cdr.detectChanges();
+          // Fetch elevations for the route
+          const locations = this.segmentRoute.map((p: any) => ({ lat: p.lat, lng: p.lng }));
+          if (locations.length > 0) {
+              const chunkSize = 500;
+              let fetched = 0;
+              for (let c = 0; c < locations.length; c += chunkSize) {
+                  const chunk = locations.slice(c, c + chunkSize);
+                  this.elevationService.getElevationForLocations({ locations: chunk }, (results, status) => {
+                      fetched += chunk.length;
+                      if (status === google.maps.ElevationStatus.OK && results) {
+                          for (let j = 0; j < results.length; j++) {
+                              (this.segmentRoute[c + j] as any).z = Math.round(results[j].elevation * 100) / 100;
+                          }
+                      }
+                      if (fetched >= locations.length) {
+                          this.calculateVectors();
+                          emitSegmentUpdate();
+                      }
+                  });
+              }
+          } else {
+              this.calculateVectors();
+              emitSegmentUpdate();
+          }
         });
+      }
+  }
+
+  public segmentVectors: any[] = [];
+  
+  private calculateVectors() {
+      this.segmentVectors = [];
+      if (!this.segmentRoute || this.segmentRoute.length < 2) return;
+      
+      for (let i = 0; i < this.segmentRoute.length - 1; i++) {
+          const p1 = this.segmentRoute[i] as any;
+          const p2 = this.segmentRoute[i + 1] as any;
+          
+          const startZ = p1.z || 0;
+          const endZ = p2.z || 0;
+          
+          const p1LatLng = new google.maps.LatLng(p1.lat, p1.lng);
+          const p2LatLng = new google.maps.LatLng(p2.lat, p2.lng);
+          const distance = google.maps.geometry.spherical.computeDistanceBetween(p1LatLng, p2LatLng);
+          
+          let slope = 0;
+          if (distance > 0) {
+              slope = ((endZ - startZ) / distance) * 100;
+          }
+          
+          this.segmentVectors.push({
+              index: i + 1,
+              startZ: startZ,
+              endZ: endZ,
+              distance: distance,
+              slope: slope
+          });
       }
   }
 

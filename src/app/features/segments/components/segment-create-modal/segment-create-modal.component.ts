@@ -160,6 +160,12 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
     this.newSegment.endLatitude = coords.endLat;
     this.newSegment.endLongitude = coords.endLng;
     this.newSegment.geometry = coords.geometry;
+
+    if (coords.geometry && coords.geometry.length > 0) {
+      this.newSegment.startElevation = coords.geometry[0].z || 0;
+      this.newSegment.endElevation = coords.geometry[coords.geometry.length - 1].z || 0;
+      this.fetchMissingElevations(coords.geometry);
+    }
     
     if (coords.length) {
       this.newSegment.length = coords.length;
@@ -174,9 +180,61 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
     if (coords.startLat && coords.endLat && coords.length) {
       this.safetyService.getAutomatedPlan(coords.startLat, coords.startLng, coords.length).subscribe(plan => {
         this.smartPlan = plan;
-        this.cdr.detectChanges();
       });
     }
+  }
+
+  private fetchMissingElevations(geometry: {lat: number, lng: number, z?: number}[]) {
+    const missing = geometry.filter(p => p.z === undefined || p.z === null);
+    if (missing.length === 0) return;
+
+    const elevationService = new google.maps.ElevationService();
+    // Chunk requests if needed (max 512 locations per request)
+    const chunkSize = 500;
+    for (let i = 0; i < missing.length; i += chunkSize) {
+      const chunk = missing.slice(i, i + chunkSize);
+      const locations = chunk.map(p => ({ lat: p.lat, lng: p.lng }));
+      
+      elevationService.getElevationForLocations({ locations }, (results, status) => {
+        if (status === google.maps.ElevationStatus.OK && results) {
+          for (let j = 0; j < chunk.length; j++) {
+            chunk[j].z = Math.round(results[j].elevation * 100) / 100;
+          }
+        }
+      });
+    }
+  }
+
+  public get vectors() {
+    const geom = this.newSegment?.geometry;
+    if (!geom || geom.length < 2) return [];
+    
+    const vecs = [];
+    for (let i = 0; i < geom.length - 1; i++) {
+        const p1 = geom[i];
+        const p2 = geom[i + 1];
+        
+        const startZ = p1.z || 0;
+        const endZ = p2.z || 0;
+        
+        const p1LatLng = new google.maps.LatLng(p1.lat, p1.lng);
+        const p2LatLng = new google.maps.LatLng(p2.lat, p2.lng);
+        const distance = google.maps.geometry.spherical.computeDistanceBetween(p1LatLng, p2LatLng);
+        
+        let slope = 0;
+        if (distance > 0) {
+            slope = ((endZ - startZ) / distance) * 100;
+        }
+        
+        vecs.push({
+            index: i + 1,
+            startZ: startZ,
+            endZ: endZ,
+            distance: distance,
+            slope: slope
+        });
+    }
+    return vecs;
   }
 
   getStateText(state: string): string {

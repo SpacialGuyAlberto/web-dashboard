@@ -474,6 +474,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
             this.startPos = null;
             this.endPos = null;
         }
+        this.refreshMissingElevations();
         this.emitChanges();
         this.update3DOverlay();
     }
@@ -677,7 +678,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
                 this.endPos = this.segments[this.segments.length - 1][this.segments[this.segments.length - 1].length - 1];
                 this.streetViewPos = this.segments[this.activeSegmentIndex][lastIdx] || this.segments[0][0];
             }
-
+            this.refreshMissingElevations();
             this.emitChanges();
             this.update3DOverlay();
         }
@@ -703,10 +704,12 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         // Instant visual update for 2D map
         this.updatePlanningState(true); // Call with 'isFastUpdate = true'
 
+        // Fetch elevation immediately for this point so it's not cancelled by fast clicking
+        this.fetchElevationForPoints([newPoint]);
+
         // Debounce expensive 3D and Service updates
         if (this.updateTimer) clearTimeout(this.updateTimer);
         this.updateTimer = setTimeout(() => {
-            this.fetchElevation(newPoint);
             this.updatePlanningState(false); // Full update with addresses
 
             if (this.panorama && this.showStreetView) {
@@ -718,15 +721,32 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         }, 400); // 400ms delay to allow fluid multi-clicking
     }
 
-    private fetchElevation(point: any) {
+    private fetchElevationForPoints(pointsToFetch: any[]) {
+        if (!pointsToFetch || pointsToFetch.length === 0) return;
+        
+        const locations = pointsToFetch.map(p => ({ lat: p.lat, lng: p.lng }));
+        
         this.elevationService.getElevationForLocations({
-            locations: [{ lat: point.lat, lng: point.lng }]
+            locations: locations
         }, (results, status) => {
-            if (status === google.maps.ElevationStatus.OK && results && results[0]) {
-                point.z = Math.round(results[0].elevation * 100) / 100;
+            if (status === google.maps.ElevationStatus.OK && results && results.length === pointsToFetch.length) {
+                for (let i = 0; i < pointsToFetch.length; i++) {
+                    pointsToFetch[i].z = Math.round(results[i].elevation * 100) / 100;
+                }
+                this.emitChanges();
+            } else {
+                console.warn('Elevation service failed due to: ', status);
+                pointsToFetch.forEach(p => { if (p.z === undefined) p.z = 0; });
                 this.emitChanges();
             }
         });
+    }
+
+    public refreshMissingElevations() {
+        const missing = this._allPoints.filter(p => (p as any).z === undefined || (p as any).z === null);
+        if (missing.length > 0) {
+            this.fetchElevationForPoints(missing);
+        }
     }
 
     private updatePanoramaPosition(pos: google.maps.LatLngLiteral) {
@@ -774,6 +794,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         this.startPos = this._allPoints[0];
         this.endPos = this._allPoints[this._allPoints.length - 1];
         this.routePoints = [...this._allPoints];
+        this.refreshMissingElevations();
 
         // Skip heavy address lookups during fast updates
         if (isFastUpdate) return;
@@ -799,6 +820,36 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
             length += google.maps.geometry.spherical.computeDistanceBetween(p1, p2);
         }
         return length;
+    }
+
+    public get vectors() {
+        if (!this._allPoints || this._allPoints.length < 2) return [];
+        const vecs = [];
+        for (let i = 0; i < this._allPoints.length - 1; i++) {
+            const p1 = this._allPoints[i] as any;
+            const p2 = this._allPoints[i + 1] as any;
+            
+            const startZ = p1.z !== undefined && p1.z !== null ? p1.z : 0;
+            const endZ = p2.z !== undefined && p2.z !== null ? p2.z : 0;
+            
+            const p1LatLng = new google.maps.LatLng(p1);
+            const p2LatLng = new google.maps.LatLng(p2);
+            const distance = google.maps.geometry.spherical.computeDistanceBetween(p1LatLng, p2LatLng);
+            
+            let slope = 0;
+            if (distance > 0) {
+                slope = ((endZ - startZ) / distance) * 100;
+            }
+            
+            vecs.push({
+                index: i + 1,
+                startZ: startZ,
+                endZ: endZ,
+                distance: distance,
+                slope: slope
+            });
+        }
+        return vecs;
     }
 
     private emitChanges() {
@@ -846,6 +897,8 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
 
                 // Auto-fit bounds
                 this.fitBounds();
+
+                this.refreshMissingElevations();
 
                 // Emit
                 this.coordinatesChanged.emit({
