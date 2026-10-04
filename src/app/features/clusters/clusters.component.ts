@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Cluster } from './cluster.model';
 import { ClusterService } from './cluster.service';
+import { PlanImporterComponent } from '../gis/components/plan-importer/plan-importer.component';
 
 @Component({
   selector: 'app-clusters',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, PlanImporterComponent],
   templateUrl: './clusters.component.html',
   styleUrls: ['./clusters.component.css']
 })
@@ -18,6 +19,8 @@ export class ClustersComponent implements OnInit {
   
   clusters: Cluster[] = [];
   showCreateModal = false;
+  showImportModal = false;
+  selectedClusterIdForImport: number | null = null;
   
   newCluster: Cluster = {
     name: '',
@@ -56,6 +59,22 @@ export class ClustersComponent implements OnInit {
 
   closeCreateModal() {
     this.showCreateModal = false;
+  }
+
+  openImportModal(clusterId: number) {
+    this.selectedClusterIdForImport = clusterId;
+    this.showImportModal = true;
+  }
+
+  closeImportModal() {
+    this.showImportModal = false;
+    this.selectedClusterIdForImport = null;
+  }
+
+  onPlanImported(event: any) {
+    console.log('Líneas extraídas para el cluster', this.selectedClusterIdForImport, event);
+    // Aquí enviaríamos las event.lines y event.utilityType al backend de Quarkbau
+    this.closeImportModal();
   }
 
   saveCluster() {

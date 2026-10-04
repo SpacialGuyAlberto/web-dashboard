@@ -53,4 +53,8 @@ export class SegmentService {
     linkSegments(sourceId: number, targetId: number): Observable<any> {
         return this.http.post(`${this.apiUrl}/analysis/segments/${sourceId}/link/${targetId}`, {});
     }
+
+    generateFencingPlan(segmentId: number, strategy: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/planning/fencing-plans/segment/${segmentId}/generate?strategy=${strategy}`, {});
+    }
 }

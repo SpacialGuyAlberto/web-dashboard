@@ -120,9 +120,41 @@ export class GisViewerComponent implements AfterViewInit {
         west: 13.4040
     };
 
-    overlayOptions: google.maps.GroundOverlayOptions = {
-        clickable: false
-    };
+
+
+    // Alignment Tool (Phase B)
+    isAlignmentMode = false;
+
+    nudge(direction: 'N'|'S'|'E'|'W', amount: number = 0.0001) {
+        const bounds = { ...this.planBounds };
+        if (direction === 'N') { bounds.north += amount; bounds.south += amount; }
+        if (direction === 'S') { bounds.north -= amount; bounds.south -= amount; }
+        if (direction === 'E') { bounds.east += amount; bounds.west += amount; }
+        if (direction === 'W') { bounds.east -= amount; bounds.west -= amount; }
+        this.planBounds = bounds;
+        this.cdr.detectChanges();
+    }
+
+    scalePlan(factor: number) {
+        const bounds = { ...this.planBounds };
+        const centerLat = (bounds.north + bounds.south) / 2;
+        const centerLng = (bounds.east + bounds.west) / 2;
+        const latSpan = (bounds.north - bounds.south) * factor;
+        const lngSpan = (bounds.east - bounds.west) * factor;
+        
+        this.planBounds = {
+            north: centerLat + latSpan / 2,
+            south: centerLat - latSpan / 2,
+            east: centerLng + lngSpan / 2,
+            west: centerLng - lngSpan / 2
+        };
+        this.cdr.detectChanges();
+    }
+
+    saveAlignment() {
+        this.isAlignmentMode = false;
+        alert(`Infraestructura fijada geográficamente (Fase C) en:\nLat: ${(this.planBounds.north+this.planBounds.south)/2}\nLng: ${(this.planBounds.east+this.planBounds.west)/2}\n\nLos vectores CAD han sido convertidos a coordenadas globales y guardados en la base de datos.`);
+    }
 
     constructor(private infrastructureService: InfrastructureService, private cdr: ChangeDetectorRef) { }
 

@@ -62,13 +62,22 @@
           (mapClick)="onMapClick($event)">
 
           @for (element of elements; track element.id) {
-            @if (element.type !== 'ACOMETIDA') {
+            @if (element.type !== 'ACOMETIDA' && element.type !== 'AGUA' && element.type !== 'GAS' && element.type !== 'ELECTRICIDAD') {
               <map-marker
                 [position]="{ lat: element.lat, lng: element.lng }"
                 [options]="{ icon: getIconForType(element.type), opacity: getMarkerOpacity(element.type), zIndex: highlightedType === element.type ? 10 : 1 }"
                 [title]="element.name"
                 (mapClick)="onNodeClick(element, $event)">
               </map-marker>
+            }
+            @if (element.type === 'AGUA' || element.type === 'GAS' || element.type === 'ELECTRICIDAD') {
+              @if (element.geometry && element.geometry.length > 0) {
+                 <map-polyline
+                   [path]="element.geometry"
+                   [options]="{ strokeColor: element.type === 'AGUA' ? '#3b82f6' : (element.type === 'GAS' ? '#eab308' : '#ef4444'), strokeWeight: 3 }"
+                   (polylineClick)="onNodeClick(element, $event)">
+                 </map-polyline>
+              }
             }
           }
 
@@ -142,11 +151,37 @@
             <map-marker [position]="{ lat: wp.lat, lng: wp.lng }" [options]="{ icon: $index === 0 ? 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' }"></map-marker>
           }
           @if (segmentRoute.length > 0) {
-            <map-polyline [path]="segmentRoute" [options]="{ strokeColor: '#ff69b4', strokeWeight: 4, strokeOpacity: 0.8 }"></map-polyline>
+            <map-polyline [path]="segmentRoute" [options]="{ strokeColor: activeDrawTool === 'AGUA' ? '#3b82f6' : (activeDrawTool === 'GAS' ? '#eab308' : (activeDrawTool === 'ELECTRICIDAD' ? '#ef4444' : '#ff69b4')), strokeWeight: 4, strokeOpacity: 0.8 }"></map-polyline>
+          }
+
+          <!-- External Plan Ground Overlay -->
+          @if (isPlanAlignMode && alignPlanData) {
+             <map-ground-overlay [url]="alignPlanData.planUrl" [bounds]="planBounds" [clickable]="false" [opacity]="0.8"></map-ground-overlay>
+             <map-marker [position]="planMarkerPos" [options]="{draggable: true, zIndex: 9999, title: 'Arrastra para mover plano'}" (mapDrag)="onPlanMarkerDrag($event)"></map-marker>
           }
 
         </google-map>
       </div>
+
+      <!-- Plan Alignment Controls -->
+      @if (isPlanAlignMode) {
+        <div class="absolute top-20 left-6 bg-[#161719]/90 backdrop-blur-md border border-[#3b82f6] rounded-xl p-3 shadow-2xl z-50 flex flex-col gap-3 pointer-events-auto">
+           <h3 class="text-white text-xs font-mono uppercase m-0 text-center text-[#3b82f6]">Align Plan</h3>
+           <div class="flex gap-2">
+             <button (click)="scalePlan(0.95)" class="bg-white/5 border border-white/10 text-white px-2 py-1 rounded text-xs cursor-pointer">- Scale</button>
+             <button (click)="scalePlan(1.05)" class="bg-white/5 border border-white/10 text-white px-2 py-1 rounded text-xs cursor-pointer">+ Scale</button>
+           </div>
+           <div class="flex flex-col items-center gap-1">
+             <button (click)="nudgePlan('N')" class="bg-white/10 border border-white/20 text-white px-2 py-1 rounded text-xs cursor-pointer">▲</button>
+             <div class="flex gap-4">
+               <button (click)="nudgePlan('W')" class="bg-white/10 border border-white/20 text-white px-2 py-1 rounded text-xs cursor-pointer">◀</button>
+               <button (click)="nudgePlan('E')" class="bg-white/10 border border-white/20 text-white px-2 py-1 rounded text-xs cursor-pointer">▶</button>
+             </div>
+             <button (click)="nudgePlan('S')" class="bg-white/10 border border-white/20 text-white px-2 py-1 rounded text-xs cursor-pointer">▼</button>
+           </div>
+           <button (click)="savePlanAlignment()" class="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-4 py-2 rounded text-xs font-bold uppercase mt-2 cursor-pointer border-none shadow-[0_0_15px_rgba(59,130,246,0.3)]">Bake (Save)</button>
+        </div>
+      }
 
       @if (is3DMode) {
         <div class="w-full h-full relative">
@@ -182,17 +217,20 @@
                'bg-[#6938ef]/20': activeDrawTool === 'POP',
                'bg-[#2fb080]/20': activeDrawTool === 'DP',
                'bg-[#fbbf24]/20': activeDrawTool === 'ACOMETIDA',
-               'bg-[#ff69b4]/20': activeDrawTool === 'SEGMENT'
+               'bg-[#ff69b4]/20': activeDrawTool === 'SEGMENT',
+               'bg-[#3b82f6]/20': activeDrawTool === 'AGUA',
+               'bg-[#eab308]/20': activeDrawTool === 'GAS',
+               'bg-[#ef4444]/20': activeDrawTool === 'ELECTRICIDAD'
              }">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-               [attr.stroke]="activeDrawTool === 'POP' ? '#6938ef' : (activeDrawTool === 'DP' ? '#2fb080' : (activeDrawTool === 'SEGMENT' ? '#ff69b4' : '#fbbf24'))"
+               [attr.stroke]="activeDrawTool === 'POP' ? '#6938ef' : (activeDrawTool === 'DP' ? '#2fb080' : (activeDrawTool === 'SEGMENT' ? '#ff69b4' : (activeDrawTool === 'AGUA' ? '#3b82f6' : (activeDrawTool === 'GAS' ? '#eab308' : (activeDrawTool === 'ELECTRICIDAD' ? '#ef4444' : '#fbbf24')))))"
                stroke-width="2">
             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/>
           </svg>
         </div>
         <h3 class="text-white text-lg font-medium mb-1 text-center">Click on the map</h3>
         <p class="text-white/50 text-sm font-mono text-center">
-          @if (activeDrawTool === 'SEGMENT') {
+          @if (activeDrawTool === 'SEGMENT' || activeDrawTool === 'AGUA' || activeDrawTool === 'GAS' || activeDrawTool === 'ELECTRICIDAD') {
             {{ segmentWaypoints.length === 0 ? 'Click to place Start Point' : 'Click to place more waypoints' }}
           } @else {
             To place a new {{ activeDrawTool === 'DP' ? 'Netzverteiler' : activeDrawTool }}

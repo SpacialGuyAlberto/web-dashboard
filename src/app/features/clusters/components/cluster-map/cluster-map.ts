@@ -1,14 +1,15 @@
 import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GoogleMapsModule, GoogleMap, MapInfoWindow, MapPolyline } from '@angular/google-maps';
+import { GoogleMapsModule, GoogleMap, MapInfoWindow, MapPolyline, MapGroundOverlay, MapMarker } from '@angular/google-maps';
 import { NetworkElement } from '../../cluster-area-dashboard/cluster-area-dashboard.component';
 import { RoutingService } from '../../../gis/routing.service';
 import { Segment } from '../../../segments/segment.model';
+import * as turf from '@turf/turf';
 
 @Component({
   selector: 'app-cluster-map',
   standalone: true,
-  imports: [CommonModule, GoogleMapsModule],
+  imports: [CommonModule, GoogleMapsModule, MapGroundOverlay, MapMarker],
   templateUrl: './cluster-map.html'
 })
 export class ClusterMapComponent implements AfterViewInit, OnChanges {
@@ -20,11 +21,13 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   @Input() map3DOptions!: google.maps.MapOptions;
   @Input() isMapEditMode: boolean = false;
   @Input() is3DMode: boolean = false;
-  @Input() activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | null = null;
+  @Input() activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | 'AGUA' | 'GAS' | 'ELECTRICIDAD' | null = null;
   @Input() showMap: boolean = true;
   @Input() viewMode: 'map-focused' | 'split' | 'data-focused' = 'map-focused';
   @Input() highlightedType: string | null = null;
   @Input() impactedElementIds: string[] = []; // Used for intelligence highlighting
+  @Input() isPlanAlignMode: boolean = false;
+  @Input() alignPlanData: any = null;
 
   @Output() mapClicked = new EventEmitter<{lat: number, lng: number, address: string, elevation?: number}>();
   @Output() segmentUpdated = new EventEmitter<{geometry: any[], length: number, startLat: number, startLng: number, endLat: number, endLng: number, startAddress: string, endAddress: string}>();
@@ -35,9 +38,10 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   @Output() exitEditModeEvent = new EventEmitter<void>();
   @Output() saveSegmentPosition = new EventEmitter<Segment>();
   @Output() editSegmentRequested = new EventEmitter<Segment>();
+  @Output() planAlignmentSaved = new EventEmitter<any>();
 
-  setDrawTool(tool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | null) {
-    this.drawToolChanged.emit(tool);
+  setDrawTool(tool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | 'AGUA' | 'GAS' | 'ELECTRICIDAD' | null) {
+    this.drawToolChanged.emit(tool as any);
   }
 
   toggle3DMode() {
@@ -71,6 +75,10 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   infoWindowPosition: google.maps.LatLngLiteral = { lat: 0, lng: 0 };
   editingSegment: Segment | null = null;
 
+  // Plan Alignment State
+  planBounds = { north: 0, south: 0, east: 0, west: 0 };
+  planMarkerPos = { lat: 0, lng: 0 };
+
   constructor(private routingService: RoutingService, private cdr: ChangeDetectorRef) {}
 
   ngAfterViewInit() {
@@ -96,6 +104,83 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
     if (changes['elements'] && this.is3DMode) {
         this.update3DOverlay();
     }
+
+    if (changes['elements'] && this.elements) {
+        this.elements.forEach(element => {
+            if ((element.type === 'AGUA' || element.type === 'GAS' || element.type === 'ELECTRICIDAD') && element.geometry && element.geometry.length > 2) {
+                try {
+                    const line = turf.lineString(element.geometry.map((c: any) => [c.lng, c.lat]));
+                    const curvedLine = turf.bezierSpline(line, { resolution: 10000, sharpness: 0.85 });
+                    element.geometry = curvedLine.geometry.coordinates.map(coord => ({
+                        lat: coord[1],
+                        lng: coord[0]
+                    }));
+                } catch(e) {
+                    console.error("Error smoothing curve", e);
+                }
+            }
+        });
+    }
+
+    if (changes['isPlanAlignMode'] && this.isPlanAlignMode && this.alignPlanData) {
+       this.initPlanAlignment();
+    }
+  }
+
+  initPlanAlignment() {
+     const lat = this.center.lat;
+     const lng = this.center.lng;
+     const spanLat = 0.0005;
+     const spanLng = 0.0008;
+     this.planBounds = { north: lat + spanLat, south: lat - spanLat, east: lng + spanLng, west: lng - spanLng };
+     this.planMarkerPos = { lat, lng };
+  }
+
+  onPlanMarkerDrag(event: google.maps.MapMouseEvent) {
+    if (event.latLng) {
+      this.updatePlanBounds(event.latLng.lat(), event.latLng.lng());
+    }
+  }
+
+  private updatePlanBounds(newLat: number, newLng: number) {
+      const latDiff = newLat - this.planMarkerPos.lat;
+      const lngDiff = newLng - this.planMarkerPos.lng;
+      this.planBounds = {
+        north: this.planBounds.north + latDiff,
+        south: this.planBounds.south + latDiff,
+        east: this.planBounds.east + lngDiff,
+        west: this.planBounds.west + lngDiff
+      };
+      this.planMarkerPos = { lat: newLat, lng: newLng };
+  }
+
+  scalePlan(factor: number) {
+    const latSpan = (this.planBounds.north - this.planBounds.south) * factor;
+    const lngSpan = (this.planBounds.east - this.planBounds.west) * factor;
+    this.planBounds = {
+        north: this.planMarkerPos.lat + latSpan / 2,
+        south: this.planMarkerPos.lat - latSpan / 2,
+        east: this.planMarkerPos.lng + lngSpan / 2,
+        west: this.planMarkerPos.lng - lngSpan / 2
+    };
+  }
+
+  nudgePlan(direction: 'N'|'S'|'E'|'W', amount: number = 0.0001) {
+    let newLat = this.planMarkerPos.lat;
+    let newLng = this.planMarkerPos.lng;
+    if (direction === 'N') newLat += amount;
+    if (direction === 'S') newLat -= amount;
+    if (direction === 'E') newLng += amount;
+    if (direction === 'W') newLng -= amount;
+    this.updatePlanBounds(newLat, newLng);
+  }
+
+  savePlanAlignment() {
+    this.planAlignmentSaved.emit({
+       ...this.alignPlanData,
+       center: this.planMarkerPos,
+       bounds: this.planBounds
+    });
   }
 
   triggerMapResize() {
@@ -152,7 +237,8 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
           
           this.mapClicked.emit({lat: clickedLat, lng: clickedLng, address: address, elevation: elevation});
           
-          if (this.activeDrawTool === 'SEGMENT') {
+          const isPolylineTool = this.activeDrawTool === 'SEGMENT' || this.activeDrawTool === 'AGUA' || this.activeDrawTool === 'GAS' || this.activeDrawTool === 'ELECTRICIDAD';
+          if (isPolylineTool) {
             this.handleSegmentClick(clickedLat, clickedLng, address, elevation);
           } else {
             this.tempMarker = { lat: clickedLat, lng: clickedLng };
@@ -162,7 +248,8 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
         .catch((e) => {
           console.error("Elevation service failed due to: " + e);
           this.mapClicked.emit({lat: clickedLat, lng: clickedLng, address: address});
-          if (this.activeDrawTool === 'SEGMENT') {
+          const isPolylineTool = this.activeDrawTool === 'SEGMENT' || this.activeDrawTool === 'AGUA' || this.activeDrawTool === 'GAS' || this.activeDrawTool === 'ELECTRICIDAD';
+          if (isPolylineTool) {
             this.handleSegmentClick(clickedLat, clickedLng, address);
           } else {
             this.tempMarker = { lat: clickedLat, lng: clickedLng };
@@ -340,7 +427,8 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
         this.streetViewMarkers.push(marker);
     });
 
-    if (this.tempMarker && this.activeDrawTool !== 'SEGMENT') {
+    const isPolylineTool = this.activeDrawTool === 'SEGMENT' || this.activeDrawTool === 'AGUA' || this.activeDrawTool === 'GAS' || this.activeDrawTool === 'ELECTRICIDAD';
+    if (this.tempMarker && !isPolylineTool) {
         const marker = new google.maps.Marker({
             position: this.tempMarker,
             map: this.panorama as any,

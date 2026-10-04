@@ -10,16 +10,19 @@ import { Segment } from '../../segments/segment.model';
 import { HuepService } from '../../infrastructure/huep.service';
 import { Huep } from '../../infrastructure/huep.model';
 import { IntelligenceService } from '../infrastructure/intelligence.service';
+import { UtilityLineService } from '../../infrastructure/utility-line.service';
+import { UtilityLine as UtilityLineModel } from '../../infrastructure/utility-line.model';
 
 import { ClusterMapComponent } from '../components/cluster-map/cluster-map';
 import { combineLatest } from 'rxjs';
 import { ClusterStatsComponent } from '../components/cluster-stats/cluster-stats';
 import { ClusterNodesAccordionComponent } from '../components/cluster-nodes-accordion/cluster-nodes-accordion';
 import { ClusterNodeFormComponent } from '../components/cluster-node-form/cluster-node-form';
+import { PlanImporterComponent } from '../../gis/components/plan-importer/plan-importer.component';
 
 export interface NetworkElement {
   id: string;
-  type: 'POP' | 'DP' | 'ACOMETIDA' | 'HEUP' | 'SEGMENT';
+  type: 'POP' | 'DP' | 'ACOMETIDA' | 'HEUP' | 'SEGMENT' | 'AGUA' | 'GAS' | 'ELECTRICIDAD';
   name: string;
   lat: number;
   lng: number;
@@ -27,8 +30,13 @@ export interface NetworkElement {
   createdBy?: string;
   createdAt?: Date;
   forecastDate?: Date;
+  company?: string;
+  material?: string;
   budget?: number;
   contractor?: string;
+  geometry?: any[];
+  planUrl?: string;
+  planBounds?: any;
 }
 
 @Component({
@@ -39,7 +47,8 @@ export interface NetworkElement {
     ClusterMapComponent,
     ClusterStatsComponent,
     ClusterNodesAccordionComponent,
-    ClusterNodeFormComponent
+    ClusterNodeFormComponent,
+    PlanImporterComponent
   ],
   templateUrl: './cluster-area-dashboard.html',
   styleUrls: ['./cluster-area-dashboard.css']
@@ -86,7 +95,10 @@ export class ClusterAreaDashboardComponent implements OnInit {
   elements: NetworkElement[] = [];
   segments: Segment[] = [];
   stats = { pop: 0, dp: 0, acometida: 0, heup: 0, segment: 0 };
-  groupedElements: { [key: string]: NetworkElement[] } = { 'POP': [], 'Netzverteiler': [], 'Acometidas': [], 'HEÜPs': [], 'Segments': [] };
+  groupedElements: { [key: string]: NetworkElement[] } = { 
+    'POP': [], 'Netzverteiler': [], 'Acometidas': [], 'HEÜPs': [], 'Segments': [],
+    'Agua': [], 'Gas': [], 'Electricidad': []
+  };
   
   isSidebarOpen = true;
   viewMode: 'map-focused' | 'split' | 'data-focused' = 'map-focused';
@@ -94,12 +106,18 @@ export class ClusterAreaDashboardComponent implements OnInit {
   showMap: boolean = true;
   isMapEditMode = false;
   is3DMode = false;
-  activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | null = null;
+  activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | 'AGUA' | 'GAS' | 'ELECTRICIDAD' | null = null;
   tempMarker: { lat: number, lng: number } | null = null;
   newNodeData: any = {};
   availablePops: Pop[] = [];
   highlightedType: string | null = null;
   impactedElementIds: string[] = []; // IDs of nodes impacted by a risk scenario
+
+  // External Plans State
+  showPlanImporter = false;
+  planImportType = 'WATER'; // WATER, GAS, ELECTRICITY
+  isPlanAlignMode = false;
+  alignPlanData: any = null;
   
   @ViewChild(ClusterMapComponent) clusterMap!: ClusterMapComponent;
 
@@ -127,7 +145,8 @@ export class ClusterAreaDashboardComponent implements OnInit {
     private huepService: HuepService,
     private intelligenceService: IntelligenceService,
     private cdr: ChangeDetectorRef,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private utilityLineService: UtilityLineService
   ) {}
 
   ngOnInit() {
@@ -150,8 +169,9 @@ export class ClusterAreaDashboardComponent implements OnInit {
     
     combineLatest([
       this.popService.getAllPops(),
-      this.nvtService.getAllNetzverteilers()
-    ]).subscribe(([pops, nvts]) => {
+      this.nvtService.getAllNetzverteilers(),
+      this.utilityLineService.getAll()
+    ]).subscribe(([pops, nvts, utilities]) => {
       this.availablePops = pops.filter(p => p.clusterId === this.clusterId);
       const popIdsInCluster = this.availablePops.map(p => p.id);
 
@@ -162,6 +182,25 @@ export class ClusterAreaDashboardComponent implements OnInit {
       const clusterNvts = nvts.filter(n => popIdsInCluster.includes((n as any).popId));
       clusterNvts.forEach(n => {
         this.elements.push({ id: n.id ? n.id.toString() : 'DP-?', type: 'DP', name: (n as any).identifier || 'Unnamed DP', lat: (n as any).latitude || this.center.lat + 0.001, lng: (n as any).longitude || this.center.lng + 0.001, status: 'PLANNED', createdAt: new Date() });
+      });
+
+      utilities.forEach((u: any) => {
+        let mappedType = u.utilityType;
+        if (u.utilityType === 'WATER') mappedType = 'AGUA';
+        if (u.utilityType === 'GAS') mappedType = 'GAS';
+        if (u.utilityType === 'ELECTRICITY') mappedType = 'ELECTRICIDAD';
+
+        this.elements.push({
+          id: u.id ? u.id.toString() : 'UTIL-?',
+          type: mappedType as any,
+          name: u.operatorName ? u.operatorName + ' Line' : 'External Utility',
+          lat: u.geometry && u.geometry.length > 0 ? u.geometry[0].lat : this.center.lat,
+          lng: u.geometry && u.geometry.length > 0 ? u.geometry[0].lng : this.center.lng,
+          status: 'ACTIVE',
+          createdAt: new Date(),
+          geometry: u.geometry,
+          company: u.operatorName
+        });
       });
 
       this.calculateStats();
@@ -207,7 +246,10 @@ export class ClusterAreaDashboardComponent implements OnInit {
       'Netzverteiler': this.elements.filter(e => e.type === 'DP'),
       'Acometidas': this.elements.filter(e => e.type === 'ACOMETIDA'),
       'HEÜPs': this.elements.filter(e => e.type === 'HEUP'),
-      'Segments': this.elements.filter(e => e.type === 'SEGMENT')
+      'Segments': this.elements.filter(e => e.type === 'SEGMENT'),
+      'Agua': this.elements.filter(e => e.type === 'AGUA'),
+      'Gas': this.elements.filter(e => e.type === 'GAS'),
+      'Electricidad': this.elements.filter(e => e.type === 'ELECTRICIDAD')
     };
     this.cdr.detectChanges();
   }
@@ -296,7 +338,7 @@ export class ClusterAreaDashboardComponent implements OnInit {
     }
   }
 
-  handleDrawToolChanged(tool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | null) {
+  handleDrawToolChanged(tool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | 'AGUA' | 'GAS' | 'ELECTRICIDAD' | null) {
     this.activeDrawTool = tool;
     this.tempMarker = null;
     this.newNodeData = {};
@@ -312,13 +354,50 @@ export class ClusterAreaDashboardComponent implements OnInit {
     this.tempMarker = null;
   }
 
-  openModalFor(type: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP') {
+  openModalFor(type: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | 'AGUA' | 'GAS' | 'ELECTRICIDAD') {
     this.showMap = true;
     this.isMapEditMode = true;
     this.setViewMode('map-focused');
     this.activeDrawTool = type;
     this.tempMarker = null;
     this.newNodeData = {};
+  }
+
+  onImportPlanRequested(type: string) {
+    if (type === 'AGUA') this.planImportType = 'WATER';
+    else if (type === 'GAS') this.planImportType = 'GAS';
+    else if (type === 'ELECTRICIDAD') this.planImportType = 'ELECTRICITY';
+    this.showPlanImporter = true;
+  }
+
+  onPlanImported(event: any) {
+    this.showPlanImporter = false;
+    if (event) {
+      this.alignPlanData = event;
+      this.isPlanAlignMode = true;
+      this.setViewMode('map-focused');
+    }
+  }
+
+  onPlanAlignmentSaved(event: any) {
+    this.isPlanAlignMode = false;
+    if (event) {
+      const elType = event.utilityType === 'WATER' ? 'AGUA' : (event.utilityType === 'GAS' ? 'GAS' : 'ELECTRICIDAD');
+      const newElement: NetworkElement = {
+         id: 'PLAN-' + Date.now(),
+         type: elType as any,
+         name: `Plano Importado (${elType})`,
+         lat: event.center.lat,
+         lng: event.center.lng,
+         status: 'ACTIVE',
+         createdAt: new Date(),
+         planUrl: event.planUrl,
+         planBounds: event.bounds
+      };
+      this.elements.push(newElement);
+      this.calculateStats();
+    }
+    this.alignPlanData = null;
   }
 
   onNodeClicked(element: NetworkElement) {
@@ -423,5 +502,45 @@ export class ClusterAreaDashboardComponent implements OnInit {
     this.tempMarker = null;
     this.isEditing = false;
     this.loadClusterData();
+  }
+
+  onSavePlanLine(data: any) {
+    if (!this.activeDrawTool) return;
+    
+    let mappedType = 'GAS';
+    if (this.activeDrawTool === 'AGUA') mappedType = 'WATER';
+    if (this.activeDrawTool === 'ELECTRICIDAD') mappedType = 'ELECTRICITY';
+
+    const utilityData: UtilityLineModel = {
+      utilityType: mappedType as any,
+      geometry: data.geometry || [],
+      operatorName: data.company || '',
+      status: 'ACTIVE'
+    };
+
+    this.utilityLineService.create(utilityData).subscribe({
+      next: (savedUtility) => {
+        const newElement: NetworkElement = {
+           id: 'PLAN-LINE-' + savedUtility.id,
+           type: this.activeDrawTool as any, // AGUA, GAS, ELECTRICIDAD
+           name: data.name || `Línea de ${this.activeDrawTool}`,
+           lat: data.geometry && data.geometry.length > 0 ? data.geometry[0].lat : this.center.lat,
+           lng: data.geometry && data.geometry.length > 0 ? data.geometry[0].lng : this.center.lng,
+           status: 'ACTIVE',
+           createdAt: new Date(),
+           geometry: data.geometry,
+           company: data.company,
+           material: data.material
+        };
+        this.elements.push(newElement);
+        this.calculateStats();
+        this.activeDrawTool = null;
+        this.tempMarker = null;
+        this.newNodeData = {};
+      },
+      error: (err) => {
+        console.error('Error saving utility line', err);
+      }
+    });
   }
 }

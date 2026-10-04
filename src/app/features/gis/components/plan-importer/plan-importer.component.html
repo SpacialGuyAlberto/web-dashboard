@@ -1,0 +1,89 @@
+<div class="plan-importer-container">
+  <h2>Importador Inteligente de Planos (Fase A)</h2>
+
+  <!-- PASO 1: SUBIDA -->
+  <div *ngIf="currentStep === 'UPLOAD'" class="upload-zone">
+    <div style="margin-bottom: 25px; z-index: 10; position: relative;">
+      <label style="color:#666; font-size:12px; font-weight:bold; text-transform:uppercase;">Tipo de Infraestructura:</label><br>
+      <select [(ngModel)]="utilityType" style="margin-top:8px; padding:8px; width: 200px; border-radius:4px; border:1px solid #ccc; font-size:14px;">
+        <option value="WATER">Agua (WATER)</option>
+        <option value="GAS">Gas (GAS)</option>
+        <option value="ELECTRICITY">Electricidad (ELECTRICITY)</option>
+      </select>
+    </div>
+    
+    <p>Arrastra tu plano aquí o haz clic en la caja</p>
+    <p class="subtitle">Soportado: Archivos de Ingeniería (.DXF) o Escaneos (.PDF)</p>
+    <input type="file" (change)="onFileSelected($event)" accept=".dxf,.dwg,.pdf" title="Seleccionar archivo" />
+  </div>
+
+  <!-- PASO 2: PROCESAMIENTO (LA ESTRATEGIA ACTÚA) -->
+  <div *ngIf="currentStep === 'PROCESSING'" class="loading-zone">
+    <div class="spinner"></div>
+    <p>Procesando: <strong>{{fileName}}</strong></p>
+    <p class="subtitle">Seleccionando estrategia (Parseo Matemático o Visión Artificial)...</p>
+  </div>
+
+  <!-- PASO 3: CONFIRMACIÓN EN CANVAS -->
+  <div *ngIf="currentStep === 'CONFIRM'" class="confirm-zone">
+    <h3>Líneas Extraídas Correctamente</h3>
+    <p>Verifica si el sistema (CAD Parser o OpenCV) detectó correctamente las tuberías.</p>
+    
+    <div class="canvas-wrapper">
+      <canvas #previewCanvas width="600" height="400"></canvas>
+    </div>
+
+    <div class="actions">
+      <button class="btn-cancel" (click)="reset()">Descartar y volver a subir</button>
+      <button class="btn-confirm" (click)="confirmLines()">{{ emitBeforeAlign ? 'Aceptar y Extraer al Mapa Principal' : 'Aceptar y pasar al Mapa (Fases B y C)' }}</button>
+    </div>
+  </div>
+
+  <!-- PASO 4: ALINEACIÓN EN MAPA (Arrastrar con Mouse) -->
+  <div *ngIf="currentStep === 'ALIGN'" class="align-zone" style="height: 500px; display: flex; flex-direction: column;">
+    <h3 style="margin-top:0; color:#3f51b5;">Fase B: Alineación Geográfica</h3>
+    <p style="font-size:12px; color:#666;">Arrastra el <strong>marcador rojo</strong> con el mouse para mover las líneas. Usa los botones para escalar.</p>
+    
+    <div style="flex:1; position:relative; border-radius:6px; overflow:hidden; border:2px solid #ccc;">
+      <google-map height="100%" width="100%" [center]="center" [zoom]="zoom" [options]="mapOptions">
+        <!-- Capa Fantasma -->
+        <map-ground-overlay [url]="planUrl" [bounds]="planBounds" [clickable]="false" [opacity]="0.7"></map-ground-overlay>
+        <!-- Marcador para Arrastrar -->
+        <map-marker [position]="markerPosition" [options]="markerOptions" (mapDrag)="onMarkerDrag($event)"></map-marker>
+      </google-map>
+
+      <!-- Controles de Escala Flotantes -->
+      <div style="position:absolute; top:10px; left:10px; background:white; padding:8px; border-radius:4px; display:flex; flex-direction:column; gap:8px; box-shadow:0 2px 5px rgba(0,0,0,0.3); z-index:100;">
+         <div style="display:flex; gap:8px;">
+           <button (click)="scalePlan(0.95)" style="background:#f0f0f0; border:1px solid #ccc; padding:4px 8px; border-radius:2px; font-weight:bold; cursor:pointer; color:black;">- Escala</button>
+           <button (click)="scalePlan(1.05)" style="background:#f0f0f0; border:1px solid #ccc; padding:4px 8px; border-radius:2px; font-weight:bold; cursor:pointer; color:black;">+ Escala</button>
+         </div>
+         
+         <hr style="margin:4px 0; border:0; border-top:1px solid #ccc;">
+         
+         <div style="display:flex; flex-direction:column; align-items:center;">
+           <span style="font-size:10px; color:#666; margin-bottom:4px; text-transform:uppercase; font-weight:bold;">Ajuste Fino</span>
+           <div>
+             <button (click)="nudge('N')" style="background:#e3f2fd; border:1px solid #90caf9; padding:2px 8px; cursor:pointer;">▲</button>
+           </div>
+           <div style="display:flex; gap:15px; margin:2px 0;">
+             <button (click)="nudge('W')" style="background:#e3f2fd; border:1px solid #90caf9; padding:2px 8px; cursor:pointer;">◀</button>
+             <button (click)="nudge('E')" style="background:#e3f2fd; border:1px solid #90caf9; padding:2px 8px; cursor:pointer;">▶</button>
+           </div>
+           <div>
+             <button (click)="nudge('S')" style="background:#e3f2fd; border:1px solid #90caf9; padding:2px 8px; cursor:pointer;">▼</button>
+           </div>
+         </div>
+      </div>
+
+      <div style="position:absolute; top:60px; right:10px; background:white; padding:8px; border-radius:4px; box-shadow:0 2px 5px rgba(0,0,0,0.3); z-index:100;">
+          <button (click)="bringPlanHere()" style="background:#ff9800; color:white; border:none; padding:6px 12px; border-radius:2px; font-weight:bold; cursor:pointer; font-size:12px;">Traer Plano al Centro</button>
+      </div>
+    </div>
+
+    <div class="actions" style="margin-top:15px;">
+      <button class="btn-cancel" (click)="reset()">Cancelar</button>
+      <button class="btn-confirm" (click)="saveFinalAlignment()" style="background:#00c853;">Guardar Infraestructura (Fase C)</button>
+    </div>
+  </div>
+</div>

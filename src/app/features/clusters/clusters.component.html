@@ -38,8 +38,11 @@
         </div>
 
         <div class="card-footer-actions">
-          <button [routerLink]="['/project-details/clusters', cluster.id, 'areas']" [queryParams]="{projectId: projectId, projectName: projectName}" class="btn-action-outline w-full">
+          <button [routerLink]="['/project-details/clusters', cluster.id, 'areas']" [queryParams]="{projectId: projectId, projectName: projectName}" class="btn-action-outline w-full mb-2">
             <span>Manage Areas</span>
+          </button>
+          <button (click)="openImportModal(cluster.id!)" class="btn-primary w-full text-[10px] uppercase font-mono tracking-widest py-2 rounded" style="background: #3f51b5; border: none; color: white;">
+            <span>Import Ext. Infra</span>
           </button>
         </div>
       </div>
@@ -89,6 +92,20 @@
           <button (click)="saveCluster()" class="btn-primary px-6 py-2 rounded bg-[#6938ef] text-white hover:bg-[#5b2ecf] transition-all text-[10px] font-mono uppercase tracking-widest disabled:opacity-50" [disabled]="!newCluster.name">
             Create Cluster
           </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showImportModal) {
+    <div class="modal-overlay">
+      <div class="modal-container-medium" style="background: white; border-radius: 8px; overflow: hidden; max-width: 750px;">
+        <div class="modal-header p-4 border-b flex justify-between items-center bg-[#f5f5ff]">
+          <h2 class="text-xl text-[#3f51b5] font-bold m-0">Import External Infrastructure</h2>
+          <button (click)="closeImportModal()" class="text-black text-3xl font-bold cursor-pointer bg-transparent border-none hover:text-red-500">&times;</button>
+        </div>
+        <div class="modal-content overflow-y-auto max-h-[80vh]">
+          <app-plan-importer (importCompleted)="onPlanImported($event)"></app-plan-importer>
         </div>
       </div>
     </div>

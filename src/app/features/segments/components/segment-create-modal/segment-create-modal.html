@@ -110,6 +110,25 @@
               </div>
             </div>
 
+            <div class="space-y-2 group p-6 rounded-xl border border-amber-500/10 bg-amber-500/5 relative overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none"></div>
+              <label class="block text-[10px] font-medium uppercase text-amber-300 tracking-[0.25em] relative z-10 flex items-center gap-2">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                Fencing Strategy (Plan de Vallado)
+              </label>
+              <div class="relative z-10">
+                <select [(ngModel)]="newSegment.fencingStrategy" class="w-full bg-[#121318]/80 backdrop-blur-md border border-amber-500/20 rounded-xl px-4 py-3.5 font-mono text-sm text-amber-100 shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)] transition-all duration-300 hover:border-amber-500/40 focus:border-amber-400 focus:bg-[#0f1014] focus:outline-none focus:ring-2 focus:ring-amber-400/30 appearance-none cursor-pointer">
+                  <option value="none" class="bg-[#121318] text-white/50">-- None --</option>
+                  <option value="standard" class="bg-[#121318] text-white">Standard Road Closure</option>
+                  <option value="sidewalk" class="bg-[#121318] text-white">Sidewalk Only</option>
+                  <option value="custom" class="bg-[#121318] text-white">Custom (Drag & Drop)</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-amber-300/50">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+              </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
               <div class="space-y-2 group">
                 <label class="block text-[10px] font-medium uppercase text-emerald-300/80 tracking-[0.25em] transition-colors group-hover:text-emerald-200">Start Netzverteiler</label>

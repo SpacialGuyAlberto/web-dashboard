@@ -29,4 +29,5 @@ export interface Segment {
     plannedStartDate?: string;
     plannedEndDate?: string;
     customFields?: { [key: string]: any };
+    fencingStrategy?: string;
 }

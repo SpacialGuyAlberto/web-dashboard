@@ -1,5 +1,12 @@
 <div class="h-full w-full bg-[#0a0a0c] flex flex-col font-sans overflow-hidden">
   
+  <app-plan-importer 
+      *ngIf="showPlanImporter" 
+      class="absolute inset-0 z-[9999]"
+      [emitBeforeAlign]="true"
+      (importCompleted)="onPlanImported($event)">
+  </app-plan-importer>
+  
   <!-- Header Navbar -->
   <header class="h-16 shrink-0 bg-[#0a0a0c]/80 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-6 z-10">
     <div class="flex items-center gap-4">
@@ -112,6 +119,7 @@
                 [showMap]="showMap" 
                 [highlightedType]="highlightedType"
                 (createRequested)="openModalFor($event)" 
+                (importPlanRequested)="onImportPlanRequested($event)"
                 (nodeClicked)="onNodeClicked($event)"
                 (editRequested)="onEditNodeRequested($event)">
             </app-cluster-nodes-accordion>
@@ -125,7 +133,8 @@
                 [projectId]="projectId"
                 [availablePops]="availablePops"
                 (saveRequested)="saveNode()" 
-                (segmentSaved)="onSegmentSaved($event)">
+                (segmentSaved)="onSegmentSaved($event)"
+                (savePlanLineRequested)="onSavePlanLine($event)">
             </app-cluster-node-form>
         </div>
       </div>
@@ -152,6 +161,8 @@
         [showMap]="showMap"
         [viewMode]="viewMode"
         [highlightedType]="highlightedType"
+        [isPlanAlignMode]="isPlanAlignMode"
+        [alignPlanData]="alignPlanData"
         (mapClicked)="onMapClicked($event)"
         (segmentUpdated)="onSegmentUpdated($event)"
         (saveSegmentPosition)="onSaveSegmentPosition($event)"
@@ -159,7 +170,8 @@
         (drawToolChanged)="handleDrawToolChanged($event)"
         (toggle3DModeEvent)="handleToggle3DMode()"
         (exitEditModeEvent)="handleExitEditMode()"
-        (editSegmentRequested)="onEditSegmentFromMap($event)">
+        (editSegmentRequested)="onEditSegmentFromMap($event)"
+        (planAlignmentSaved)="onPlanAlignmentSaved($event)">
     </app-cluster-map>
   </div>
 </div>

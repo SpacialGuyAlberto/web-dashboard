@@ -11,7 +11,7 @@ import { Pop } from '../../../infrastructure/pop.model';
   templateUrl: './cluster-node-form.html'
 })
 export class ClusterNodeFormComponent {
-  @Input() activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | null = null;
+  @Input() activeDrawTool: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | 'AGUA' | 'GAS' | 'ELECTRICIDAD' | null = null;
   @Input() isEditing: boolean = false;
   @Input() tempMarker: { lat: number, lng: number } | null = null;
   @Input() newNodeData: any = {};
@@ -21,6 +21,7 @@ export class ClusterNodeFormComponent {
   @Output() saveRequested = new EventEmitter<void>();
   @Output() segmentSaved = new EventEmitter<any>();
   @Output() locateRequested = new EventEmitter<{lat: number, lng: number}>();
+  @Output() savePlanLineRequested = new EventEmitter<any>();
   
   @ViewChild(SegmentCreateModalComponent) segmentModal!: SegmentCreateModalComponent;
 
@@ -35,7 +36,13 @@ export class ClusterNodeFormComponent {
   updateSegmentCoordinates(event: any) {
     if (this.segmentModal) {
       this.segmentModal.updateExternalCoordinates(event);
+    } else {
+      this.newNodeData.geometry = event.geometry;
     }
+  }
+
+  onSaveExternalPlan() {
+     this.savePlanLineRequested.emit(this.newNodeData);
   }
 
   selectPop(pop: Pop) {

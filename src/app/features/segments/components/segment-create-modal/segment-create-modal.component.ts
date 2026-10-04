@@ -273,7 +273,7 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
     if (this.isEditing && this.currentSegmentId) {
       this.segmentService.updateSegment(this.currentSegmentId, segmentToSave).subscribe({
         next: (updated) => {
-          this.saved.emit(updated);
+          this.handleFencingAndEmit(updated);
         },
         error: (err) => {
           console.error('Failed to update segment', err);
@@ -282,12 +282,29 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
     } else {
       this.segmentService.createSegment(this.projectId, segmentToSave).subscribe({
         next: (segment) => {
-          this.saved.emit(segment);
+          this.handleFencingAndEmit(segment);
         },
         error: (err) => {
           console.error('Failed to create segment', err);
         }
       });
+    }
+  }
+
+  private handleFencingAndEmit(segment: Segment) {
+    if (this.newSegment.fencingStrategy && this.newSegment.fencingStrategy !== 'none' && segment.id) {
+      this.segmentService.generateFencingPlan(segment.id, this.newSegment.fencingStrategy).subscribe({
+        next: (plan) => {
+          console.log('Fencing Plan generated:', plan);
+          this.saved.emit(segment);
+        },
+        error: (err) => {
+          console.error('Failed to generate fencing plan', err);
+          this.saved.emit(segment); // Emit anyway to close modal
+        }
+      });
+    } else {
+      this.saved.emit(segment);
     }
   }
 }

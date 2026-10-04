@@ -11,10 +11,26 @@
                   </span>
                 </button>
                 <div class="flex items-center gap-3">
-                  <button *ngIf="group.key === 'POP'" (click)="openModalFor('POP')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
-                  <button *ngIf="group.key === 'Netzverteiler'" (click)="openModalFor('DP')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
-                  <button *ngIf="group.key === 'Acometidas' || group.key === 'HEÜPs'" (click)="openModalFor('ACOMETIDA')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
-                  <button *ngIf="group.key === 'Segments'" (click)="openModalFor('SEGMENT')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
+                  <button *ngIf="group.key === 'POP'" (click)="openModalFor('POP')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5" title="New POP">+</button>
+                  <button *ngIf="group.key === 'Netzverteiler'" (click)="openModalFor('DP')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5" title="New DP">+</button>
+                  <button *ngIf="group.key === 'Acometidas' || group.key === 'HEÜPs'" (click)="openModalFor('ACOMETIDA')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5" title="New Acometida">+</button>
+                  <button *ngIf="group.key === 'Segments'" (click)="openModalFor('SEGMENT')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5" title="New Segment">+</button>
+                  
+                  <!-- External Plans Import Buttons -->
+                  <div *ngIf="group.key === 'Agua'" class="flex gap-1">
+                     <button (click)="openModalForDraw('AGUA')" class="opacity-0 group-hover/header:opacity-100 bg-[#3b82f6]/20 hover:bg-[#3b82f6] text-[#3b82f6] hover:text-white w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border border-[#3b82f6]/30 font-mono text-[10px] font-bold" title="Draw Water Line">✏️</button>
+                     <button (click)="openModalFor('AGUA')" class="opacity-0 group-hover/header:opacity-100 bg-[#3b82f6]/20 hover:bg-[#3b82f6] text-[#3b82f6] hover:text-white w-auto px-2 h-6 rounded flex items-center justify-center transition-all cursor-pointer border border-[#3b82f6]/30 font-mono text-[9px] font-bold uppercase" title="Import Water Plan">Import</button>
+                  </div>
+                  
+                  <div *ngIf="group.key === 'Gas'" class="flex gap-1">
+                     <button (click)="openModalForDraw('GAS')" class="opacity-0 group-hover/header:opacity-100 bg-[#eab308]/20 hover:bg-[#eab308] text-[#eab308] hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border border-[#eab308]/30 font-mono text-[10px] font-bold" title="Draw Gas Line">✏️</button>
+                     <button (click)="openModalFor('GAS')" class="opacity-0 group-hover/header:opacity-100 bg-[#eab308]/20 hover:bg-[#eab308] text-[#eab308] hover:text-black w-auto px-2 h-6 rounded flex items-center justify-center transition-all cursor-pointer border border-[#eab308]/30 font-mono text-[9px] font-bold uppercase" title="Import Gas Plan">Import</button>
+                  </div>
+                  
+                  <div *ngIf="group.key === 'Electricidad'" class="flex gap-1">
+                     <button (click)="openModalForDraw('ELECTRICIDAD')" class="opacity-0 group-hover/header:opacity-100 bg-[#ef4444]/20 hover:bg-[#ef4444] text-[#ef4444] hover:text-white w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border border-[#ef4444]/30 font-mono text-[10px] font-bold" title="Draw Electricity Line">✏️</button>
+                     <button (click)="openModalFor('ELECTRICIDAD')" class="opacity-0 group-hover/header:opacity-100 bg-[#ef4444]/20 hover:bg-[#ef4444] text-[#ef4444] hover:text-white w-auto px-2 h-6 rounded flex items-center justify-center transition-all cursor-pointer border border-[#ef4444]/30 font-mono text-[9px] font-bold uppercase" title="Import Electricity Plan">Import</button>
+                  </div>
                   <span class="text-[9px] font-mono bg-white/10 px-2 py-0.5 rounded-full text-white/70">{{ group.value.length }}</span>
                   <button class="bg-transparent border-none p-0 flex items-center cursor-pointer" (click)="toggleGroup(group.key)">
                     <svg [class.rotate-180]="expandedGroup === group.key" class="transition-transform duration-300 text-white/40" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
@@ -81,10 +97,26 @@
                           </span>
                         </div>
                         <div class="flex items-center gap-4">
-                          <button *ngIf="group.key === 'POP'" (click)="openModalFor('POP')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
-                          <button *ngIf="group.key === 'Netzverteiler'" (click)="openModalFor('DP')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
-                          <button *ngIf="group.key === 'Acometidas' || group.key === 'HEÜPs'" (click)="openModalFor('ACOMETIDA')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
-                          <button *ngIf="group.key === 'Segments'" (click)="openModalFor('SEGMENT')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5">+</button>
+                          <button *ngIf="group.key === 'POP'" (click)="openModalFor('POP')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5" title="New POP">+</button>
+                          <button *ngIf="group.key === 'Netzverteiler'" (click)="openModalFor('DP')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5" title="New DP">+</button>
+                          <button *ngIf="group.key === 'Acometidas' || group.key === 'HEÜPs'" (click)="openModalFor('ACOMETIDA')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5" title="New Acometida">+</button>
+                          <button *ngIf="group.key === 'Segments'" (click)="openModalFor('SEGMENT')" class="opacity-0 group-hover/header:opacity-100 bg-white/10 hover:bg-white text-white/70 hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border-none font-bold pb-0.5" title="New Segment">+</button>
+                          
+                          <!-- External Plans Import Buttons -->
+                          <div *ngIf="group.key === 'Agua'" class="flex gap-1">
+                             <button (click)="openModalForDraw('AGUA')" class="opacity-0 group-hover/header:opacity-100 bg-[#3b82f6]/20 hover:bg-[#3b82f6] text-[#3b82f6] hover:text-white w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border border-[#3b82f6]/30 font-mono text-[10px] font-bold" title="Draw Water Line">✏️</button>
+                             <button (click)="openModalFor('AGUA')" class="opacity-0 group-hover/header:opacity-100 bg-[#3b82f6]/20 hover:bg-[#3b82f6] text-[#3b82f6] hover:text-white w-auto px-2 h-6 rounded flex items-center justify-center transition-all cursor-pointer border border-[#3b82f6]/30 font-mono text-[9px] font-bold uppercase" title="Import Water Plan">Import</button>
+                          </div>
+                          
+                          <div *ngIf="group.key === 'Gas'" class="flex gap-1">
+                             <button (click)="openModalForDraw('GAS')" class="opacity-0 group-hover/header:opacity-100 bg-[#eab308]/20 hover:bg-[#eab308] text-[#eab308] hover:text-black w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border border-[#eab308]/30 font-mono text-[10px] font-bold" title="Draw Gas Line">✏️</button>
+                             <button (click)="openModalFor('GAS')" class="opacity-0 group-hover/header:opacity-100 bg-[#eab308]/20 hover:bg-[#eab308] text-[#eab308] hover:text-black w-auto px-2 h-6 rounded flex items-center justify-center transition-all cursor-pointer border border-[#eab308]/30 font-mono text-[9px] font-bold uppercase" title="Import Gas Plan">Import</button>
+                          </div>
+                          
+                          <div *ngIf="group.key === 'Electricidad'" class="flex gap-1">
+                             <button (click)="openModalForDraw('ELECTRICIDAD')" class="opacity-0 group-hover/header:opacity-100 bg-[#ef4444]/20 hover:bg-[#ef4444] text-[#ef4444] hover:text-white w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer border border-[#ef4444]/30 font-mono text-[10px] font-bold" title="Draw Electricity Line">✏️</button>
+                             <button (click)="openModalFor('ELECTRICIDAD')" class="opacity-0 group-hover/header:opacity-100 bg-[#ef4444]/20 hover:bg-[#ef4444] text-[#ef4444] hover:text-white w-auto px-2 h-6 rounded flex items-center justify-center transition-all cursor-pointer border border-[#ef4444]/30 font-mono text-[9px] font-bold uppercase" title="Import Electricity Plan">Import</button>
+                          </div>
                           <svg (click)="toggleGroup(group.key)" [class.rotate-180]="expandedGroup === group.key" class="transition-transform duration-300 text-white/40 cursor-pointer" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
                         </div>
                       </div>

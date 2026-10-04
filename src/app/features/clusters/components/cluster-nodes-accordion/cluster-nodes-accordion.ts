@@ -14,7 +14,8 @@ export class ClusterNodesAccordionComponent implements OnChanges {
   @Input() showMap: boolean = true;
   @Input() highlightedType: string | null = null;
   
-  @Output() createRequested = new EventEmitter<'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP'>();
+  @Output() createRequested = new EventEmitter<'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP' | 'AGUA' | 'GAS' | 'ELECTRICIDAD'>();
+  @Output() importPlanRequested = new EventEmitter<string>();
   @Output() nodeClicked = new EventEmitter<NetworkElement>();
   @Output() editRequested = new EventEmitter<NetworkElement>();
 
@@ -39,8 +40,16 @@ export class ClusterNodesAccordionComponent implements OnChanges {
     this.expandedGroup = this.expandedGroup === group ? '' : group;
   }
 
-  openModalFor(type: 'POP' | 'DP' | 'ACOMETIDA' | 'SEGMENT' | 'HEUP') {
-    this.createRequested.emit(type);
+  openModalFor(type: string) {
+    if (type === 'AGUA' || type === 'GAS' || type === 'ELECTRICIDAD') {
+       this.importPlanRequested.emit(type);
+    } else {
+       this.createRequested.emit(type as any);
+    }
+  }
+
+  openModalForDraw(type: string) {
+    this.createRequested.emit(type as any);
   }
 
   onNodeClick(element: NetworkElement) {
@@ -59,6 +68,9 @@ export class ClusterNodesAccordionComponent implements OnChanges {
       case 'ACOMETIDA': return '#fbbf24';
       case 'HEUP': return '#ef4444';
       case 'SEGMENT': return '#ff69b4';
+      case 'AGUA': return '#3b82f6';
+      case 'GAS': return '#eab308';
+      case 'ELECTRICIDAD': return '#ef4444';
       default: return '#ffffff';
     }
   }

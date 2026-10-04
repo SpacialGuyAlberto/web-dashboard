@@ -21,7 +21,7 @@
               </h3>
 
               <!-- Common Node Fields -->
-              @if (activeDrawTool !== 'SEGMENT') {
+              @if (activeDrawTool === 'POP' || activeDrawTool === 'DP' || activeDrawTool === 'ACOMETIDA' || activeDrawTool === 'HEUP') {
               <div class="form-group mb-4">
                 <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Identifier</label>
                 <input type="text" [(ngModel)]="newNodeData.identifier" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors">
@@ -73,7 +73,7 @@
                 <label *ngIf="newNodeData.elevation !== undefined" class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5 mt-2">Elevation (Google API)</label>
                 <p *ngIf="newNodeData.elevation !== undefined" class="text-xs text-[#2fb080] font-mono">{{ newNodeData.elevation.toFixed(2) }} m</p>
               </div>
-            }
+              }
 
             <!-- Segment Specific Fields embedded via component -->
             @if (activeDrawTool === 'SEGMENT') {
@@ -91,7 +91,33 @@
               </div>
             }
 
-            <button *ngIf="activeDrawTool !== 'SEGMENT'" (click)="onSave()" class="w-full mt-4 py-3 rounded text-[11px] font-bold font-mono uppercase tracking-[0.2em] transition-all"
+            @if (activeDrawTool === 'AGUA' || activeDrawTool === 'GAS' || activeDrawTool === 'ELECTRICIDAD') {
+              <div class="form-group mb-4">
+                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Identifier</label>
+                <input type="text" [(ngModel)]="newNodeData.identifier" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors">
+              </div>
+              <div class="form-group mb-4">
+                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Plan Name</label>
+                <input type="text" [(ngModel)]="newNodeData.name" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors">
+              </div>
+              <div class="form-group mb-4">
+                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Company / Owner</label>
+                <input type="text" [(ngModel)]="newNodeData.company" placeholder="e.g. Stadtwerke Fürth" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors">
+              </div>
+              <div class="form-group mb-4">
+                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Material / Type</label>
+                <input type="text" [(ngModel)]="newNodeData.material" placeholder="e.g. PVC, PE, Cast Iron" class="w-full bg-[#0a0a0c] border border-white/10 rounded p-2 text-sm text-white/90 outline-none focus:border-white/30 transition-colors">
+              </div>
+              <div class="form-group mb-4 bg-white/5 p-3 rounded border border-white/10">
+                <label class="block text-[9px] font-mono text-white/50 uppercase tracking-widest mb-1.5">Geometry</label>
+                <p class="text-xs text-[#2fb080] font-mono">{{ newNodeData.geometry?.length || 0 }} waypoints defined</p>
+              </div>
+              <button (click)="onSaveExternalPlan()" class="w-full mt-4 py-3 rounded text-[11px] font-bold font-mono uppercase tracking-[0.2em] transition-all bg-[#3b82f6] text-white hover:bg-[#2563eb]" [disabled]="!newNodeData.geometry || newNodeData.geometry.length === 0">
+                Save {{ activeDrawTool }} Line
+              </button>
+            }
+
+            <button *ngIf="activeDrawTool !== 'SEGMENT' && activeDrawTool !== 'AGUA' && activeDrawTool !== 'GAS' && activeDrawTool !== 'ELECTRICIDAD'" (click)="onSave()" class="w-full mt-4 py-3 rounded text-[11px] font-bold font-mono uppercase tracking-[0.2em] transition-all"
                     [disabled]="!tempMarker"
                     [ngClass]="{
                       'bg-[#6938ef] text-white hover:bg-[#5b2ecf]': activeDrawTool === 'POP',

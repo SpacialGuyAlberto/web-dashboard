@@ -15,6 +15,12 @@
             </div>
         </div>
         <div class="flex gap-2">
+            <button (click)="isAlignmentMode = !isAlignmentMode; showPlanOverlay = true" 
+                [class.bg-[#00ffcc]]="isAlignmentMode" [class.text-black]="isAlignmentMode"
+                [class.bg-[#161719]]="!isAlignmentMode" [class.text-white]="!isAlignmentMode"
+                class="px-6 py-3 rounded border border-white/5 font-mono text-[10px] font-bold uppercase tracking-widest transition-colors hover:bg-white/10">
+                {{ isAlignmentMode ? 'Cancel Alignment' : 'Align Plan (Phase B)' }}
+            </button>
             <button (click)="togglePlanOverlay(!showPlanOverlay)" [class.bg-[#6938ef]]="showPlanOverlay" [class.text-white]="showPlanOverlay"
                 [class.bg-[#161719]]="!showPlanOverlay" [class.text-white/60]="!showPlanOverlay"
                 class="px-6 py-3 rounded border border-white/5 font-mono text-[10px] uppercase tracking-widest transition-colors hover:bg-white/5">
@@ -34,8 +40,40 @@
             class="block w-full h-full">
             <!-- Ground Overlay for Utility Plan -->
             <map-ground-overlay *ngIf="showPlanOverlay" [url]="planUrl" [bounds]="planBounds"
-                [clickable]="false"></map-ground-overlay>
+                [clickable]="false" [opacity]="0.7"></map-ground-overlay>
         </google-map>
+
+        <!-- Tool de Alineación (Fase B) -->
+        <div *ngIf="isAlignmentMode"
+            class="absolute top-8 left-8 p-6 bg-[#131415]/95 backdrop-blur-md rounded-xl border border-[#00ffcc] shadow-[0_0_20px_rgba(0,255,204,0.2)] z-10 flex flex-col gap-4 w-64">
+            
+            <h3 class="text-[11px] font-mono text-[#00ffcc] font-bold uppercase tracking-[0.1em] text-center border-b border-[#00ffcc]/30 pb-2">
+                Herramienta de Anclaje
+            </h3>
+
+            <!-- D-PAD Nudge -->
+            <div class="grid grid-cols-3 gap-1 mx-auto w-32">
+                <div></div>
+                <button (click)="nudge('N')" class="bg-white/10 hover:bg-white/20 text-white rounded p-2 flex justify-center items-center">▲</button>
+                <div></div>
+                <button (click)="nudge('W')" class="bg-white/10 hover:bg-white/20 text-white rounded p-2 flex justify-center items-center">◀</button>
+                <div class="flex justify-center items-center text-white/50 text-[10px]">Mover</div>
+                <button (click)="nudge('E')" class="bg-white/10 hover:bg-white/20 text-white rounded p-2 flex justify-center items-center">▶</button>
+                <div></div>
+                <button (click)="nudge('S')" class="bg-white/10 hover:bg-white/20 text-white rounded p-2 flex justify-center items-center">▼</button>
+                <div></div>
+            </div>
+
+            <!-- Scale -->
+            <div class="flex justify-between items-center bg-black/30 rounded p-2">
+                <button (click)="scalePlan(0.95)" class="text-white hover:text-[#00ffcc] px-2">- Escala</button>
+                <button (click)="scalePlan(1.05)" class="text-white hover:text-[#00ffcc] px-2">+ Escala</button>
+            </div>
+
+            <button (click)="saveAlignment()" class="mt-2 w-full py-2 bg-[#00ffcc] text-black font-bold font-mono text-[10px] uppercase tracking-widest rounded hover:bg-[#00ccaa] transition-colors">
+                Bake (Fijar Geo)
+            </button>
+        </div>
 
         <!-- Legend Overlay -->
         <div
