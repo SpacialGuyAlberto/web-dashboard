@@ -44,6 +44,7 @@
                     <th class="table-th">Serie / ID</th>
                     <th class="table-th">Estado</th>
                     <th class="table-th">Ubicación</th>
+                    <th class="table-th">Asignado A</th>
                     <th class="table-th text-right">Acciones</th>
                 </tr>
             </thead>
@@ -72,6 +73,12 @@
                         <div class="location-box">
                             <span *ngIf="machine.currentLocation">📍 {{ machine.currentLocation }}</span>
                             <span *ngIf="!machine.currentLocation" class="location-empty">Sin asignar</span>
+                        </div>
+                    </td>
+                    <td class="table-td">
+                        <div class="crew-box text-sm">
+                            <span *ngIf="machine.assignedCrewId" class="font-mono text-[#6938ef]">Crew #{{ machine.assignedCrewId }}</span>
+                            <span *ngIf="!machine.assignedCrewId" class="text-white/40 font-mono text-xs">Sin asignar</span>
                         </div>
                     </td>
                     <td class="table-td text-right text-sm">

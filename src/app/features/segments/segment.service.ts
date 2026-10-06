@@ -57,4 +57,18 @@ export class SegmentService {
     generateFencingPlan(segmentId: number, strategy: string): Observable<any> {
         return this.http.post(`${this.apiUrl}/planning/fencing-plans/segment/${segmentId}/generate?strategy=${strategy}`, {});
     }
+
+    // New: Permits Management
+    uploadPermit(segmentId: number, file: File): Observable<any> {
+        const formData = new FormData();
+        formData.append('file', file);
+        return this.http.post(`${this.apiUrl}/v1/segments/${segmentId}/permits`, formData, {
+            reportProgress: true,
+            observe: 'events'
+        });
+    }
+
+    getPermits(segmentId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/v1/segments/${segmentId}/permits`);
+    }
 }

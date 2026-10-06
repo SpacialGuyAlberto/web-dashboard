@@ -8,6 +8,12 @@
         </div>
       </div>
 
+      <!-- Machinery Link -->
+      <button (click)="goToMachinery()" class="absolute top-6 right-6 bg-[#eab308]/10 hover:bg-[#eab308]/20 border border-[#eab308]/50 text-[#eab308] px-4 py-2 rounded-xl shadow-2xl flex items-center gap-2 font-mono text-xs uppercase tracking-widest transition-all cursor-pointer pointer-events-auto z-50">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+        Machinery
+      </button>
+
       <!-- AutoCAD-style Toolbar -->
       @if (isMapEditMode) {
         <div class="bg-[#161719]/90 backdrop-blur-md border border-white/10 rounded-full shadow-2xl flex items-center p-1.5 gap-1 pointer-events-auto">
@@ -88,6 +94,20 @@
                 [options]="getSegmentOptions(seg)"
                 (polylineClick)="onSegmentClick(seg, $event)">
               </map-polyline>
+
+              @if (seg.assignedCrewId || seg.currentState === 'IN_PROGRESS') {
+                <map-marker
+                  [position]="getSegmentMidpoint(seg)!"
+                  [options]="getCrewMarkerOptions()"
+                  (mapClick)="onCrewMarkerClick(seg, $event)">
+                </map-marker>
+                
+                <map-marker
+                  [position]="getOffsetPosition(getSegmentMidpoint(seg)!)"
+                  [options]="getMachineryMarkerOptions()"
+                  (mapClick)="goToMachinery()">
+                </map-marker>
+              }
             }
           }
 

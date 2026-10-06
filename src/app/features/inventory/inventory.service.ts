@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import { Machine, ProjectAllocation, Supplier, Material } from './inventory.model';
 
@@ -59,7 +60,12 @@ export class InventoryService {
 
     // Machinery
     getAllMachines(): Observable<Machine[]> {
-        return of(this.get<Machine>(this.MACHINES_KEY));
+        return this.http.get<Machine[]>('http://localhost:8080/api/inventory/machines').pipe(
+            catchError(err => {
+                console.warn('Backend API failed for machines, falling back to mock.', err);
+                return of(this.get<Machine>(this.MACHINES_KEY));
+            })
+        );
     }
 
     createMachine(machine: Machine): Observable<Machine> {

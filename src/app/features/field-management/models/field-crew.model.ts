@@ -6,4 +6,14 @@ export interface FieldCrew {
   currentProject: string;
   status: string;
   location: string;
+  
+  // Extra metrics
+  company?: string;
+  correctionAvg?: number;
+  finishedSegments?: number;
+  materialAvg?: number;
+  hoursWorked?: number;
+  safetyScore?: number;
+  clusterId?: number;
+  projectId?: number;
 }

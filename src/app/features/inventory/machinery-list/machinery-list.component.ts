@@ -26,9 +26,10 @@ export class MachineryListComponent implements OnInit {
                 console.error('Failed to load machines', err);
                 // Fallback mock data if service is not running yet
                 this.machines = [
-                    { serialNumber: 'EX-2024-001', name: 'Excavadora Cat 320', type: 'Excavator', status: 'IN_USE', currentLocation: 'Proyecto Centro' },
-                    { serialNumber: 'TR-2024-055', name: 'Camión Volquete', type: 'Truck', status: 'AVAILABLE', currentLocation: 'Almacén Central' },
-                    { serialNumber: 'CR-2024-012', name: 'Grúa Torre', type: 'Crane', status: 'MAINTENANCE', currentLocation: 'Taller' }
+                    { serialNumber: 'EX-2024-001', name: 'Excavadora Cat 320', type: 'Excavator', status: 'IN_USE', currentLocation: 'Berlin Mitte', assignedCrewId: 1 },
+                    { serialNumber: 'TR-2024-055', name: 'Camión Volquete', type: 'Truck', status: 'AVAILABLE', currentLocation: 'Almacén Central', assignedCrewId: undefined },
+                    { serialNumber: 'CR-2024-012', name: 'Grúa Torre', type: 'Crane', status: 'MAINTENANCE', currentLocation: 'Taller', assignedCrewId: undefined },
+                    { serialNumber: 'BL-2024-088', name: 'Sopladora Fibra Plumettaz', type: 'Fiber_Blower', status: 'IN_USE', currentLocation: 'Unter den Linden', assignedCrewId: 3 }
                 ];
             }
         });

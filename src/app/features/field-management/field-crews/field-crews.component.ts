@@ -1,6 +1,7 @@
 import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FieldService } from '../field.service';
 import { FieldCrew } from '../models/field-crew.model';
 
@@ -20,7 +21,9 @@ export class FieldCrewsComponent {
   constructor(
     private fieldService: FieldService,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -125,41 +128,7 @@ export class FieldCrewsComponent {
   selectedWorker: any = null;
 
   openDetailsModal(crew: FieldCrew) {
-    // Generate mock workers based on number of members
-    this.mockWorkers = Array.from({ length: crew.members || 4 }).map((_, i) => ({
-      name: `Worker ${i + 1}`,
-      role: i === 0 ? 'Foreman' : 'Technician',
-      photoUrl: `https://i.pravatar.cc/150?u=crew_${crew.id}_worker_${i}`,
-      currentProject: crew.currentProject,
-      location: crew.location,
-      status: i % 3 === 0 ? 'On Break' : 'Working',
-      pastProjects: [
-        'Berlin Sector 4 Expansion',
-        'Munich Central Fiber Drop',
-        'Hamburg Node Maintenance'
-      ],
-      hoursLogged: Math.floor(Math.random() * 20) + 30
-    }));
-
-    // Fetch fresh crew details from backend
-    this.fieldService.getCrewById(crew.id).subscribe({
-      next: (freshCrew) => {
-        this.ngZone.run(() => {
-          this.selectedCrew = freshCrew;
-          this.showDetailsModal = true;
-          this.cdr.detectChanges();
-        });
-      },
-      error: (error) => {
-        console.error('Error fetching crew details:', error);
-        // Fallback to the crew data we already have
-        this.ngZone.run(() => {
-          this.selectedCrew = crew;
-          this.showDetailsModal = true;
-          this.cdr.detectChanges();
-        });
-      }
-    });
+    this.router.navigate(['/field-crews', crew.id]);
   }
 
   closeDetailsModal() {

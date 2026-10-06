@@ -19,11 +19,12 @@ import { PlanningService } from '@features/risk-planning/planning.service';
 import { WorkType } from '@shared/models/work-type.enum';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { SegmentCreateModalComponent } from './components/segment-create-modal/segment-create-modal.component';
+import { SegmentPermitsComponent } from './components/segment-permits/segment-permits.component';
 
 @Component({
   selector: 'app-segments',
   standalone: true,
-  imports: [CommonModule, FormsModule, SafetyProtocolsComponent, IncidentReportComponent, GoogleMapsModule, SegmentCreateModalComponent],
+  imports: [CommonModule, FormsModule, SafetyProtocolsComponent, IncidentReportComponent, GoogleMapsModule, SegmentCreateModalComponent, SegmentPermitsComponent],
   templateUrl: './segments.html',
   styleUrls: ['./segments.css']
 })

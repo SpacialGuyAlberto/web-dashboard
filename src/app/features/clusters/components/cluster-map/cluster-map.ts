@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { GoogleMapsModule, GoogleMap, MapInfoWindow, MapPolyline, MapGroundOverlay, MapMarker } from '@angular/google-maps';
 import { NetworkElement } from '../../cluster-area-dashboard/cluster-area-dashboard.component';
 import { RoutingService } from '../../../gis/routing.service';
@@ -79,7 +80,64 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   planBounds = { north: 0, south: 0, east: 0, west: 0 };
   planMarkerPos = { lat: 0, lng: 0 };
 
-  constructor(private routingService: RoutingService, private cdr: ChangeDetectorRef) {}
+  constructor(private routingService: RoutingService, private cdr: ChangeDetectorRef, private router: Router) {}
+
+  getSegmentMidpoint(seg: Segment): google.maps.LatLngLiteral | null {
+    if (!seg.geometry || seg.geometry.length === 0) return null;
+    const midIndex = Math.floor(seg.geometry.length / 2);
+    return { lat: seg.geometry[midIndex].lat, lng: seg.geometry[midIndex].lng };
+  }
+
+  getCrewMarkerOptions(): google.maps.MarkerOptions {
+    return {
+      label: { text: '👷', fontSize: '24px' },
+      icon: {
+        path: 'M -12,0 A 12,12 0 1,0 12,0 A 12,12 0 1,0 -12,0', // 24px invisible circle for click area
+        fillOpacity: 0,
+        strokeOpacity: 0,
+        scale: 1
+      },
+      zIndex: 1001,
+      title: 'Crew Trabajando - Click para Detalles'
+    };
+  }
+
+  getMachineryMarkerOptions(): google.maps.marker.AdvancedMarkerElementOptions {
+    const iconElement = document.createElement('div');
+    iconElement.innerHTML = `<div style="font-size: 20px; text-shadow: 0 0 10px #eab308; cursor: pointer;">🚜</div>`;
+    return {
+      content: iconElement,
+      gmpClickable: true,
+      zIndex: 9999
+    };
+  }
+
+  getOffsetPosition(pos: google.maps.LatLngLiteral): google.maps.LatLngLiteral {
+    // Add a small offset to the east
+    return { lat: pos.lat, lng: pos.lng + 0.00015 };
+  }
+
+  goToMachinery() {
+    this.router.navigate(['/inventory/machines']);
+  }
+
+  onCrewMarkerClick(seg: Segment, event?: google.maps.MapMouseEvent) {
+    if (event && event.domEvent) {
+      event.domEvent.preventDefault();
+      event.domEvent.stopPropagation();
+    }
+    if (seg.assignedCrewId) {
+      this.router.navigate(['/field-crews', seg.assignedCrewId], {
+        queryParams: {
+          location: seg.streetName || 'Sector Alpha',
+          project: 'Glasfaser Ausbau',
+          status: seg.currentState || 'ACTIVE'
+        }
+      });
+    } else {
+      this.router.navigate(['/field-crews']);
+    }
+  }
 
   ngAfterViewInit() {
     this.initSearchAutocomplete();
