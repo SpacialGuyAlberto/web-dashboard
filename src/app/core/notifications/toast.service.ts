@@ -10,8 +10,8 @@ export class ToastService {
     private toastSubject = new Subject<Toast>();
     toastState = this.toastSubject.asObservable();
 
-    show(message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') {
-        this.toastSubject.next({ message, type });
+    show(message: string, type: 'success' | 'error' | 'info' | 'warning' | 'industrial' = 'info', title?: string, badge?: string, badgeColor?: string) {
+        this.toastSubject.next({ message, type, title, badge, badgeColor });
     }
 
     success(message: string) {
@@ -28,5 +28,9 @@ export class ToastService {
 
     warning(message: string) {
         this.show(message, 'warning');
+    }
+
+    industrial(title: string, message: string, badge: string = 'UPDATE', badgeColor: string = 'blue') {
+        this.show(message, 'industrial', title, badge, badgeColor);
     }
 }

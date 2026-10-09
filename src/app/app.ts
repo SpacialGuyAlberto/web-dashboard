@@ -5,6 +5,7 @@ import { SidebarComponent } from '@core/layout/sidebar/sidebar.component';
 import { AuthService } from '@core/auth/auth.service';
 import { FooterComponent } from '@core/layout/footer/footer.component';
 import { ToastComponent } from '@core/notifications/toast/toast.component';
+import { SseNotificationService } from '@core/notifications/sse-notification.service';
 
 @Component({
   selector: 'app-root',
@@ -16,8 +17,9 @@ import { ToastComponent } from '@core/notifications/toast/toast.component';
 export class App {
   sidebarOpen = false;
   sidebarCollapsed = false;
+  showNotifications = false;
 
-  constructor(public authService: AuthService) { }
+  constructor(public authService: AuthService, public sseNotificationService: SseNotificationService) { }
 
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen;
@@ -29,5 +31,12 @@ export class App {
 
   logout() {
     this.authService.logout();
+  }
+
+  toggleNotifications() {
+    this.showNotifications = !this.showNotifications;
+    if (this.showNotifications) {
+      this.sseNotificationService.markAllAsRead();
+    }
   }
 }

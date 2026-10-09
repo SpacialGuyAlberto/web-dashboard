@@ -1,5 +1,8 @@
 export interface Toast {
     message: string;
-    type: 'success' | 'error' | 'info' | 'warning';
+    title?: string;
+    badge?: string;
+    badgeColor?: string;
+    type: 'success' | 'error' | 'info' | 'warning' | 'industrial';
     id?: number;
 }

@@ -32,11 +32,13 @@ export class SegmentService {
     }
 
     getAvailableTransitions(segmentId: number): Observable<any[]> {
-        // Workflow module is still simplified, but we can point to it if needed
+        // Mocking available transitions to match the Java Monolith WorkflowState
         return of([
-            { id: 1, name: 'Start Construction', targetState: 'IN_PROGRESS' },
-            { id: 2, name: 'Hold (Weather)', targetState: 'ON_HOLD' },
-            { id: 3, name: 'Complete', targetState: 'COMPLETED' }
+            { id: 1, name: 'Schedule Work', targetState: 'SCHEDULED' },
+            { id: 2, name: 'Start Execution', targetState: 'IN_PROGRESS' },
+            { id: 3, name: 'Mark Blocked', targetState: 'BLOCKED' },
+            { id: 4, name: 'Hold (Weather)', targetState: 'HOLD' },
+            { id: 5, name: 'Complete', targetState: 'COMPLETED' }
         ]);
     }
 

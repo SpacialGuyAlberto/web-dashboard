@@ -52,33 +52,17 @@
                 </div>
               </div>
 
-              @if (isEditing && availableTransitions.length > 0) {
-                <div class="space-y-2 group">
-                  <label class="block text-[10px] font-medium uppercase text-indigo-300/80 tracking-[0.25em] transition-colors group-hover:text-indigo-200">Available Actions</label>
-                  <div class="flex flex-wrap gap-2">
-                    @for (transition of availableTransitions; track transition.actionName) {
-                      <button (click)="executeTransition(transition)" class="px-4 py-2.5 rounded-lg font-mono text-[10px] uppercase tracking-widest bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 hover:bg-indigo-500/20 hover:border-indigo-500/40 hover:text-indigo-100 transition-all duration-300">
-                        {{ transition.actionName }}
-                      </button>
-                    }
-                  </div>
-                  <p class="text-[10px] font-mono text-white/30 mt-2 uppercase tracking-[0.2em] flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Current State: <span class="text-white/70">{{ getStateText(newSegment.currentState) }}</span>
-                  </p>
-                </div>
-              } @else {
                 <div class="space-y-2 group">
                   <label class="block text-[10px] font-medium uppercase text-indigo-300/80 tracking-[0.25em] transition-colors group-hover:text-indigo-200">Current State</label>
                   <div class="relative">
-                    <select [(ngModel)]="newSegment.currentState" [disabled]="isEditing" class="w-full bg-[#16171a]/80 backdrop-blur-md border border-white/5 rounded-xl px-4 py-3.5 font-mono text-sm text-white/90 shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)] transition-all duration-300 hover:border-white/10 focus:border-indigo-500/50 focus:bg-[#121316] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 appearance-none disabled:opacity-50 disabled:cursor-not-allowed">
+                    <select [(ngModel)]="newSegment.currentState" class="w-full bg-[#16171a]/80 backdrop-blur-md border border-white/5 rounded-xl px-4 py-3.5 font-mono text-sm text-white/90 shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)] transition-all duration-300 hover:border-white/10 focus:border-indigo-500/50 focus:bg-[#121316] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 appearance-none">
                       <option value="PLAN">Plan</option>
-                      <option value="EXCAVATION">Excavation</option>
-                      <option value="DUCT_INSTALLATION">Duct Installation</option>
-                      <option value="BACKFILL">Backfill</option>
-                      <option value="ASPHALT">Asphalt</option>
-                      <option value="DOCUMENTATION">Documentation</option>
-                      <option value="QA_APPROVAL">QA Approval</option>
+                      <option value="PLANNED">Planned</option>
+                      <option value="SCHEDULED">Scheduled</option>
+                      <option value="IN_PROGRESS">In Progress</option>
+                      <option value="BLOCKED">Blocked</option>
+                      <option value="HOLD">Hold</option>
+                      <option value="CANCELLED">Cancelled</option>
                       <option value="COMPLETED">Completed</option>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-white/40">
@@ -86,7 +70,6 @@
                     </div>
                   </div>
                 </div>
-              }
             </div>
 
             <div class="space-y-2 group p-6 rounded-xl border border-indigo-500/10 bg-indigo-500/5 relative overflow-hidden">
