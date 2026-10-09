@@ -14,6 +14,7 @@ import { PlanningService } from '@features/risk-planning/planning.service';
 import { WorkType } from '@shared/models/work-type.enum';
 import { Netzverteiler } from '../../../infrastructure/netzverteiler.model';
 import { NetzverteilerService } from '../../../infrastructure/netzverteiler.service';
+import { ToastService } from '@core/notifications/toast.service';
 
 
 @Component({
@@ -59,7 +60,8 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
     private customFieldService: CustomFieldService,
     private planningService: PlanningService,
     private nvtService: NetzverteilerService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toastService: ToastService
   ) {}
 
   ngOnInit() {
@@ -277,6 +279,8 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
         },
         error: (err) => {
           console.error('Failed to update segment', err);
+          const errorMsg = err.error?.message || err.error?.error || err.message || 'Failed to update segment';
+          this.toastService.error(errorMsg);
         }
       });
     } else {
@@ -286,6 +290,8 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
         },
         error: (err) => {
           console.error('Failed to create segment', err);
+          const errorMsg = err.error?.message || err.error?.error || err.message || 'Failed to create segment';
+          this.toastService.error(errorMsg);
         }
       });
     }
