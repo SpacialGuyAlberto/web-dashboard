@@ -3,6 +3,7 @@ import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GoogleMapsModule, GoogleMap, MapPolyline, MapMarker, MapPolygon } from '@angular/google-maps';
 import { RoutingService } from '@features/gis/routing.service';
+import * as turf from '@turf/turf';
 
 export interface SegmentCoordinates {
     startLat: number;
@@ -57,6 +58,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
 
     // Multi-segment planning (Fragmented segments)
     segments: google.maps.LatLngLiteral[][] = [[]];
+    renderedSegments: google.maps.LatLngLiteral[][] = [[]]; // The actual paths drawn (curved or straight)
     activeSegmentIndex: number = 0;
     private _allPoints: google.maps.LatLngLiteral[] = [];
     private updateTimer: any;
@@ -77,6 +79,10 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
     googleMaps = google;   // Export for template
     mousePos: google.maps.LatLngLiteral | null = null;
     filletRadius: number = 5; // Meters
+
+    // Interactive Curve Mode
+    isCurvedMode: boolean = false;
+    curveSharpness: number = 0.85;
 
     // Google Map State
     center: google.maps.LatLngLiteral = { lat: this.startLat, lng: this.startLng }; // Berlin
@@ -466,6 +472,27 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
     private syncStateAfterTransform() {
         this.updateCachedPoints();
         this.routePoints = [...this._allPoints];
+
+        // Generate curved paths dynamically if mode is enabled
+        this.renderedSegments = this.segments.map(seg => {
+            if (this.isCurvedMode && seg.length >= 3) {
+                try {
+                    const coords = seg.map(p => [p.lng, p.lat]);
+                    const line = turf.lineString(coords);
+                    const curved = turf.bezierSpline(line, { resolution: 10000, sharpness: this.curveSharpness });
+                    if (curved && curved.geometry && curved.geometry.coordinates) {
+                        return curved.geometry.coordinates.map((coord: any) => ({
+                            lat: coord[1],
+                            lng: coord[0]
+                        }));
+                    }
+                } catch (e) {
+                    console.error("Bezier Spline Error:", e);
+                }
+            }
+            return [...seg]; // Fallback to straight lines
+        });
+
         if (this.segments.length > 0 && this.segments[0].length > 0) {
             this.startPos = this.segments[0][0];
             const lastSeg = this.segments[this.segments.length - 1];
@@ -616,24 +643,20 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         }
     }
 
-    filletActiveSegment() {
-        const seg = this.segments[this.activeSegmentIndex];
-        if (seg.length < 3) return;
-
-        const newSeg: google.maps.LatLngLiteral[] = [seg[0]];
-        for (let i = 1; i < seg.length - 1; i++) {
-            const p1 = seg[i - 1];
-            const p2 = seg[i];
-            const p3 = seg[i + 1];
-
-            // Simple interpolation for "rounded" corner
-            const mid1 = { lat: (p1.lat + p2.lat) / 2, lng: (p1.lng + p2.lng) / 2 };
-            const mid2 = { lat: (p2.lat + p3.lat) / 2, lng: (p2.lng + p3.lng) / 2 };
-            newSeg.push(mid1, p2, mid2);
-        }
-        newSeg.push(seg[seg.length - 1]);
-        this.segments[this.activeSegmentIndex] = newSeg;
+    toggleCurveMode() {
+        this.isCurvedMode = !this.isCurvedMode;
         this.syncStateAfterTransform();
+    }
+
+    onSharpnessChange() {
+        if (this.isCurvedMode) {
+            this.syncStateAfterTransform();
+        }
+    }
+
+    filletActiveSegment() {
+        // Obsolete one-shot fillet, redirected to interactive mode toggle for UX consistency
+        this.toggleCurveMode();
     }
 
     stretchActiveSegment(factor: number) {

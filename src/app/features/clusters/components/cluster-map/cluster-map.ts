@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GoogleMapsModule, GoogleMap, MapInfoWindow, MapPolyline, MapGroundOverlay, MapMarker } from '@angular/google-maps';
 import { NetworkElement } from '../../cluster-area-dashboard/cluster-area-dashboard.component';
@@ -10,7 +11,7 @@ import * as turf from '@turf/turf';
 @Component({
   selector: 'app-cluster-map',
   standalone: true,
-  imports: [CommonModule, GoogleMapsModule, MapGroundOverlay, MapMarker],
+  imports: [CommonModule, FormsModule, GoogleMapsModule, MapGroundOverlay, MapMarker],
   templateUrl: './cluster-map.html'
 })
 export class ClusterMapComponent implements AfterViewInit, OnChanges {
@@ -79,6 +80,41 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   // Plan Alignment State
   planBounds = { north: 0, south: 0, east: 0, west: 0 };
   planMarkerPos = { lat: 0, lng: 0 };
+
+  // Draggable Modals State
+  draggingModal: 'analytics' | 'prompt' | null = null;
+  dragOffset = { x: 0, y: 0 };
+  modalPositions = {
+    analytics: { x: window.innerWidth / 2 - 192, y: window.innerHeight * 0.6 },
+    prompt: { x: window.innerWidth / 2 - 150, y: window.innerHeight / 2 - 100 }
+  };
+
+  // Curve Mode
+  curveSharpness: number = 0.85;
+
+  @HostListener('document:mousemove', ['$event'])
+  onModalMouseMove(event: MouseEvent) {
+    if (this.draggingModal) {
+      this.modalPositions[this.draggingModal] = {
+        x: event.clientX - this.dragOffset.x,
+        y: event.clientY - this.dragOffset.y
+      };
+    }
+  }
+
+  @HostListener('document:mouseup')
+  onModalMouseUp() {
+    this.draggingModal = null;
+  }
+
+  onModalMouseDown(event: MouseEvent, modal: 'analytics' | 'prompt') {
+    this.draggingModal = modal;
+    this.dragOffset = {
+      x: event.clientX - this.modalPositions[modal].x,
+      y: event.clientY - this.modalPositions[modal].y
+    };
+    event.preventDefault();
+  }
 
   constructor(private routingService: RoutingService, private cdr: ChangeDetectorRef, private router: Router) {}
 
@@ -329,63 +365,98 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
         this.newSegment.endAddress = address;
         if (elevation !== undefined) this.newSegment.endElevation = elevation;
         
-        this.routingService.getStreetRoute(this.segmentWaypoints).subscribe(route => {
-          this.segmentRoute = route;
-          
-          let length = 0;
-          for (let i = 0; i < this.segmentRoute.length - 1; i++) {
-              const p1 = new google.maps.LatLng(this.segmentRoute[i]);
-              const p2 = new google.maps.LatLng(this.segmentRoute[i + 1]);
-              length += google.maps.geometry.spherical.computeDistanceBetween(p1, p2);
-          }
-          length = Math.round(length);
-
-          const emitSegmentUpdate = () => {
-              const startPin = this.segmentWaypoints[0];
-              const endPin = this.segmentWaypoints[this.segmentWaypoints.length - 1];
-              this.segmentUpdated.emit({
-                  geometry: this.segmentRoute,
-                  length: length,
-                  startLat: startPin.lat,
-                  startLng: startPin.lng,
-                  endLat: endPin.lat,
-                  endLng: endPin.lng,
-                  startAddress: this.newSegment.startAddress!,
-                  endAddress: this.newSegment.endAddress!
-              });
-              this.update3DOverlay();
-              this.cdr.detectChanges();
-          };
-
-          // Fetch elevations for the route
-          const locations = this.segmentRoute.map((p: any) => ({ lat: p.lat, lng: p.lng }));
-          if (locations.length > 0) {
-              const chunkSize = 500;
-              let fetched = 0;
-              for (let c = 0; c < locations.length; c += chunkSize) {
-                  const chunk = locations.slice(c, c + chunkSize);
-                  this.elevationService.getElevationForLocations({ locations: chunk }, (results, status) => {
-                      fetched += chunk.length;
-                      if (status === google.maps.ElevationStatus.OK && results) {
-                          for (let j = 0; j < results.length; j++) {
-                              (this.segmentRoute[c + j] as any).z = Math.round(results[j].elevation * 100) / 100;
-                          }
-                      }
-                      if (fetched >= locations.length) {
-                          this.calculateVectors();
-                          emitSegmentUpdate();
-                      }
-                  });
-              }
-          } else {
-              this.calculateVectors();
-              emitSegmentUpdate();
-          }
-        });
+        this.recalculateSegmentRoute();
       }
   }
 
   public segmentVectors: any[] = [];
+  
+  onSharpnessChange() {
+      if (this.segmentWaypoints.length > 1) {
+          this.recalculateSegmentRoute();
+      }
+  }
+
+  onWaypointDragEnd(index: number, event: google.maps.MapMouseEvent) {
+    if (event.latLng) {
+      this.segmentWaypoints[index] = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+      this.recalculateSegmentRoute();
+    }
+  }
+
+  private recalculateSegmentRoute() {
+      if (this.segmentWaypoints.length < 2) return;
+      
+      this.routingService.getStreetRoute(this.segmentWaypoints).subscribe(route => {
+        this.segmentRoute = route;
+        
+        // Apply Curve if multiple waypoints
+        if (this.segmentRoute.length > 2) {
+            try {
+                const line = turf.lineString(this.segmentRoute.map(p => [p.lng, p.lat]));
+                const curved = turf.bezierSpline(line, { resolution: 10000, sharpness: this.curveSharpness });
+                if (curved && curved.geometry && curved.geometry.coordinates) {
+                    this.segmentRoute = curved.geometry.coordinates.map((coord: any) => ({
+                        lat: coord[1],
+                        lng: coord[0]
+                    }));
+                }
+            } catch(e) {
+                console.error("Spline error in Segment", e);
+            }
+        }
+
+        let length = 0;
+        for (let i = 0; i < this.segmentRoute.length - 1; i++) {
+            const p1 = new google.maps.LatLng(this.segmentRoute[i].lat, this.segmentRoute[i].lng);
+            const p2 = new google.maps.LatLng(this.segmentRoute[i + 1].lat, this.segmentRoute[i + 1].lng);
+            length += google.maps.geometry.spherical.computeDistanceBetween(p1, p2);
+        }
+        length = Math.round(length);
+
+        const emitSegmentUpdate = () => {
+            const startPin = this.segmentWaypoints[0];
+            const endPin = this.segmentWaypoints[this.segmentWaypoints.length - 1];
+            this.segmentUpdated.emit({
+                geometry: this.segmentRoute,
+                length: length,
+                startLat: startPin.lat,
+                startLng: startPin.lng,
+                endLat: endPin.lat,
+                endLng: endPin.lng,
+                startAddress: this.newSegment.startAddress || 'Unknown',
+                endAddress: this.newSegment.endAddress || 'Unknown'
+            });
+            this.update3DOverlay();
+            this.cdr.detectChanges();
+        };
+
+        // Fetch elevations for the route
+        const locations = this.segmentRoute.map((p: any) => ({ lat: p.lat, lng: p.lng }));
+        if (locations.length > 0) {
+            const chunkSize = 500;
+            let fetched = 0;
+            for (let c = 0; c < locations.length; c += chunkSize) {
+                const chunk = locations.slice(c, c + chunkSize);
+                this.elevationService.getElevationForLocations({ locations: chunk }, (results, status) => {
+                    fetched += chunk.length;
+                    if (status === google.maps.ElevationStatus.OK && results) {
+                        for (let j = 0; j < results.length; j++) {
+                            (this.segmentRoute[c + j] as any).z = Math.round(results[j].elevation * 100) / 100;
+                        }
+                    }
+                    if (fetched >= locations.length) {
+                        this.calculateVectors();
+                        emitSegmentUpdate();
+                    }
+                });
+            }
+        } else {
+            this.calculateVectors();
+            emitSegmentUpdate();
+        }
+      });
+  }
   
   private calculateVectors() {
       this.segmentVectors = [];
