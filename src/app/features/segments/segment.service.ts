@@ -27,6 +27,10 @@ export class SegmentService {
         return this.http.get<Segment>(`${this.apiUrl}/segments/${id}`);
     }
 
+    getCrewSchedule(crewId: number): Observable<Segment[]> {
+        return this.http.get<Segment[]>(`${this.apiUrl}/segments/crews/${crewId}/schedule`);
+    }
+
     updateSegment(id: number, segment: Segment): Observable<Segment> {
         return this.http.put<Segment>(`${this.apiUrl}/segments/${id}`, segment);
     }

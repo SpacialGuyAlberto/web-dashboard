@@ -1,7 +1,7 @@
-<div class="min-h-screen bg-[#0a0a0c] p-6 lg:p-12 font-sans">
-    <div class="max-w-[1600px] mx-auto">
+<div [ngClass]="isEmbedded ? '' : 'min-h-screen bg-[#0a0a0c] p-6 lg:p-12 font-sans'">
+    <div [ngClass]="isEmbedded ? '' : 'max-w-[1600px] mx-auto'">
         <!-- Header & Controls -->
-        <div class="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/5 pb-8 gap-4">
+        <div *ngIf="!isEmbedded" class="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/5 pb-8 gap-4">
             <div>
                 <h1 class="font-display text-5xl font-normal text-white/90 tracking-tight leading-none">Schedule</h1>
                 <p class="text-white/40 mt-4 font-sans text-sm">Manage crew assignments and project timelines</p>
@@ -36,7 +36,7 @@
                     <option [ngValue]="null">All Projects</option>
                     <option *ngFor="let p of projects" [ngValue]="p.id">{{ p.name }}</option>
                 </select>
-                <select [(ngModel)]="selectedCrewId"
+                <select [(ngModel)]="selectedCrewId" (change)="loadWeekSchedule()"
                     class="bg-[#131415] border border-white/5 rounded-md px-3 py-2 font-mono text-xs text-white/80 focus:ring-1 focus:ring-[#6938ef]/50 outline-none transition-all">
                     <option [ngValue]="null">All Crews</option>
                     <option *ngFor="let c of crews" [ngValue]="c.id">{{ c.name }}</option>
@@ -44,9 +44,22 @@
             </div>
         </div>
 
+        <!-- Embedded Controls -->
+        <div *ngIf="isEmbedded" class="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
+            <h4 class="text-[10px] font-mono text-white/80 uppercase tracking-widest flex items-center gap-2">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                Weekly Schedule
+            </h4>
+            <div class="flex items-center gap-2 bg-[#131415] p-1 rounded-lg border border-white/5">
+                <button (click)="previousWeek()" class="p-1 hover:bg-white/5 rounded transition-colors"><svg class="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-white/90 px-2 text-center">{{ weekDays[0] | date:'MMM d' }} - {{ weekDays[6] | date:'MMM d' }}</span>
+                <button (click)="nextWeek()" class="p-1 hover:bg-white/5 rounded transition-colors"><svg class="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+            </div>
+        </div>
+
         <!-- Schedule Grid Container -->
         <div
-            class="bg-[#131415] rounded-xl overflow-hidden border border-white/5 mt-8 shadow-none">
+            [ngClass]="isEmbedded ? 'bg-[#131415] rounded-xl overflow-hidden border border-white/5 shadow-none overflow-x-auto' : 'bg-[#131415] rounded-xl overflow-hidden border border-white/5 mt-8 shadow-none'">
             <!-- Grid Header (Days) -->
             <div class="grid grid-cols-8 bg-[#161719] border-b border-white/5">
                 <div
@@ -82,8 +95,9 @@
 
                     <!-- Days -->
                     <div *ngFor="let day of weekDays"
+                        [ngClass]="isEmbedded ? 'min-w-[80px]' : ''"
                         class="relative p-2 border-r border-white/5 last:border-r-0 min-h-[120px] cursor-pointer transition-colors hover:bg-white/5"
-                        (click)="openAssignModal(crew.id!, day)">
+                        (click)="!isEmbedded ? openAssignModal(crew.id!, day) : null">
 
                         <!-- Assignment Card -->
                         <ng-container *ngIf="getAssignment(crew.id!, day) as assignment; else available">
@@ -109,7 +123,7 @@
                                     class="flex justify-between items-center mt-2 pt-2 border-t border-white/5">
                                     <span class="font-mono text-[9px] uppercase tracking-[0.2em] opacity-50">{{
                                         assignment.status }}</span>
-                                    <button (click)="deleteAssignment(assignment.id); $event.stopPropagation()"
+                                    <button *ngIf="!isEmbedded" (click)="deleteAssignment(assignment.id); $event.stopPropagation()"
                                         class="p-1 hover:bg-red-400/20 rounded text-red-400 opacity-0 group-hover/card:opacity-100 transition-opacity"
                                         title="Remove Assignment">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

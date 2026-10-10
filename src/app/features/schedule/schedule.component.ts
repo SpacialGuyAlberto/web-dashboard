@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ScheduleService } from './schedule.service';
@@ -17,7 +17,7 @@ import { Project } from '@features/projects/project.model';
     templateUrl: './schedule.component.html',
     styleUrls: ['./schedule.component.css']
 })
-export class ScheduleComponent implements OnInit {
+export class ScheduleComponent implements OnInit, OnChanges {
     // Data
     assignments: CrewAssignment[] = [];
     crews: Crew[] = [];
@@ -25,8 +25,10 @@ export class ScheduleComponent implements OnInit {
     segments: Segment[] = [];
 
     // Filters
-    selectedCrewId: number | null = null;
-    selectedProjectId: number | null = null;
+    @Input() selectedCrewId: number | null = null;
+    @Input() selectedProjectId: number | null = null;
+    @Input() isEmbedded: boolean = false;
+    @Input() segmentsForCrew: Segment[] = [];
 
     // Week navigation
     currentWeekStart: Date = new Date();
@@ -55,8 +57,57 @@ export class ScheduleComponent implements OnInit {
     ngOnInit() {
         this.initializeWeek();
         this.loadCrews();
-        this.loadProjects();
-        this.loadWeekSchedule();
+        if (!this.isEmbedded) {
+            this.loadProjects();
+            this.loadWeekSchedule();
+        } else {
+            this.mapSegmentsToAssignments();
+        }
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['segmentsForCrew'] && this.isEmbedded) {
+            this.mapSegmentsToAssignments();
+        }
+        if (changes['selectedCrewId'] && !changes['selectedCrewId'].firstChange) {
+            if (!this.isEmbedded) {
+                this.loadWeekSchedule();
+            }
+        }
+    }
+
+    private mapSegmentsToAssignments() {
+        if (!this.segmentsForCrew || this.segmentsForCrew.length === 0) {
+            this.assignments = [];
+            return;
+        }
+
+        const newAssignments: CrewAssignment[] = [];
+        for (const seg of this.segmentsForCrew) {
+            if (!seg.plannedStartDate || !seg.plannedEndDate) continue;
+            
+            const start = new Date(seg.plannedStartDate);
+            const end = new Date(seg.plannedEndDate);
+            
+            // Loop through each day from start to end and create a mock assignment for the grid
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                const validStatuses = ['SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
+                const segStatus = seg.currentState || 'SCHEDULED';
+                const statusType = validStatuses.includes(segStatus) ? segStatus : 'SCHEDULED';
+
+                newAssignments.push({
+                    id: seg.id,
+                    crewId: seg.assignedCrewId || 0,
+                    segmentId: seg.id || 0,
+                    segmentName: seg.streetName || `Segment #${seg.id}`,
+                    assignedDate: this.formatDate(d),
+                    status: statusType as 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED',
+                    notes: `${seg.workType} from ${seg.plannedStartDate} to ${seg.plannedEndDate}`
+                });
+            }
+        }
+        this.assignments = newAssignments;
+        this.cdr.detectChanges();
     }
 
     // Initialize week dates (Monday to Sunday)

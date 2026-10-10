@@ -15,12 +15,12 @@ import { WorkType } from '@shared/models/work-type.enum';
 import { Netzverteiler } from '../../../infrastructure/netzverteiler.model';
 import { NetzverteilerService } from '../../../infrastructure/netzverteiler.service';
 import { ToastService } from '@core/notifications/toast.service';
-
+import { ScheduleComponent } from '@features/schedule/schedule.component';
 
 @Component({
   selector: 'app-segment-create-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, SegmentCreationMapComponent, DynamicInputComponent],
+  imports: [CommonModule, FormsModule, SegmentCreationMapComponent, DynamicInputComponent, ScheduleComponent],
   templateUrl: './segment-create-modal.html'
 })
 export class SegmentCreateModalComponent implements OnInit, OnChanges {
@@ -39,6 +39,7 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
   crews: Crew[] = [];
   netzverteilers: Netzverteiler[] = [];
   projectGeometry: {lat: number, lng: number}[] | null = null;
+  crewSchedule: Segment[] = [];
 
   startAddress: string = '';
   endAddress: string = '';
@@ -97,6 +98,10 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
         this.availableTransitions = [];
       }
       
+      if (this.newSegment.assignedCrewId) {
+         this.onCrewChanged();
+      }
+      
       this.cdr.detectChanges();
       
       // Map requires slight delay to render fully in a modal
@@ -142,7 +147,54 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
   loadCrews() {
     this.subcontractorService.getAllCrews().subscribe(crews => {
       this.crews = crews;
+      if (this.newSegment.assignedCrewId) {
+         this.onCrewChanged();
+      }
     });
+  }
+
+  onCrewChanged() {
+    if (!this.newSegment.assignedCrewId) {
+       this.crewSchedule = [];
+       return;
+    }
+    this.segmentService.getCrewSchedule(this.newSegment.assignedCrewId).subscribe({
+       next: (schedule) => {
+         // Filter out the current segment being edited
+         this.crewSchedule = schedule.filter(s => s.id !== this.currentSegmentId);
+         this.cdr.detectChanges();
+       },
+       error: (err) => {
+         console.error('Failed to load crew schedule', err);
+         this.crewSchedule = [];
+       }
+    });
+  }
+
+  get conflictingSegments(): Segment[] {
+    if (!this.newSegment.plannedStartDate || !this.newSegment.plannedEndDate) {
+       return [];
+    }
+    const start = new Date(this.newSegment.plannedStartDate).getTime();
+    const end = new Date(this.newSegment.plannedEndDate).getTime();
+    
+    return this.crewSchedule.filter(seg => {
+       if (!seg.plannedStartDate || !seg.plannedEndDate) return true; // Segments without dates are technically blocking
+       const segStart = new Date(seg.plannedStartDate).getTime();
+       const segEnd = new Date(seg.plannedEndDate).getTime();
+       return (segStart <= end && segEnd >= start);
+    });
+  }
+
+  get hasConflict(): boolean {
+     return this.conflictingSegments.length > 0;
+  }
+
+  get isDateInvalid(): boolean {
+     if (!this.newSegment.plannedStartDate || !this.newSegment.plannedEndDate) return false;
+     const start = new Date(this.newSegment.plannedStartDate).getTime();
+     const end = new Date(this.newSegment.plannedEndDate).getTime();
+     return start > end;
   }
 
   loadNetzverteilers() {

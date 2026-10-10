@@ -49,6 +49,8 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
     @Input() viewOnly: boolean = false;
     @Input() smartPlan: any = null;
     @Input() projectGeometry: {lat: number, lng: number}[] | null = null;
+    @Input() segmentGeometry: {lat: number, lng: number, z?: number}[] | undefined;
+    @Input() fencingStrategy?: string;
 
     @Output() coordinatesChanged = new EventEmitter<SegmentCoordinates>();
     @Output() centerChanged = new EventEmitter<google.maps.LatLngLiteral>();
@@ -190,11 +192,11 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         if ((this.isEditing || this.viewOnly) && this.startLat && this.endLat) {
             this.updateMapFromInputs();
         }
-        
+
         // Provide a fallback center (Berlin) if startLat is not provided
         this.center = { lat: this.startLat || 52.5200, lng: this.startLng || 13.4050 };
         this.streetViewPos = { ...this.center };
-        
+
         this.mapOptions = {
             ...this.mapOptions,
             center: this.center,
@@ -479,7 +481,8 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
                 try {
                     const coords = seg.map(p => [p.lng, p.lat]);
                     const line = turf.lineString(coords);
-                    const curved = turf.bezierSpline(line, { resolution: 10000, sharpness: this.curveSharpness });
+                    // Aumentar resolución a 5000 (el default es 10000). 10 era excesivamente bajo y creaba miles de vectores.
+                    const curved = turf.bezierSpline(line, { resolution: 5000, sharpness: this.curveSharpness });
                     if (curved && curved.geometry && curved.geometry.coordinates) {
                         return curved.geometry.coordinates.map((coord: any) => ({
                             lat: coord[1],
@@ -502,6 +505,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
             this.endPos = null;
         }
         this.refreshMissingElevations();
+        this.renderFencingPlan();
         this.emitChanges();
         this.update3DOverlay();
     }
@@ -513,7 +517,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         if ((changes['startLat'] || changes['endLat']) && !changes['startLat']?.firstChange) {
             this.updateMapFromInputs();
         }
-        if (changes['smartPlan'] && this.smartPlan) {
+        if (changes['smartPlan'] || changes['fencingStrategy']) {
             this.renderFencingPlan();
         }
         if (changes['projectGeometry'] && this.projectGeometry) {
@@ -746,9 +750,9 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
 
     private fetchElevationForPoints(pointsToFetch: any[]) {
         if (!pointsToFetch || pointsToFetch.length === 0) return;
-        
+
         const locations = pointsToFetch.map(p => ({ lat: p.lat, lng: p.lng }));
-        
+
         this.elevationService.getElevationForLocations({
             locations: locations
         }, (results, status) => {
@@ -851,19 +855,19 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         for (let i = 0; i < this._allPoints.length - 1; i++) {
             const p1 = this._allPoints[i] as any;
             const p2 = this._allPoints[i + 1] as any;
-            
+
             const startZ = p1.z !== undefined && p1.z !== null ? p1.z : 0;
             const endZ = p2.z !== undefined && p2.z !== null ? p2.z : 0;
-            
+
             const p1LatLng = new google.maps.LatLng(p1);
             const p2LatLng = new google.maps.LatLng(p2);
             const distance = google.maps.geometry.spherical.computeDistanceBetween(p1LatLng, p2LatLng);
-            
+
             let slope = 0;
             if (distance > 0) {
                 slope = ((endZ - startZ) / distance) * 100;
             }
-            
+
             vecs.push({
                 index: i + 1,
                 startZ: startZ,
@@ -881,7 +885,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
             startLng: this.startPos!.lng,
             endLat: this.endPos!.lat,
             endLng: this.endPos!.lng,
-            geometry: this.points,
+            geometry: this.renderedSegments.flat(),
             length: Math.round(this.calculateTotalLength()),
             startAddress: this.startAddress,
             endAddress: this.endAddress
@@ -932,7 +936,7 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
                     length: Math.round(length),
                     startAddress: this.startAddress,
                     endAddress: this.endAddress,
-                    geometry: this.points
+                    geometry: this.renderedSegments.flat()
                 });
             });
     }
@@ -947,42 +951,86 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
     }
 
     private renderFencingPlan(): void {
-        if (!this.routePoints.length || !this.smartPlan) return;
+        const paths = this.renderedSegments.filter(s => s.length > 0);
+        if (!paths.length) return;
 
         this.fencingMarkers = [];
-        const barrierSpacing = 10; // meters
 
-        // Add Barriers (🚧)
-        for (let i = 0; i < this.routePoints.length - 1; i++) {
-            const p1 = new google.maps.LatLng(this.routePoints[i]);
-            const p2 = new google.maps.LatLng(this.routePoints[i + 1]);
-            const dist = google.maps.geometry.spherical.computeDistanceBetween(p1, p2);
-
-            let currentDist = 0;
-            while (currentDist < dist) {
-                const fraction = currentDist / dist;
-                const pos = google.maps.geometry.spherical.interpolate(p1, p2, fraction);
-
-                this.fencingMarkers.push({
-                    position: { lat: pos.lat(), lng: pos.lng() },
-                    title: 'Fencing Barrier',
-                    options: {
-                        label: { text: '🚧', color: 'orange', fontSize: '16px' },
-                        clickable: false
-                    }
-                });
-                currentDist += barrierSpacing;
-            }
+        const strategy = this.fencingStrategy || 'none';
+        if (strategy === 'none') {
+            return;
         }
 
-        // Add Traffic Light (🚦) if needed
-        if (this.smartPlan.requiresPermit) {
-            this.fencingMarkers.push({
-                position: this.routePoints[0],
-                title: 'Traffic Light Required',
-                options: {
-                    label: { text: '🚦', fontSize: '24px' },
-                    clickable: false
+        const barrierSpacing = 10; // meters
+
+        if (strategy === 'standard' || strategy === 'custom') {
+            // Add Barriers
+            paths.forEach(path => {
+                for (let i = 0; i < path.length - 1; i++) {
+                    const p1 = new google.maps.LatLng(path[i]);
+                    const p2 = new google.maps.LatLng(path[i + 1]);
+                    const dist = google.maps.geometry.spherical.computeDistanceBetween(p1, p2);
+
+                    let currentDist = 0;
+                    while (currentDist < dist) {
+                        const fraction = currentDist / dist;
+                        const pos = google.maps.geometry.spherical.interpolate(p1, p2, fraction);
+
+                        this.fencingMarkers.push({
+                            position: { lat: pos.lat(), lng: pos.lng() },
+                            title: 'Fencing Barrier',
+                            options: {
+                                label: { text: '🚧', color: 'orange', fontSize: '16px' },
+                                clickable: false
+                            }
+                        });
+                        currentDist += barrierSpacing;
+                    }
+                }
+
+                // Add Traffic Light at ends
+                if (path.length > 0) {
+                    this.fencingMarkers.push({
+                        position: path[0],
+                        title: 'Traffic Light Required',
+                        options: {
+                            label: { text: '🚦', fontSize: '24px' },
+                            clickable: false
+                        }
+                    });
+                    this.fencingMarkers.push({
+                        position: path[path.length - 1],
+                        title: 'Traffic Light Required',
+                        options: {
+                            label: { text: '🚦', fontSize: '24px' },
+                            clickable: false
+                        }
+                    });
+                }
+            });
+        } else if (strategy === 'sidewalk') {
+            // Add Cones instead
+            paths.forEach(path => {
+                for (let i = 0; i < path.length - 1; i++) {
+                    const p1 = new google.maps.LatLng(path[i]);
+                    const p2 = new google.maps.LatLng(path[i + 1]);
+                    const dist = google.maps.geometry.spherical.computeDistanceBetween(p1, p2);
+
+                    let currentDist = 0;
+                    while (currentDist < dist) {
+                        const fraction = currentDist / dist;
+                        const pos = google.maps.geometry.spherical.interpolate(p1, p2, fraction);
+
+                        this.fencingMarkers.push({
+                            position: { lat: pos.lat(), lng: pos.lng() },
+                            title: 'Cone',
+                            options: {
+                                label: { text: '🔺', color: 'red', fontSize: '16px' },
+                                clickable: false
+                            }
+                        });
+                        currentDist += barrierSpacing;
+                    }
                 }
             });
         }
@@ -993,9 +1041,16 @@ export class SegmentCreationMapComponent implements OnInit, OnChanges, AfterView
         this.startPos = { lat: this.startLat, lng: this.startLng };
         this.endPos = { lat: this.endLat, lng: this.endLng };
 
-        // If we have geometry from inputs, use it, otherwise use points A and B
-        if (!this.points || this.points.length < 2) {
+        if (this.segmentGeometry && this.segmentGeometry.length > 0) {
+            // Cargar los puntos guardados del backend
+            this.segments = [this.segmentGeometry.map(p => ({ lat: p.lat, lng: p.lng }))];
+            this._allPoints = [...this.segments[0]];
+            this.routePoints = [...this._allPoints];
+            this.renderedSegments = [...this.segments];
+        } else if (!this.points || this.points.length < 2) {
+            // Fallback a una línea recta básica
             this.segments = [[this.startPos, this.endPos]];
+            this._allPoints = [this.startPos, this.endPos];
         }
 
         this.calculateRoute();

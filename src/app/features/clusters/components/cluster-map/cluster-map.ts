@@ -418,7 +418,9 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
             const startPin = this.segmentWaypoints[0];
             const endPin = this.segmentWaypoints[this.segmentWaypoints.length - 1];
             this.segmentUpdated.emit({
-                geometry: this.segmentRoute,
+                // DO NOT send this.segmentRoute (which contains thousands of curved spline points) to the backend.
+                // We send only the raw waypoints to avoid memory overflows in Unity AR.
+                geometry: this.segmentWaypoints,
                 length: length,
                 startLat: startPin.lat,
                 startLng: startPin.lng,
