@@ -47,7 +47,7 @@
                 <!-- Actions -->
                 <div class="project-actions">
                     <button [routerLink]="['/project-details']"
-                        [queryParams]="{projectId: project.id, projectName: project.name}" class="btn-view">
+                        [queryParams]="{projectId: project.id, projectName: project.name, lat: project.latitude || project.startLatitude || (project.geometry && project.geometry[0]?.lat), lng: project.longitude || project.startLongitude || (project.geometry && project.geometry[0]?.lng)}" class="btn-view">
                         View Details
                     </button>
                     <button (click)="openEditModal(project)" class="btn-edit">

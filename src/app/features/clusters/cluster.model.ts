@@ -5,4 +5,6 @@ export interface Cluster {
   projectId: number;
   projectManagerId?: number;
   pops?: any[];
+  latitude?: number;
+  longitude?: number;
 }

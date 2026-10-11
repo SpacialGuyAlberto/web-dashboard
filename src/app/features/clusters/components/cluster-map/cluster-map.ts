@@ -180,6 +180,10 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    if (changes['center'] && this.center && this.map && this.map.googleMap) {
+      this.map.googleMap.panTo(this.center);
+    }
+
     if (changes['is3DMode']) {
       if (this.is3DMode) {
         setTimeout(() => this.initPanorama(), 100);

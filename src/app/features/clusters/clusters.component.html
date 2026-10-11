@@ -38,7 +38,7 @@
         </div>
 
         <div class="card-footer-actions">
-          <button [routerLink]="['/project-details/clusters', cluster.id, 'areas']" [queryParams]="{projectId: projectId, projectName: projectName}" class="btn-action-outline w-full mb-2">
+          <button [routerLink]="['/project-details/clusters', cluster.id, 'areas']" [queryParams]="{projectId: projectId, projectName: projectName, lat: cluster.latitude || mapCenter.lat, lng: cluster.longitude || mapCenter.lng}" class="btn-action-outline w-full mb-2">
             <span>Manage Areas</span>
           </button>
           <button (click)="openImportModal(cluster.id!)" class="btn-primary w-full text-[10px] uppercase font-mono tracking-widest py-2 rounded" style="background: #3f51b5; border: none; color: white;">
@@ -83,6 +83,36 @@
             <div class="form-group mb-4">
               <label class="form-label text-[9px] font-mono uppercase text-white/30 mb-2 block">Project Manager ID</label>
               <input [(ngModel)]="newCluster.projectManagerId" type="number" class="form-input w-full bg-[#131415] border border-white/5 rounded px-4 py-2 text-white/90 text-sm focus:border-[#6938ef]/50 outline-none" placeholder="e.g., 12">
+            </div>
+
+            <div class="form-group mb-4">
+              <div class="flex justify-between items-center mb-2">
+                <label class="form-label text-[9px] font-mono uppercase text-white/40 block">Ubicación en el Mapa (Proyecto Padre)</label>
+                <span class="text-[10px] font-mono text-purple-400 bg-purple-900/30 px-2 py-0.5 rounded border border-purple-500/20">
+                  {{ newCluster.latitude ? newCluster.latitude.toFixed(5) : mapCenter.lat.toFixed(5) }}, {{ newCluster.longitude ? newCluster.longitude.toFixed(5) : mapCenter.lng.toFixed(5) }}
+                </span>
+              </div>
+              <div class="h-60 w-full rounded-xl overflow-hidden border border-white/10 relative shadow-inner">
+                <google-map
+                  height="100%"
+                  width="100%"
+                  [center]="mapCenter"
+                  [zoom]="mapZoom"
+                  [options]="mapOptions"
+                  (mapClick)="onMapClick($event)">
+                  @if (newCluster.latitude && newCluster.longitude) {
+                    <map-marker
+                      [position]="{ lat: newCluster.latitude, lng: newCluster.longitude }"
+                      [options]="markerOptions"
+                      (mapDragend)="onMarkerDrag($event)">
+                    </map-marker>
+                  }
+                </google-map>
+              </div>
+              <p class="text-[9px] font-mono text-white/40 mt-1.5 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Centrado automáticamente en el proyecto padre. Puedes hacer clic o arrastrar el marcador para ajustar la posición del cluster.
+              </p>
             </div>
           </div>
         </div>

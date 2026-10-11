@@ -12,6 +12,8 @@ import { Huep } from '../../infrastructure/huep.model';
 import { IntelligenceService } from '../infrastructure/intelligence.service';
 import { UtilityLineService } from '../../infrastructure/utility-line.service';
 import { UtilityLine as UtilityLineModel } from '../../infrastructure/utility-line.model';
+import { ClusterService } from '../cluster.service';
+import { PlanningService } from '../../risk-planning/planning.service';
 
 import { ClusterMapComponent } from '../components/cluster-map/cluster-map';
 import { combineLatest } from 'rxjs';
@@ -144,6 +146,8 @@ export class ClusterAreaDashboardComponent implements OnInit {
     private segmentService: SegmentService,
     private huepService: HuepService,
     private intelligenceService: IntelligenceService,
+    private clusterService: ClusterService,
+    private planningService: PlanningService,
     private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object,
     private utilityLineService: UtilityLineService
@@ -157,6 +161,52 @@ export class ClusterAreaDashboardComponent implements OnInit {
       this.clusterId = +params['clusterId'];
       this.projectId = +queryParams['projectId'];
       this.projectName = queryParams['projectName'] || 'Project';
+
+      if (queryParams['lat'] && queryParams['lng']) {
+        const qLat = +queryParams['lat'];
+        const qLng = +queryParams['lng'];
+        if (!isNaN(qLat) && !isNaN(qLng)) {
+          this.center = { lat: qLat, lng: qLng };
+          if (this.clusterMap && this.clusterMap.map && this.clusterMap.map.googleMap) {
+            this.clusterMap.map.googleMap.panTo(this.center);
+          }
+        }
+      }
+
+      if (this.clusterId) {
+        this.clusterService.getCluster(this.clusterId).subscribe({
+          next: (cluster) => {
+            if (cluster.latitude && cluster.longitude && !isNaN(cluster.latitude) && !isNaN(cluster.longitude)) {
+              this.center = { lat: cluster.latitude, lng: cluster.longitude };
+              if (this.clusterMap && this.clusterMap.map && this.clusterMap.map.googleMap) {
+                this.clusterMap.map.googleMap.panTo(this.center);
+              }
+              this.cdr.detectChanges();
+            }
+          },
+          error: (err) => console.warn('Could not fetch cluster coords:', err)
+        });
+      }
+
+      if (this.projectId) {
+        this.planningService.getProject(this.projectId).subscribe({
+          next: (project) => {
+            const lat = project.latitude ?? project.startLatitude ?? (project.geometry && project.geometry.length > 0 ? project.geometry[0].lat : undefined);
+            const lng = project.longitude ?? project.startLongitude ?? (project.geometry && project.geometry.length > 0 ? project.geometry[0].lng : undefined);
+            if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+              // If center is still at Berlin fallback, update to project location
+              if (Math.abs(this.center.lat - 52.5200) < 0.001 && Math.abs(this.center.lng - 13.4050) < 0.001) {
+                this.center = { lat, lng };
+                if (this.clusterMap && this.clusterMap.map && this.clusterMap.map.googleMap) {
+                  this.clusterMap.map.googleMap.panTo(this.center);
+                }
+                this.cdr.detectChanges();
+              }
+            }
+          },
+          error: (err) => console.warn('Could not fetch project coords:', err)
+        });
+      }
       
       if (this.projectId && this.clusterId) {
         this.loadClusterData();
@@ -225,11 +275,11 @@ export class ClusterAreaDashboardComponent implements OnInit {
       const latSum = validElements.reduce((sum, e) => sum + e.lat, 0);
       const lngSum = validElements.reduce((sum, e) => sum + e.lng, 0);
       this.center = { lat: latSum / validElements.length, lng: lngSum / validElements.length };
-      if (this.clusterMap && this.clusterMap.map && this.clusterMap.map.googleMap) {
-         this.clusterMap.map.googleMap.panTo(this.center);
-      }
-      this.cdr.detectChanges();
     }
+    if (this.clusterMap && this.clusterMap.map && this.clusterMap.map.googleMap) {
+       this.clusterMap.map.googleMap.panTo(this.center);
+    }
+    this.cdr.detectChanges();
   }
 
   calculateStats() {
