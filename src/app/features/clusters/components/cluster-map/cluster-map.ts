@@ -177,11 +177,26 @@ export class ClusterMapComponent implements AfterViewInit, OnChanges {
 
   ngAfterViewInit() {
     this.initSearchAutocomplete();
+    this.panToCurrentCenter();
+  }
+
+  panToCurrentCenter() {
+    if (!this.center) return;
+    const apply = () => {
+      if (this.map && this.map.googleMap) {
+        this.map.googleMap.setCenter(this.center);
+        this.map.googleMap.panTo(this.center);
+      }
+    };
+    apply();
+    setTimeout(apply, 100);
+    setTimeout(apply, 300);
+    setTimeout(apply, 600);
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['center'] && this.center && this.map && this.map.googleMap) {
-      this.map.googleMap.panTo(this.center);
+    if (changes['center'] && this.center) {
+      this.panToCurrentCenter();
     }
 
     if (changes['is3DMode']) {

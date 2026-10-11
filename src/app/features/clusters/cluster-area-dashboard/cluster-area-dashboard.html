@@ -17,7 +17,9 @@
       <div class="h-4 w-px bg-white/10"></div>
       <div class="flex flex-col">
         <span class="text-[9px] font-mono text-white/40 uppercase tracking-[0.2em]">{{ projectName }}</span>
-        <h1 class="text-lg font-display text-white tracking-wide m-0 leading-tight">Cluster <span class="text-[#6938ef]">#{{ clusterId }}</span></h1>
+        <h1 class="text-lg font-display text-white tracking-wide m-0 leading-tight">
+          {{ clusterName || ('Cluster #' + clusterId) }}
+        </h1>
       </div>
     </div>
     

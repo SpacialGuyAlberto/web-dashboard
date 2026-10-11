@@ -62,6 +62,9 @@ export class ClusterAreaDashboardComponent implements OnInit {
   
   isEditing: boolean = false;
 
+  clusterName: string = '';
+  hasExplicitCenter: boolean = false;
+
   center: google.maps.LatLngLiteral = { lat: 52.5200, lng: 13.4050 };
   zoom = 16;
   
@@ -151,7 +154,17 @@ export class ClusterAreaDashboardComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object,
     private utilityLineService: UtilityLineService
-  ) {}
+  ) {
+    const q = this.route.snapshot.queryParams;
+    if (q && q['lat'] && q['lng']) {
+      const qLat = +q['lat'];
+      const qLng = +q['lng'];
+      if (!isNaN(qLat) && !isNaN(qLng)) {
+        this.center = { lat: qLat, lng: qLng };
+        this.hasExplicitCenter = true;
+      }
+    }
+  }
 
   ngOnInit() {
     combineLatest([
@@ -167,41 +180,47 @@ export class ClusterAreaDashboardComponent implements OnInit {
         const qLng = +queryParams['lng'];
         if (!isNaN(qLat) && !isNaN(qLng)) {
           this.center = { lat: qLat, lng: qLng };
-          if (this.clusterMap && this.clusterMap.map && this.clusterMap.map.googleMap) {
-            this.clusterMap.map.googleMap.panTo(this.center);
-          }
+          this.hasExplicitCenter = true;
+          this.panMapToCenter();
         }
       }
 
       if (this.clusterId) {
         this.clusterService.getCluster(this.clusterId).subscribe({
           next: (cluster) => {
+            if (cluster.name) {
+              this.clusterName = cluster.name;
+            }
             if (cluster.latitude && cluster.longitude && !isNaN(cluster.latitude) && !isNaN(cluster.longitude)) {
               this.center = { lat: cluster.latitude, lng: cluster.longitude };
-              if (this.clusterMap && this.clusterMap.map && this.clusterMap.map.googleMap) {
-                this.clusterMap.map.googleMap.panTo(this.center);
-              }
+              this.hasExplicitCenter = true;
+              this.panMapToCenter();
               this.cdr.detectChanges();
+            } else if (this.hasExplicitCenter && this.center) {
+              // Persist coordinates in backend if cluster lacks them
+              this.clusterService.updateCluster(this.clusterId, {
+                ...cluster,
+                latitude: this.center.lat,
+                longitude: this.center.lng
+              }).subscribe({
+                error: (e) => console.warn('Could not auto-update cluster coordinates in backend:', e)
+              });
             }
           },
           error: (err) => console.warn('Could not fetch cluster coords:', err)
         });
       }
 
-      if (this.projectId) {
+      if (this.projectId && !this.hasExplicitCenter) {
         this.planningService.getProject(this.projectId).subscribe({
           next: (project) => {
             const lat = project.latitude ?? project.startLatitude ?? (project.geometry && project.geometry.length > 0 ? project.geometry[0].lat : undefined);
             const lng = project.longitude ?? project.startLongitude ?? (project.geometry && project.geometry.length > 0 ? project.geometry[0].lng : undefined);
             if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
-              // If center is still at Berlin fallback, update to project location
-              if (Math.abs(this.center.lat - 52.5200) < 0.001 && Math.abs(this.center.lng - 13.4050) < 0.001) {
-                this.center = { lat, lng };
-                if (this.clusterMap && this.clusterMap.map && this.clusterMap.map.googleMap) {
-                  this.clusterMap.map.googleMap.panTo(this.center);
-                }
-                this.cdr.detectChanges();
-              }
+              this.center = { lat, lng };
+              this.hasExplicitCenter = true;
+              this.panMapToCenter();
+              this.cdr.detectChanges();
             }
           },
           error: (err) => console.warn('Could not fetch project coords:', err)
@@ -212,6 +231,16 @@ export class ClusterAreaDashboardComponent implements OnInit {
         this.loadClusterData();
       }
     });
+  }
+
+  panMapToCenter() {
+    if (this.clusterMap) {
+      if (this.clusterMap.map && this.clusterMap.map.googleMap) {
+        this.clusterMap.map.googleMap.setCenter(this.center);
+        this.clusterMap.map.googleMap.panTo(this.center);
+      }
+      this.clusterMap.center = { ...this.center };
+    }
   }
 
   loadClusterData() {
@@ -234,7 +263,15 @@ export class ClusterAreaDashboardComponent implements OnInit {
         this.elements.push({ id: n.id ? n.id.toString() : 'DP-?', type: 'DP', name: (n as any).identifier || 'Unnamed DP', lat: (n as any).latitude || this.center.lat + 0.001, lng: (n as any).longitude || this.center.lng + 0.001, status: 'PLANNED', createdAt: new Date() });
       });
 
-      utilities.forEach((u: any) => {
+      // Filter utilities to those within ~30km of cluster center to prevent cross-city map jumps
+      const clusterUtilities = utilities.filter((u: any) => {
+        if (!u.geometry || u.geometry.length === 0) return false;
+        const uLat = u.geometry[0].lat;
+        const uLng = u.geometry[0].lng;
+        return Math.abs(uLat - this.center.lat) < 0.3 && Math.abs(uLng - this.center.lng) < 0.3;
+      });
+
+      clusterUtilities.forEach((u: any) => {
         let mappedType = u.utilityType;
         if (u.utilityType === 'WATER') mappedType = 'AGUA';
         if (u.utilityType === 'GAS') mappedType = 'GAS';
@@ -244,8 +281,8 @@ export class ClusterAreaDashboardComponent implements OnInit {
           id: u.id ? u.id.toString() : 'UTIL-?',
           type: mappedType as any,
           name: u.operatorName ? u.operatorName + ' Line' : 'External Utility',
-          lat: u.geometry && u.geometry.length > 0 ? u.geometry[0].lat : this.center.lat,
-          lng: u.geometry && u.geometry.length > 0 ? u.geometry[0].lng : this.center.lng,
+          lat: u.geometry[0].lat,
+          lng: u.geometry[0].lng,
           status: 'ACTIVE',
           createdAt: new Date(),
           geometry: u.geometry,
@@ -270,15 +307,19 @@ export class ClusterAreaDashboardComponent implements OnInit {
   }
 
   recenterMap() {
-    const validElements = this.elements.filter(e => e.lat && e.lng && (Math.abs(e.lat - 52.5200) > 0.01 || Math.abs(e.lng - 13.4050) > 0.01));
-    if (validElements.length > 0) {
-      const latSum = validElements.reduce((sum, e) => sum + e.lat, 0);
-      const lngSum = validElements.reduce((sum, e) => sum + e.lng, 0);
-      this.center = { lat: latSum / validElements.length, lng: lngSum / validElements.length };
+    if (this.hasExplicitCenter) {
+      this.panMapToCenter();
+      this.cdr.detectChanges();
+      return;
     }
-    if (this.clusterMap && this.clusterMap.map && this.clusterMap.map.googleMap) {
-       this.clusterMap.map.googleMap.panTo(this.center);
+
+    const clusterElements = this.elements.filter(e => (e.type === 'POP' || e.type === 'DP') && e.lat && e.lng);
+    if (clusterElements.length > 0) {
+      const latSum = clusterElements.reduce((sum, e) => sum + e.lat, 0);
+      const lngSum = clusterElements.reduce((sum, e) => sum + e.lng, 0);
+      this.center = { lat: latSum / clusterElements.length, lng: lngSum / clusterElements.length };
     }
+    this.panMapToCenter();
     this.cdr.detectChanges();
   }
 
