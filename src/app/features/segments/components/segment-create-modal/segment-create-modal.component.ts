@@ -179,7 +179,7 @@ export class SegmentCreateModalComponent implements OnInit, OnChanges {
     const end = new Date(this.newSegment.plannedEndDate).getTime();
     
     return this.crewSchedule.filter(seg => {
-       if (!seg.plannedStartDate || !seg.plannedEndDate) return true; // Segments without dates are technically blocking
+       if (!seg.plannedStartDate || !seg.plannedEndDate) return false; // Segments without dates do not cause conflicts
        const segStart = new Date(seg.plannedStartDate).getTime();
        const segEnd = new Date(seg.plannedEndDate).getTime();
        return (segStart <= end && segEnd >= start);

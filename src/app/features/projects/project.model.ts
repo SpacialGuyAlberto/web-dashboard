@@ -27,4 +27,8 @@ export interface Project {
     clusters?: Cluster[];
     lifecycle_todo?: WorkType[];
     lifecycle_done?: WorkType[];
+    latitude?: number;
+    longitude?: number;
+    startLatitude?: number;
+    startLongitude?: number;
 }

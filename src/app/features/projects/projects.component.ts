@@ -122,7 +122,20 @@ export class ProjectsComponent implements OnInit {
   openCreateModal() {
     this.isEditing = false;
     this.currentProjectId = null;
-    this.newProject = { name: '', description: '', startDate: '', endDate: '', lifecycle_todo: [], lifecycle_done: [], geometry: [] };
+    this.mapCenter = { lat: 52.4746, lng: 13.4475 };
+    this.newProject = {
+      name: '',
+      description: '',
+      startDate: '',
+      endDate: '',
+      lifecycle_todo: [],
+      lifecycle_done: [],
+      geometry: [],
+      latitude: this.mapCenter.lat,
+      longitude: this.mapCenter.lng,
+      startLatitude: this.mapCenter.lat,
+      startLongitude: this.mapCenter.lng
+    };
     this.selectedFile = null;
     this.currentStep = 1;
     this.showCreateModal = true;
@@ -131,6 +144,13 @@ export class ProjectsComponent implements OnInit {
   openEditModal(project: Project) {
     this.isEditing = true;
     this.currentProjectId = project.id!;
+    if (project.latitude && project.longitude) {
+      this.mapCenter = { lat: project.latitude, lng: project.longitude };
+    } else if (project.startLatitude && project.startLongitude) {
+      this.mapCenter = { lat: project.startLatitude, lng: project.startLongitude };
+    } else if (project.geometry && project.geometry.length > 0) {
+      this.mapCenter = { lat: project.geometry[0].lat, lng: project.geometry[0].lng };
+    }
     this.newProject = {
         ...project,
         lifecycle_todo: project.lifecycle_todo || [],
@@ -160,7 +180,7 @@ export class ProjectsComponent implements OnInit {
   planRotation = 0;
   planX = 0;
   planY = 0;
-  
+
   isDraggingOverlay = false;
   private dragStartX = 0;
   private dragStartY = 0;
@@ -176,19 +196,19 @@ export class ProjectsComponent implements OnInit {
       // Deterministic function based on transforms to simulate real-time alignment analysis
       const normalizedX = Math.abs(this.planX % 200) / 200;
       const normalizedY = Math.abs(this.planY % 200) / 200;
-      
+
       // Let's create a sweet spot for rotation around 0, 90, 180...
       const rotMod = Math.abs(this.planRotation % 90);
-      const normalizedRot = rotMod > 45 ? (90 - rotMod) / 45 : rotMod / 45; 
-      
+      const normalizedRot = rotMod > 45 ? (90 - rotMod) / 45 : rotMod / 45;
+
       // Base score 50. Closer to 0 mod 200 on X/Y gives higher score. Closer to orthogonal rotation gives higher score.
       let score = 50 + ((1 - normalizedX) * 20) + ((1 - normalizedY) * 20) + ((1 - normalizedRot) * 9.9);
-      
+
       // Penalize absurd scales
       if (this.planScale > 2.0) {
           score -= (this.planScale - 2.0) * 30;
       }
-      
+
       return Math.max(0, Math.min(99.9, score));
   }
 
@@ -245,7 +265,7 @@ export class ProjectsComponent implements OnInit {
       this.planRotation = 0; // Keeping it straight, or maybe adjust if needed
       this.planX = 0;
       this.planY = 0;
-      
+
       // Let's add a slight rotation or scale to make it feel "calculated"
       // In a real scenario, this would compare image edges with map streets
       setTimeout(() => {
@@ -280,7 +300,26 @@ export class ProjectsComponent implements OnInit {
   saveProject() {
     if (!this.newProject.name) return;
 
-    // Ensure geometry is a closed polygon
+    // Retrieve current map center from reference map if mounted or fallback to mapCenter
+    let currentLat = this.mapCenter.lat;
+    let currentLng = this.mapCenter.lng;
+
+    if (this.referenceMap) {
+      const center = this.referenceMap.getCurrentCenter();
+      if (center && typeof center.lat === 'number' && typeof center.lng === 'number' && !isNaN(center.lat) && !isNaN(center.lng)) {
+        currentLat = center.lat;
+        currentLng = center.lng;
+        this.mapCenter = center;
+      }
+    }
+
+    // Persist coordinates in project model
+    this.newProject.latitude = currentLat;
+    this.newProject.longitude = currentLng;
+    this.newProject.startLatitude = currentLat;
+    this.newProject.startLongitude = currentLng;
+
+    // Ensure geometry is a closed polygon or at least stores the map center
     if (this.newProject.geometry && this.newProject.geometry.length > 2) {
       const first = this.newProject.geometry[0];
       const last = this.newProject.geometry[this.newProject.geometry.length - 1];
@@ -288,6 +327,8 @@ export class ProjectsComponent implements OnInit {
         // Append first point to the end to close the circle (A->B->C->D->A)
         this.newProject.geometry.push({ ...first });
       }
+    } else if (!this.newProject.geometry || this.newProject.geometry.length === 0) {
+      this.newProject.geometry = [{ lat: currentLat, lng: currentLng }];
     }
 
     this.loading = true;
@@ -336,7 +377,7 @@ export class ProjectsComponent implements OnInit {
     if (this.selectedFile) {
         let currentLat = this.mapCenter.lat;
         let currentLng = this.mapCenter.lng;
-        
+
         if (this.referenceMap) {
             const center = this.referenceMap.getCurrentCenter();
             currentLat = center.lat;
@@ -344,14 +385,14 @@ export class ProjectsComponent implements OnInit {
         }
 
         this.planningService.processPlanauskunft(
-            projectId, 
+            projectId,
             this.selectedFile,
             this.planScale,
             this.planRotation,
             this.planX,
             this.planY,
-            currentLat, 
-            currentLng  
+            currentLat,
+            currentLng
         ).subscribe({
             next: (segments) => {
                 console.log('Planauskunft processed, segments generated:', segments);
