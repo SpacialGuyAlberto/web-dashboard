@@ -32,8 +32,9 @@ export class ScheduleComponent implements OnInit, OnChanges {
 
     // Week navigation
     currentWeekStart: Date = new Date();
+    currentMonthStart: Date = new Date();
     weekDays: Date[] = [];
-
+    monthDates: Date[] = [];
     // Modal state
     showAssignModal = false;
     validationErrors: string[] = [];
@@ -113,17 +114,20 @@ export class ScheduleComponent implements OnInit, OnChanges {
     // Initialize week dates (Monday to Sunday)
     initializeWeek() {
         const today = new Date();
-        console.log('Today:', today);
         const dayOfWeek = today.getDay();
         const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
 
+
         this.weekDays = [];
         for (let i = 0; i < 7; i++) {
+            console.log("Current week start");
+            console.log(this.currentWeekStart)
             const day = new Date(this.currentWeekStart);
-            day.setDate(this.currentWeekStart.getDate() + i);
+            day.setDate(this.currentWeekStart.getDate() + i - 1);
             this.weekDays.push(day);
         }
     }
+
 
     // Navigate week
     previousWeek() {
