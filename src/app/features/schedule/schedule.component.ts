@@ -85,10 +85,10 @@ export class ScheduleComponent implements OnInit, OnChanges {
         const newAssignments: CrewAssignment[] = [];
         for (const seg of this.segmentsForCrew) {
             if (!seg.plannedStartDate || !seg.plannedEndDate) continue;
-            
+
             const start = new Date(seg.plannedStartDate);
             const end = new Date(seg.plannedEndDate);
-            
+
             // Loop through each day from start to end and create a mock assignment for the grid
             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
                 const validStatuses = ['SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
@@ -113,12 +113,9 @@ export class ScheduleComponent implements OnInit, OnChanges {
     // Initialize week dates (Monday to Sunday)
     initializeWeek() {
         const today = new Date();
+        console.log('Today:', today);
         const dayOfWeek = today.getDay();
-        const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust to Monday
-
-        this.currentWeekStart = new Date(today);
-        this.currentWeekStart.setDate(today.getDate() + diff);
-        this.currentWeekStart.setHours(0, 0, 0, 0);
+        const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
 
         this.weekDays = [];
         for (let i = 0; i < 7; i++) {
