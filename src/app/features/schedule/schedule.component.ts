@@ -34,7 +34,7 @@ export class ScheduleComponent implements OnInit, OnChanges {
     currentWeekStart: Date = new Date();
     currentMonthStart: Date = new Date();
     weekDays: Date[] = [];
-    monthDates: Date[] = [];
+    monthDays: Date[] = [];
     // Modal state
     showAssignModal = false;
     validationErrors: string[] = [];
@@ -117,16 +117,29 @@ export class ScheduleComponent implements OnInit, OnChanges {
         const dayOfWeek = today.getDay();
         const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
 
-
         this.weekDays = [];
         for (let i = 0; i < 7; i++) {
-            console.log("Current week start");
+            console.log("Current difference :", diff);
             console.log(this.currentWeekStart)
             const day = new Date(this.currentWeekStart);
-            day.setDate(this.currentWeekStart.getDate() + i - 1);
+            //esto solo funcionara si el dia de hoy es martes
+            day.setDate(this.currentWeekStart.getDate() + i + diff);
             this.weekDays.push(day);
         }
     }
+
+  initializeMonth() {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+
+    this.monthDays = [];
+    for (let i = 0; i < 7; i++) {
+
+      const day = new Date(this.currentMonthStart);
+      day.setDate(this.currentMonthStart.getDate() + i - 1);
+      this.weekDays.push(day);
+    }
+  }
 
 
     // Navigate week
