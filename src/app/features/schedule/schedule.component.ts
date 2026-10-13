@@ -57,6 +57,7 @@ export class ScheduleComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         this.initializeWeek();
+        this.initializeMonth();
         this.loadCrews();
         if (!this.isEmbedded) {
             this.loadProjects();
@@ -117,9 +118,10 @@ export class ScheduleComponent implements OnInit, OnChanges {
         const dayOfWeek = today.getDay();
         const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
 
+
         this.weekDays = [];
         for (let i = 0; i < 7; i++) {
-            console.log("Current difference :", diff);
+            console.log("Current month day :", today.getDate());
             console.log(this.currentWeekStart)
             const day = new Date(this.currentWeekStart);
             //esto solo funcionara si el dia de hoy es martes
@@ -130,14 +132,22 @@ export class ScheduleComponent implements OnInit, OnChanges {
 
   initializeMonth() {
     const today = new Date();
-    const dayOfWeek = today.getDay();
+    const dayOfMonth = today.getDate();
+    const monthHas31Days = (today.getMonth() % 2 == 0) ? false : true;
+
+    const monthLength = monthHas31Days ? 31 : 30;
+
+    console.log("October number month", today.getMonth());
+    console.log("October length: ", monthHas31Days);
+
+    const diff = dayOfMonth === 0 ? -(monthLength - 1) : 1 - dayOfMonth;
 
     this.monthDays = [];
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < monthLength ; i++) {
 
       const day = new Date(this.currentMonthStart);
-      day.setDate(this.currentMonthStart.getDate() + i - 1);
-      this.weekDays.push(day);
+      day.setDate(this.currentMonthStart.getDate() + i + diff);
+      this.monthDays.push(day);
     }
   }
 
