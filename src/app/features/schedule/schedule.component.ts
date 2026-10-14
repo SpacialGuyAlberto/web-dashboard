@@ -42,6 +42,7 @@ export class ScheduleComponent implements OnInit, OnChanges {
     isToday: Boolean = false;
     columnClass: any;
 
+
     // New assignment
     newAssignment: CrewAssignment = {
         crewId: 0,
@@ -49,6 +50,8 @@ export class ScheduleComponent implements OnInit, OnChanges {
         assignedDate: '',
         status: 'SCHEDULED'
     };
+
+    timePeriods: String[] = ["Weekly", "Monthly"]
 
     constructor(
         private scheduleService: ScheduleService,
@@ -281,10 +284,11 @@ export class ScheduleComponent implements OnInit, OnChanges {
         return date.toLocaleDateString('en-US', { weekday: 'short' });
     }
 
-    checkIfDayIsToday(date: Date): void {
-      if (this.getDayName(date) === this.getDayName(this.today)){
-        this.isToday = true;
+    assertDate(day: Date): boolean {
+      if ((this.today.getDate() == day.getDate()) && (this.today.getMonth() == day.getMonth()) && (this.today.getFullYear() == day.getFullYear())){
+       return true;
       }
+      return false;
     }
 
     // Get status color
