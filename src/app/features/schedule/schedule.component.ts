@@ -38,6 +38,9 @@ export class ScheduleComponent implements OnInit, OnChanges {
     // Modal state
     showAssignModal = false;
     validationErrors: string[] = [];
+    today: Date = new Date();
+    isToday: Boolean = false;
+    columnClass: any;
 
     // New assignment
     newAssignment: CrewAssignment = {
@@ -53,7 +56,8 @@ export class ScheduleComponent implements OnInit, OnChanges {
         private planningService: PlanningService,
         private segmentService: SegmentService,
         private cdr: ChangeDetectorRef
-    ) { }
+    ) {
+    }
 
     ngOnInit() {
         this.initializeWeek();
@@ -104,7 +108,8 @@ export class ScheduleComponent implements OnInit, OnChanges {
                     segmentName: seg.streetName || `Segment #${seg.id}`,
                     assignedDate: this.formatDate(d),
                     status: statusType as 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED',
-                    notes: `${seg.workType} from ${seg.plannedStartDate} to ${seg.plannedEndDate}`
+
+                notes: `${seg.workType} from ${seg.plannedStartDate} to ${seg.plannedEndDate}`
                 });
             }
         }
@@ -117,7 +122,6 @@ export class ScheduleComponent implements OnInit, OnChanges {
         const today = new Date();
         const dayOfWeek = today.getDay();
         const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-
 
         this.weekDays = [];
         for (let i = 0; i < 7; i++) {
@@ -275,6 +279,12 @@ export class ScheduleComponent implements OnInit, OnChanges {
     // Get day name
     getDayName(date: Date): string {
         return date.toLocaleDateString('en-US', { weekday: 'short' });
+    }
+
+    checkIfDayIsToday(date: Date): void {
+      if (this.getDayName(date) === this.getDayName(this.today)){
+        this.isToday = true;
+      }
     }
 
     // Get status color
