@@ -27,7 +27,7 @@ export class SegmentService {
         return this.http.get<Segment>(`${this.apiUrl}/segments/${id}`);
     }
 
-    getCrewSchedule(crewId: number): Observable<Segment[]> {
+    getCrewSchedule(crewId: number | null): Observable<Segment[]> {
         return this.http.get<Segment[]>(`${this.apiUrl}/segments/crews/${crewId}/schedule`);
     }
 

@@ -23,6 +23,7 @@ export class ScheduleComponent implements OnInit, OnChanges {
     crews: Crew[] = [];
     projects: Project[] = [];
     segments: Segment[] = [];
+    crewSegments: Segment[] = [];
 
     // Filters
     @Input() selectedCrewId: number | null = null;
@@ -63,15 +64,19 @@ export class ScheduleComponent implements OnInit, OnChanges {
     }
 
     ngOnInit() {
+
         this.initializeWeek();
         this.initializeMonth();
         this.loadCrews();
+        this.loadCrewAssignements(1);
         if (!this.isEmbedded) {
             this.loadProjects();
             this.loadWeekSchedule();
         } else {
             this.mapSegmentsToAssignments();
         }
+
+        console.log(this.today)
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -128,8 +133,6 @@ export class ScheduleComponent implements OnInit, OnChanges {
 
         this.weekDays = [];
         for (let i = 0; i < 7; i++) {
-            console.log("Current month day :", today.getDate());
-            console.log(this.currentWeekStart)
             const day = new Date(this.currentWeekStart);
             //esto solo funcionara si el dia de hoy es martes
             day.setDate(this.currentWeekStart.getDate() + i + diff);
@@ -143,9 +146,6 @@ export class ScheduleComponent implements OnInit, OnChanges {
     const monthHas31Days = (today.getMonth() % 2 == 0) ? false : true;
 
     const monthLength = monthHas31Days ? 31 : 30;
-
-    console.log("October number month", today.getMonth());
-    console.log("October length: ", monthHas31Days);
 
     const diff = dayOfMonth === 0 ? -(monthLength - 1) : 1 - dayOfMonth;
 
@@ -206,10 +206,15 @@ export class ScheduleComponent implements OnInit, OnChanges {
         const start = this.formatDate(this.weekDays[0]);
         const end = this.formatDate(this.weekDays[6]);
 
-        this.scheduleService.getWeekSchedule(start, end).subscribe((assignments: CrewAssignment[]) => {
-            this.assignments = assignments;
-            this.cdr.detectChanges();
-        });
+        this.loadCrewAssignements(this.selectedCrewId);
+
+    }
+
+    loadCrewAssignements(crewId: number | null){
+      this.segmentService.getCrewSchedule(crewId).subscribe((segments: Segment[]) => {
+        this.crewSegments = segments;
+        this.cdr.detectChanges();
+      });
     }
 
     // Get assignments for a specific crew and date
@@ -284,10 +289,44 @@ export class ScheduleComponent implements OnInit, OnChanges {
         return date.toLocaleDateString('en-US', { weekday: 'short' });
     }
 
-    assertDate(day: Date): boolean {
+    assertDateFormatting(day: Date): string {
       if ((this.today.getDate() == day.getDate()) && (this.today.getMonth() == day.getMonth()) && (this.today.getFullYear() == day.getFullYear())){
-       return true;
+       return 'relative bg-[#2fb080]/10 p-2 border-r border-white/5 last:border-r-0 min-h-[120px] cursor-pointer transition-colors hover:bg-white/5'
       }
+      console.log('valor final fuera de la funcion: ', this.isDateInAssignement(day));
+      if (this.isDateInAssignement(day)) {
+        return 'relative bg-[#5D3140]/10 p-2 border-r border-white/5 last:border-r-0 min-h-[120px] cursor-pointer transition-colors hover:bg-white/5'
+      }
+      return 'relative  p-2 border-r border-white/5 last:border-r-0 min-h-[120px] cursor-pointer transition-colors hover:bg-white/5'
+    }
+
+
+  isDateInAssignement(date: Date): boolean {
+
+    return this.crewSegments.some(s => {
+      if (s.plannedStartDate && s.plannedEndDate) {
+        const startDate = new Date(s.plannedStartDate);
+        const endDate = new Date(s.plannedEndDate);
+        const isValid = date >= startDate && date <= endDate;
+        return isValid;
+      }
+      return false;
+    });
+  }
+
+    isDayAssignedToCrew(day: Date) : boolean{
+      this.crewSegments.map( s => {
+
+        if (s.plannedStartDate && s.plannedEndDate && s.assignedCrewId){
+          const startDate = new Date(s.plannedStartDate);
+          const endDate = new Date(s.plannedEndDate);
+
+          console.log("Dia recorrido: ", day);
+          console.log("Dia planeado de segmento empezar: ", startDate);
+          console.log("Dia planeado de terminacion", endDate);
+          return ((day >= startDate && day <= endDate ) && (this.selectedCrewId == s.assignedCrewId)) ? true : false;
+        } else return false;
+      })
       return false;
     }
 

@@ -72,16 +72,11 @@
                     Crew / Shift
                 </div>
                 <div *ngFor="let day of weekDays"
-                    [ngClass]=" (assertDate(day)) ?
+                    [ngClass]=" (assertDateFormatting(day)) ?
                     'p-4 bg-[#1a1b1e] text-center border-r border-white/5 last:border-r-0 flex flex-col items-center' :
                     'p-4 text-center border-r border-white/5 last:border-r-0 flex flex-col items-center'"
                 >
-                 @if (assertDate(day))
-                 {
-                   <div class="font-mono text-[13px] uppercase tracking-widest text-[#84A282] mb-1">{{ getDayName(day) }} </div>
-                 } @else {
                    <div class="font-mono text-[13px] uppercase tracking-widest text-[#6938ef] mb-1">{{ getDayName(day) }} </div>
-                 }
                     <div class="font-mono text-xl text-white/90">{{ day | date:'d' }}</div>
                 </div>
             </div>
@@ -108,9 +103,7 @@
                     <!-- Days -->
                     <div *ngFor="let day of weekDays"
                         [ngClass]="isEmbedded ? 'min-w-[80px]' : ''"
-                        [ngClass]="(assertDate(day)) ?
-                        'relative  bg-[#2fb080]/10 p-2 border-r border-white/5 last:border-r-0 min-h-[120px] cursor-pointer transition-colors hover:bg-white/5' :
-                        'relative  p-2 border-r border-white/5 last:border-r-0 min-h-[120px] cursor-pointer transition-colors hover:bg-white/5'"
+                        [ngClass]="assertDateFormatting(day)"
                         (click)="!isEmbedded ? openAssignModal(crew.id!, day) : null">
 
                         <!-- Assignment Card -->

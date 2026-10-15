@@ -2,7 +2,7 @@ export interface CrewAssignment {
     id?: number;
     crewId: number;
     segmentId: number;
-    assignedDate: string;  // ISO date format (YYYY-MM-DD)
+    assignedDate: string;
     startTime?: string;    // HH:mm format
     endTime?: string;      // HH:mm format
     status: 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
