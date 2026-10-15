@@ -1,259 +1,272 @@
 <div [ngClass]="isEmbedded ? '' : 'min-h-screen bg-[#0a0a0c] p-6 lg:p-12 font-sans'">
-    <div [ngClass]="isEmbedded ? '' : 'max-w-[1600px] mx-auto'">
-        <!-- Header & Controls -->
-        <div *ngIf="!isEmbedded" class="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/5 pb-8 gap-4">
-            <div>
-                <h1 class="font-display text-5xl font-normal text-white/90 tracking-tight leading-none">Schedule</h1>
-                <p class="text-white/40 mt-4 font-sans text-sm">Manage crew assignments and project timelines</p>
-            </div>
+  <div [ngClass]="isEmbedded ? '' : 'max-w-[1600px] mx-auto'">
+    <!-- Header & Controls -->
+    @if (!isEmbedded) {
+      <div class="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/5 pb-8 gap-4">
+        <div>
+          <h1 class="font-display text-5xl font-normal text-white/90 tracking-tight leading-none">Schedule</h1>
+          <p class="text-white/40 mt-4 font-sans text-sm">Manage crew assignments and project timelines</p>
+        </div>
 
-            <div class="flex items-center gap-4 bg-[#131415] p-2 rounded-xl border border-white/5 shadow-none">
-                <button (click)="previousWeek()"
-                    class="p-2 hover:bg-white/5 rounded-md transition-colors">
-                    <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
-                        </path>
-                    </svg>
-                </button>
+        <div class="flex items-center gap-4 bg-[#131415] p-2 rounded-xl border border-white/5 shadow-none">
+          <button (click)="previousWeek()"
+                  class="p-2 hover:bg-white/5 rounded-md transition-colors">
+            <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+              </path>
+            </svg>
+          </button>
 
-                <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-white/90 min-w-[160px] text-center">
+          <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-white/90 min-w-[160px] text-center">
                     {{ weekDays[0] | date:'MMM d' }} - {{ weekDays[6] | date:'MMM d, y' }}
                 </span>
 
-                <button (click)="nextWeek()"
-                    class="p-2 hover:bg-white/5 rounded-md transition-colors">
-                    <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </button>
-            </div>
-
-            <div class="flex gap-4">
-              <select (change)="loadWeekSchedule()"
-                      class="bg-[#131415] border border-white/5 rounded-md px-3 py-2 font-mono text-xs text-white/80 focus:ring-1 focus:ring-[#6938ef]/50 outline-none transition-all">
-                <option [ngValue]="null">View</option>
-                <option *ngFor="let p of timePeriods" [ngValue]="p">{{ p }}</option>
-              </select>
-                <select [(ngModel)]="selectedProjectId" (change)="loadWeekSchedule()"
-                    class="bg-[#131415] border border-white/5 rounded-md px-3 py-2 font-mono text-xs text-white/80 focus:ring-1 focus:ring-[#6938ef]/50 outline-none transition-all">
-                    <option [ngValue]="null">All Projects</option>
-                    <option *ngFor="let p of projects" [ngValue]="p.id">{{ p.name }}</option>
-                </select>
-                <select [(ngModel)]="selectedCrewId" (change)="loadWeekSchedule()"
-                    class="bg-[#131415] border border-white/5 rounded-md px-3 py-2 font-mono text-xs text-white/80 focus:ring-1 focus:ring-[#6938ef]/50 outline-none transition-all">
-                    <option [ngValue]="null">All Crews</option>
-                    <option *ngFor="let c of crews" [ngValue]="c.id">{{ c.name }}</option>
-                </select>
-            </div>
+          <button (click)="nextWeek()"
+                  class="p-2 hover:bg-white/5 rounded-md transition-colors">
+            <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
         </div>
 
-        <!-- Embedded Controls -->
-        <div *ngIf="isEmbedded" class="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
-            <h4 class="text-[10px] font-mono text-white/80 uppercase tracking-widest flex items-center gap-2">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                Weekly Schedule
-            </h4>
-            <div class="flex items-center gap-2 bg-[#131415] p-1 rounded-lg border border-white/5">
-                <button (click)="previousWeek()" class="p-1 hover:bg-white/5 rounded transition-colors"><svg class="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
-                <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-white/90 px-2 text-center">{{ weekDays[0] | date:'MMM d' }} - {{ weekDays[6] | date:'MMM d' }}</span>
-                <button (click)="nextWeek()" class="p-1 hover:bg-white/5 rounded transition-colors"><svg class="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
-            </div>
+        <div class="flex gap-4">
+          <select (change)="loadWeekSchedule()"
+                  class="bg-[#131415] border border-white/5 rounded-md px-3 py-2 font-mono text-xs text-white/80 focus:ring-1 focus:ring-[#6938ef]/50 outline-none transition-all">
+            <option [ngValue]="null">View</option>
+            @for (p of timePeriods; track p) {
+              <option [ngValue]="p">{{ p }}</option>
+            }
+          </select>
+          <select [(ngModel)]="selectedProjectId" (change)="loadWeekSchedule()"
+                  class="bg-[#131415] border border-white/5 rounded-md px-3 py-2 font-mono text-xs text-white/80 focus:ring-1 focus:ring-[#6938ef]/50 outline-none transition-all">
+            <option [ngValue]="null">All Projects</option>
+            @for (p of projects; track p.id) {
+              <option [ngValue]="p.id">{{ p.name }}</option>
+            }
+          </select>
+          <select [(ngModel)]="selectedCrewId" (change)="loadWeekSchedule()"
+                  class="bg-[#131415] border border-white/5 rounded-md px-3 py-2 font-mono text-xs text-white/80 focus:ring-1 focus:ring-[#6938ef]/50 outline-none transition-all">
+            <option [ngValue]="null">All Crews</option>
+            @for (c of crews; track c.id) {
+              <option [ngValue]="c.id">{{ c.name }}</option>
+            }
+          </select>
         </div>
+      </div>
+    }
 
-        <!-- Schedule Grid Container -->
+    <!-- Embedded Controls -->
+    @if (isEmbedded) {
+      <div class="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
+        <h4 class="text-[10px] font-mono text-white/80 uppercase tracking-widest flex items-center gap-2">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          Weekly Schedule
+        </h4>
+        <div class="flex items-center gap-2 bg-[#131415] p-1 rounded-lg border border-white/5">
+          <button (click)="previousWeek()" class="p-1 hover:bg-white/5 rounded transition-colors"><svg class="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+          <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-white/90 px-2 text-center">{{ weekDays[0] | date:'MMM d' }} - {{ weekDays[6] | date:'MMM d' }}</span>
+          <button (click)="nextWeek()" class="p-1 hover:bg-white/5 rounded transition-colors"><svg class="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+        </div>
+      </div>
+    }
+
+    <!-- Schedule Grid Container -->
+    <div
+      [ngClass]="isEmbedded ? 'bg-[#131415] rounded-xl overflow-hidden border border-white/5 shadow-none overflow-x-auto' : 'bg-[#131415] rounded-xl overflow-hidden border border-white/5 mt-8 shadow-none'">
+      <!-- Grid Header (Days) -->
+      <div class="grid grid-cols-8 bg-[#161719] border-b border-white/5">
         <div
-            [ngClass]="isEmbedded ? 'bg-[#131415] rounded-xl overflow-hidden border border-white/5 shadow-none overflow-x-auto' : 'bg-[#131415] rounded-xl overflow-hidden border border-white/5 mt-8 shadow-none'">
-            <!-- Grid Header (Days) -->
-            <div class="grid grid-cols-8 bg-[#161719] border-b border-white/5">
-                <div
-                    class="p-4 font-mono text-[9px] text-white/40 border-r border-white/5 uppercase tracking-[0.2em] flex items-center">
-                    Crew / Shift
-                </div>
-                <div *ngFor="let day of weekDays"
-                    [ngClass]=" (assertDateFormatting(day)) ?
+          class="p-4 font-mono text-[9px] text-white/40 border-r border-white/5 uppercase tracking-[0.2em] flex items-center">
+          Crew / Shift
+        </div>
+        @for (day of weekDays; track day) {
+          <div
+            [ngClass]=" (assertDateFormatting(day)) ?
                     'p-4 bg-[#1a1b1e] text-center border-r border-white/5 last:border-r-0 flex flex-col items-center' :
                     'p-4 text-center border-r border-white/5 last:border-r-0 flex flex-col items-center'"
-                >
-                   <div class="font-mono text-[13px] uppercase tracking-widest text-[#6938ef] mb-1">{{ getDayName(day) }} </div>
-                    <div class="font-mono text-xl text-white/90">{{ day | date:'d' }}</div>
-                </div>
-            </div>
+          >
+            <div class="font-mono text-[13px] uppercase tracking-widest text-[#6938ef] mb-1">{{ getDayName(day) }} </div>
+            <div class="font-mono text-xl text-white/90">{{ day | date:'d' }}</div>
+          </div>
+        }
+      </div>
 
-            <!-- Calendar Body -->
-            <div class="divide-y divide-white/5">
-                <div *ngFor="let crew of filteredCrews"
-                    class="grid grid-cols-8 hover:bg-white/[0.02] transition-colors group">
-                    <!-- Crew Name -->
-                    <div
-                        class="p-4 border-r border-white/5 flex flex-col justify-center bg-[#131415] group-hover:bg-white/[0.02]">
-                        <span class="font-mono text-xs text-white/90 uppercase tracking-wider">{{ crew.name }}</span>
-                        <span class="font-mono text-[9px] text-white/40 uppercase tracking-widest mt-1 flex items-center gap-1">
+      <!-- Calendar Body -->
+      <div class="divide-y divide-white/5">
+        @for (crew of filteredCrews; track crew.id) {
+          <div class="grid grid-cols-8 hover:bg-white/[0.02] transition-colors group">
+            <!-- Crew Name -->
+            <div
+              class="p-4 border-r border-white/5 flex flex-col justify-center bg-[#131415] group-hover:bg-white/[0.02]">
+              <span class="font-mono text-xs text-white/90 uppercase tracking-wider">{{ crew.name }}</span>
+              <span class="font-mono text-[9px] text-white/40 uppercase tracking-widest mt-1 flex items-center gap-1">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z">
+                                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z">
                                 </path>
                             </svg>
-                            {{ crew.size }} pax
+                {{ crew.size }} pax
                         </span>
-                        <span class="font-mono text-[9px] text-white/30 tracking-widest uppercase mt-1">{{ crew.vehiclePlate }}</span>
+              <span class="font-mono text-[9px] text-white/30 tracking-widest uppercase mt-1">{{ crew.vehiclePlate }}</span>
+            </div>
+
+            <!-- Days -->
+            @for (day of weekDays; track day) {
+              <div [ngClass]="isEmbedded ? 'min-w-[80px]' : ''"
+                   [ngClass]="assertDateFormatting(day)"
+                   (click)="!isEmbedded ? openAssignModal(crew.id!, day) : null">
+
+                <!-- Assignment Card -->
+                @if (getAssignment(crew.id!, day); as assignment) {
+                  <div [class]="getStatusColor(assignment.status)"
+                       class="h-full w-full p-2 rounded flex flex-col justify-between group/card text-xs hover:border-white/20 transition-all">
+                    <div>
+                      <div class="font-mono text-[10px] text-white uppercase tracking-wider truncate mb-1" [title]="assignment.segmentName">
+                        {{ assignment.segmentName }}
+                      </div>
+                      <div class="line-clamp-2 text-white/40 font-sans text-xs mb-2">
+                        {{ assignment.notes || 'No notes provided' }}
+                      </div>
+                      <div class="flex items-center gap-1 font-mono text-[9px] text-white/50 tracking-widest">
+                        <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {{ assignment.startTime || '08:00' }} - {{ assignment.endTime || '17:00' }}
+                      </div>
                     </div>
 
-                    <!-- Days -->
-                    <div *ngFor="let day of weekDays"
-                        [ngClass]="isEmbedded ? 'min-w-[80px]' : ''"
-                        [ngClass]="assertDateFormatting(day)"
-                        (click)="!isEmbedded ? openAssignModal(crew.id!, day) : null">
-
-                        <!-- Assignment Card -->
-                        <ng-container *ngIf="getAssignment(crew.id!, day) as assignment; else available">
-                            <div [class]="getStatusColor(assignment.status)"
-                                class="h-full w-full p-2 rounded flex flex-col justify-between group/card text-xs hover:border-white/20 transition-all">
-                                <div>
-                                    <div class="font-mono text-[10px] text-white uppercase tracking-wider truncate mb-1" [title]="assignment.segmentName">
-                                        {{ assignment.segmentName }}
-                                    </div>
-                                    <div class="line-clamp-2 text-white/40 font-sans text-xs mb-2">
-                                        {{ assignment.notes || 'No notes provided' }}
-                                    </div>
-                                    <div class="flex items-center gap-1 font-mono text-[9px] text-white/50 tracking-widest">
-                                        <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        {{ assignment.startTime || '08:00' }} - {{ assignment.endTime || '17:00' }}
-                                    </div>
-                                </div>
-
-                                <div
-                                    class="flex justify-between items-center mt-2 pt-2 border-t border-white/5">
-                                    <span class="font-mono text-[9px] uppercase tracking-[0.2em] opacity-50">{{
-                                        assignment.status }}</span>
-                                    <button *ngIf="!isEmbedded" (click)="deleteAssignment(assignment.id); $event.stopPropagation()"
-                                        class="p-1 hover:bg-red-400/20 rounded text-red-400 opacity-0 group-hover/card:opacity-100 transition-opacity"
-                                        title="Remove Assignment">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </ng-container>
-
-                        <!-- Empty Slot Placeholder (Hover only) -->
-                        <ng-template #available>
-                            <div
-                                class="h-full w-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                <span
-                                    class="bg-[#6938ef]/10 text-[#6938ef] rounded-md p-2 border border-[#6938ef]/30">
+                    <div class="flex justify-between items-center mt-2 pt-2 border-t border-white/5">
+                      <span class="font-mono text-[9px] uppercase tracking-[0.2em] opacity-50">{{ assignment.status }}</span>
+                      @if (!isEmbedded) {
+                        <button (click)="deleteAssignment(assignment.id); $event.stopPropagation()"
+                                class="p-1 hover:bg-red-400/20 rounded text-red-400 opacity-0 group-hover/card:opacity-100 transition-opacity"
+                                title="Remove Assignment">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                            </path>
+                          </svg>
+                        </button>
+                      }
+                    </div>
+                  </div>
+                } @else {
+                  <!-- Empty Slot Placeholder (Hover only) -->
+                  <div class="h-full w-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                                <span class="bg-[#6938ef] text-[#6938ef] rounded-md p-2 border border-[#6938ef]/30">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v16m8-8H4"></path>
+                                              d="M12 4v16m8-8H4"></path>
                                     </svg>
                                 </span>
-                            </div>
-                        </ng-template>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Empty State -->
-            <div *ngIf="filteredCrews.length === 0" class="p-24 flex flex-col items-center justify-center bg-[#131415]/50">
-                <span class="text-4xl mb-4 opacity-30">👷</span>
-                <h3 class="font-display text-3xl font-normal text-white/80 mb-2">No crews found</h3>
-                <p class="font-mono text-[9px] uppercase tracking-widest text-white/40">Please add crews via the Subcontractors section before scheduling.</p>
-            </div>
-        </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        } @empty {
+          <!-- Empty State -->
+          <div class="p-24 flex flex-col items-center justify-center bg-[#131415]/50">
+            <span class="text-4xl mb-4 opacity-30">👷</span>
+            <h3 class="font-display text-3xl font-normal text-white/80 mb-2">No crews found</h3>
+            <p class="font-mono text-[9px] uppercase tracking-widest text-white/40">Please add crews via the Subcontractors section before scheduling.</p>
+          </div>
+        }
+      </div>
     </div>
+  </div>
 
-    <!-- Assignment Modal -->
-    <div *ngIf="showAssignModal"
-        class="fixed inset-0 bg-[#0a0a0c]/80 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-opacity">
-        <div
-            class="bg-[#131415] border border-white/10 rounded-xl max-w-md w-full shadow-none transform transition-transform scale-100 overflow-hidden">
-            <div class="p-8 border-b border-white/5 bg-[#161719]">
-                <span class="text-[9px] font-mono uppercase text-[#6938ef] tracking-[0.2em] mb-2 block">Resource Assignment</span>
-                <h2 class="font-display text-4xl font-normal text-white/90">Assign Crew</h2>
-            </div>
-
-            <div class="p-8">
-                <!-- Validation Errors -->
-                <div *ngIf="validationErrors.length > 0"
-                    class="mb-6 bg-red-400/10 border border-red-400/20 rounded-md p-4">
-                    <div *ngFor="let error of validationErrors"
-                        class="text-red-400 font-mono text-[10px] uppercase tracking-widest flex items-center gap-2">
-                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        {{ error }}
-                    </div>
-                </div>
-
-                <div class="space-y-5">
-                    <div>
-                        <label class="block font-mono text-[9px] uppercase tracking-widest text-white/40 mb-2">Segment to Work
-                            On</label>
-                        <div class="relative">
-                            <select [(ngModel)]="newAssignment.segmentId" required
-                                class="w-full pl-3 pr-10 py-3 bg-[#0a0a0c] border border-white/5 font-mono text-xs text-white/80 rounded-md focus:outline-none focus:ring-1 focus:ring-[#6938ef]/50 appearance-none">
-                                <option [ngValue]="0">Select a segment...</option>
-                                <option *ngFor="let segment of segments" [ngValue]="segment.id">
-                                    {{ segment.streetName }} ({{ segment.workType }})
-                                </option>
-                            </select>
-                            <div
-                                class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-white/40">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block font-mono text-[9px] uppercase tracking-widest text-white/40 mb-2">Date</label>
-                        <input [(ngModel)]="newAssignment.assignedDate" type="date"
-                            class="w-full bg-[#0a0a0c] border border-white/5 font-mono text-xs text-white/80 rounded-md px-3 py-3 focus:outline-none focus:ring-1 focus:ring-[#6938ef]/50"
-                            readonly>
-                    </div>
-
-                    <div>
-                        <label class="block font-mono text-[9px] uppercase tracking-widest text-white/40 mb-2">Status</label>
-                        <select [(ngModel)]="newAssignment.status"
-                            class="w-full bg-[#0a0a0c] border border-white/5 font-mono text-xs text-white/80 rounded-md px-3 py-3 focus:outline-none focus:ring-1 focus:ring-[#6938ef]/50">
-                            <option value="SCHEDULED">Scheduled</option>
-                            <option value="IN_PROGRESS">In Progress</option>
-                            <option value="COMPLETED">Completed</option>
-                            <option value="CANCELLED">Cancelled</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block font-mono text-[9px] uppercase tracking-widest text-white/40 mb-2">Notes
-                            (optional)</label>
-                        <textarea [(ngModel)]="newAssignment.notes" rows="3"
-                            class="w-full bg-[#0a0a0c] border border-white/5 font-mono text-xs text-white/80 rounded-md px-3 py-3 focus:outline-none focus:ring-1 focus:ring-[#6938ef]/50"
-                            placeholder="e.g. Bring extra concrete..."></textarea>
-                    </div>
-
-                    <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-white/5">
-                        <button (click)="closeAssignModal()"
-                            class="bg-transparent border border-white/5 py-3 px-6 rounded-md font-mono text-[10px] uppercase tracking-widest hover:border-white/10 hover:bg-white/5 transition-all text-white/60 hover:text-white">
-                            Cancel
-                        </button>
-                        <button (click)="saveAssignment()"
-                            class="bg-[#6938ef] text-white px-6 py-3 rounded-md font-mono text-[10px] uppercase tracking-widest hover:bg-[#5b2ecf] transition-all disabled:opacity-50"
-                            [disabled]="newAssignment.segmentId === 0">
-                            Assign Crew
-                        </button>
-                    </div>
-                </div>
-            </div>
+  <!-- Assignment Modal -->
+  @if (showAssignModal) {
+    <div class="fixed inset-0 bg-[#0a0a0c]/80 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-opacity">
+      <div class="bg-[#131415] border border-white/10 rounded-xl max-w-md w-full shadow-none transform transition-transform scale-100 overflow-hidden">
+        <div class="p-8 border-b border-white/5 bg-[#161719]">
+          <span class="text-[9px] font-mono uppercase text-[#6938ef] tracking-[0.2em] mb-2 block">Resource Assignment</span>
+          <h2 class="font-display text-4xl font-normal text-white/90">Assign Crew</h2>
         </div>
+
+        <div class="p-8">
+          <!-- Validation Errors -->
+          @if (validationErrors.length > 0) {
+            <div class="mb-6 bg-red-400/10 border border-red-400/20 rounded-md p-4">
+              @for (error of validationErrors; track error) {
+                <div class="text-red-400 font-mono text-[10px] uppercase tracking-widest flex items-center gap-2">
+                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  {{ error }}
+                </div>
+              }
+            </div>
+          }
+
+          <div class="space-y-5">
+            <div>
+              <label class="block font-mono text-[9px] uppercase tracking-widest text-white/40 mb-2">Segment to Work
+                On</label>
+              <div class="relative">
+                <select [(ngModel)]="newAssignment.segmentId" required
+                        class="w-full pl-3 pr-10 py-3 bg-[#0a0a0c] border border-white/5 font-mono text-xs text-white/80 rounded-md focus:outline-none focus:ring-1 focus:ring-[#6938ef]/50 appearance-none">
+                  <option [ngValue]="0">Select a segment...</option>
+                  @for (segment of segments; track segment.id) {
+                    <option [ngValue]="segment.id">
+                      {{ segment.streetName }} ({{ segment.workType }})
+                    </option>
+                  }
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-white/40">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-mono text-[9px] uppercase tracking-widest text-white/40 mb-2">Date</label>
+              <input [(ngModel)]="newAssignment.assignedDate" type="date"
+                     class="w-full bg-[#0a0a0c] border border-white/5 font-mono text-xs text-white/80 rounded-md px-3 py-3 focus:outline-none focus:ring-1 focus:ring-[#6938ef]/50"
+                     readonly>
+            </div>
+
+            <div>
+              <label class="block font-mono text-[9px] uppercase tracking-widest text-white/40 mb-2">Status</label>
+              <select [(ngModel)]="newAssignment.status"
+                      class="w-full bg-[#0a0a0c] border border-white/5 font-mono text-xs text-white/80 rounded-md px-3 py-3 focus:outline-none focus:ring-1 focus:ring-[#6938ef]/50">
+                <option value="SCHEDULED">Scheduled</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-mono text-[9px] uppercase tracking-widest text-white/40 mb-2">Notes
+                (optional)</label>
+              <textarea [(ngModel)]="newAssignment.notes" rows="3"
+                        class="w-full bg-[#0a0a0c] border border-white/5 font-mono text-xs text-white/80 rounded-md px-3 py-3 focus:outline-none focus:ring-1 focus:ring-[#6938ef]/50"
+                        placeholder="e.g. Bring extra concrete..."></textarea>
+            </div>
+
+            <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-white/5">
+              <button (click)="closeAssignModal()"
+                      class="bg-transparent border border-white/5 py-3 px-6 rounded-md font-mono text-[10px] uppercase tracking-widest hover:border-white/10 hover:bg-white/5 transition-all text-white/60 hover:text-white">
+                Cancel
+              </button>
+              <button (click)="saveAssignment()"
+                      class="bg-[#6938ef] text-white px-6 py-3 rounded-md font-mono text-[10px] uppercase tracking-widest hover:bg-[#5b2ecf] transition-all disabled:opacity-50"
+                      [disabled]="newAssignment.segmentId === 0">
+                Assign Crew
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  }
 </div>
