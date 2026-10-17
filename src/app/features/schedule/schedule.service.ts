@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { CrewAssignment, ValidationResponse } from './schedule.model';
 
@@ -15,6 +15,11 @@ export class ScheduleService {
     // Create a crew assignment
     createAssignment(assignment: CrewAssignment): Observable<CrewAssignment> {
         return this.http.post<CrewAssignment>(`${this.apiUrl}/assignments`, assignment);
+    }
+
+    // Get assignment by ID
+    getAssignmentById(assignmentId: number): Observable<CrewAssignment> {
+        return this.http.get<CrewAssignment>(`${this.apiUrl}/assignments/${assignmentId}`);
     }
 
     // Get crew schedule for a date range
@@ -33,6 +38,17 @@ export class ScheduleService {
     getWeekSchedule(start: string, end: string): Observable<CrewAssignment[]> {
         const params = new HttpParams().set('start', start).set('end', end);
         return this.http.get<CrewAssignment[]>(`${this.apiUrl}/assignments`, { params });
+    }
+
+    // Unified helper to get schedule based on active filters
+    getSchedule(filters: { crewId?: number | null; projectId?: number | null; start: string; end: string }): Observable<CrewAssignment[]> {
+        if (filters.crewId) {
+            return this.getCrewSchedule(filters.crewId, filters.start, filters.end);
+        }
+        if (filters.projectId) {
+            return this.getProjectSchedule(filters.projectId, filters.start, filters.end);
+        }
+        return this.getWeekSchedule(filters.start, filters.end);
     }
 
     // Update an assignment

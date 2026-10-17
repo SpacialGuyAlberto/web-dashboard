@@ -1,7 +1,10 @@
 export interface CrewAssignment {
     id?: number;
     crewId: number;
-    segmentId: number;
+    segmentId?: number;
+    nodeId?: number;
+    nodeType?: string;
+    nodeName?: string;
     assignedDate: string;
     startTime?: string;    // HH:mm format
     endTime?: string;      // HH:mm format
