@@ -68,7 +68,6 @@ export class ScheduleComponent implements OnInit, OnChanges {
         this.initializeWeek();
         this.initializeMonth();
         this.loadCrews();
-        this.loadCrewAssignements(1);
         if (!this.isEmbedded) {
             this.loadProjects();
             this.loadWeekSchedule();
@@ -76,10 +75,11 @@ export class ScheduleComponent implements OnInit, OnChanges {
             this.mapSegmentsToAssignments();
         }
 
-        console.log(this.today)
+
     }
 
     ngOnChanges(changes: SimpleChanges) {
+      this.mapSegmentsToAssignments();
         if (changes['segmentsForCrew'] && this.isEmbedded) {
             this.mapSegmentsToAssignments();
         }
@@ -96,6 +96,8 @@ export class ScheduleComponent implements OnInit, OnChanges {
             return;
         }
 
+
+        console.log("crew segments length inside map segments to assignements", this.crewSegments);
         const newAssignments: CrewAssignment[] = [];
         for (const seg of this.segmentsForCrew) {
             if (!seg.plannedStartDate || !seg.plannedEndDate) continue;
@@ -121,7 +123,10 @@ export class ScheduleComponent implements OnInit, OnChanges {
                 });
             }
         }
+
         this.assignments = newAssignments;
+        console.log("new assignements: ", newAssignments)
+        console.log("ASSIGNEMENT: ", this.assignments.length)
         this.cdr.detectChanges();
     }
 
@@ -213,8 +218,14 @@ export class ScheduleComponent implements OnInit, OnChanges {
     loadCrewAssignements(crewId: number | null){
       this.segmentService.getCrewSchedule(crewId).subscribe((segments: Segment[]) => {
         this.crewSegments = segments;
+        this.segmentsForCrew = segments;
         this.cdr.detectChanges();
       });
+
+      this.mapSegmentsToAssignments();
+      this.assignments.map( assignement => console.log(assignement));
+
+
     }
 
     // Get assignments for a specific crew and date
@@ -293,7 +304,6 @@ export class ScheduleComponent implements OnInit, OnChanges {
       if ((this.today.getDate() == day.getDate()) && (this.today.getMonth() == day.getMonth()) && (this.today.getFullYear() == day.getFullYear())){
        return 'relative bg-[#2fb080]/10 p-2 border-r border-white/5 last:border-r-0 min-h-[120px] cursor-pointer transition-colors hover:bg-white/5'
       }
-      console.log('valor final fuera de la funcion: ', this.isDateInAssignement(day));
       if (this.isDateInAssignement(day)) {
         return 'relative bg-[#5D3140]/10 p-2 border-r border-white/5 last:border-r-0 min-h-[120px] cursor-pointer transition-colors hover:bg-white/5'
       }
@@ -320,10 +330,6 @@ export class ScheduleComponent implements OnInit, OnChanges {
         if (s.plannedStartDate && s.plannedEndDate && s.assignedCrewId){
           const startDate = new Date(s.plannedStartDate);
           const endDate = new Date(s.plannedEndDate);
-
-          console.log("Dia recorrido: ", day);
-          console.log("Dia planeado de segmento empezar: ", startDate);
-          console.log("Dia planeado de terminacion", endDate);
           return ((day >= startDate && day <= endDate ) && (this.selectedCrewId == s.assignedCrewId)) ? true : false;
         } else return false;
       })
